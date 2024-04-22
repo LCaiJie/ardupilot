@@ -1,0 +1,33 @@
+# MCU class and specific type
+MCU STM32F4xx STM32F405xx
+
+# crystal frequency
+OSCILLATOR_HZ 8000000
+
+# board ID for firmware load
+APJ_BOARD_ID 1223
+
+FLASH_SIZE_KB 1024
+
+# bootloader loads at start of flash
+FLASH_RESERVE_START_KB 0
+
+# location of application code
+FLASH_BOOTLOADER_LOAD_KB 16
+
+# uarts and USB to run bootloader protocol on
+SERIAL_ORDER OTG1 
+
+//PC4 VBUS INPUT OPENDRAIN
+
+# now we define the pins that USB is connected on
+PA11 OTG_FS_DM OTG1
+PA12 OTG_FS_DP OTG1
+
+# these are the pins for SWD debugging with a STlinkv2 or black-magic probe
+PA13 JTMS-SWDIO SWD
+PA14 JTCK-SWCLK SWD
+
+# define a LED
+PC14 LED_BOOTLOADER OUTPUT
+define HAL_LED_ON 0
