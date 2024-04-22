@@ -20,7 +20,6 @@
 #include "AP_Proximity_RPLidarA2.h"
 #include "AP_Proximity_TeraRangerTower.h"
 #include "AP_Proximity_TeraRangerTowerEvo.h"
-#include "AP_Proximity_RangeFinder.h"
 #include "AP_Proximity_MAV.h"
 #include "AP_Proximity_LightWareSF40C.h"
 #include "AP_Proximity_LightWareSF45B.h"
@@ -178,12 +177,6 @@ void AP_Proximity::init()
                 drivers[instance] = new AP_Proximity_TeraRangerTowerEvo(*this, state[instance], params[instance], serial_instance);
                 serial_instance++;
             }
-            break;
-#endif
-#if AP_PROXIMITY_RANGEFINDER_ENABLED
-        case Type::RangeFinder:
-            state[instance].instance = instance;
-            drivers[instance] = new AP_Proximity_RangeFinder(*this, state[instance], params[instance]);
             break;
 #endif
 #if AP_PROXIMITY_LIGHTWARE_SF40C_ENABLED

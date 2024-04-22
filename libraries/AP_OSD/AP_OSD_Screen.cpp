@@ -40,7 +40,6 @@
 #include <AP_OLC/AP_OLC.h>
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_Terrain/AP_Terrain.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_RPM/AP_RPM.h>
 #if APM_BUILD_TYPE(APM_BUILD_Rover)
@@ -2233,16 +2232,7 @@ void AP_OSD_Screen::draw_fence(uint8_t x, uint8_t y)
 
 void AP_OSD_Screen::draw_rngf(uint8_t x, uint8_t y)
 {
-    RangeFinder *rangefinder = RangeFinder::get_singleton();
-    if (rangefinder == nullptr) {
-       return;
-    }
-    if (rangefinder->status_orient(ROTATION_PITCH_270) < RangeFinder::Status::Good) {
-        backend->write(x, y, false, "%c---%c", SYMBOL(SYM_RNGFD), u_icon(DISTANCE));
-    } else {
-        const float distance = rangefinder->distance_orient(ROTATION_PITCH_270);
-        backend->write(x, y, false, "%c%4.1f%c", SYMBOL(SYM_RNGFD), u_scale(DISTANCE, distance), u_icon(DISTANCE));
-    }
+    return;
 }
 
 #define DRAW_SETTING(n) if (n.enabled) draw_ ## n(n.xpos, n.ypos)

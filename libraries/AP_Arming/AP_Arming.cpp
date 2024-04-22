@@ -33,7 +33,6 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_ADSB/AP_ADSB.h>
@@ -911,24 +910,6 @@ bool AP_Arming::mission_checks(bool report)
 }
 #endif  // AP_MISSION_ENABLED
 
-bool AP_Arming::rangefinder_checks(bool report)
-{
-    if (check_enabled(ARMING_CHECK_RANGEFINDER)) {
-        RangeFinder *range = RangeFinder::get_singleton();
-        if (range == nullptr) {
-            return true;
-        }
-
-        char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
-        if (!range->prearm_healthy(buffer, ARRAY_SIZE(buffer))) {
-            check_failed(ARMING_CHECK_RANGEFINDER, report, "%s", buffer);
-            return false;
-        }
-    }
-
-    return true;
-}
-
 bool AP_Arming::servo_checks(bool report) const
 {
 #if NUM_SERVO_CHANNELS
@@ -1459,9 +1440,6 @@ bool AP_Arming::pre_arm_checks(bool report)
 #endif
 #if AP_MISSION_ENABLED
         &  mission_checks(report)
-#endif
-#if AP_RANGEFINDER_ENABLED
-        &  rangefinder_checks(report)
 #endif
         &  servo_checks(report)
         &  board_voltage_checks(report)

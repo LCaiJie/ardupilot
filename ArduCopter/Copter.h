@@ -119,9 +119,6 @@
 #if AP_TERRAIN_AVAILABLE
  # include <AP_Terrain/AP_Terrain.h>
 #endif
-#if RANGEFINDER_ENABLED == ENABLED
- # include <AP_RangeFinder/AP_RangeFinder.h>
-#endif
 
 #if HAL_BUTTON_ENABLED
  # include <AP_Button/AP_Button.h>
@@ -810,11 +807,6 @@ private:
     void set_land_complete(bool b);
     void set_land_complete_maybe(bool b);
     void update_throttle_mix();
-
-#if AP_LANDINGGEAR_ENABLED
-    // landing_gear.cpp
-    void landinggear_update();
-#endif
 
     // standby.cpp
     void standby_update();

@@ -243,9 +243,6 @@
 #define AP_BATT_MONITOR_BATTERY_CAPACITY 0
 #endif
 
-#ifndef RANGEFINDER_MAX_INSTANCES
-#define RANGEFINDER_MAX_INSTANCES 1
-#endif
 
 // by default AP_Periphs don't use INS:
 #ifndef AP_INERTIALSENSOR_ENABLED

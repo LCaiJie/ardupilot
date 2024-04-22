@@ -25,7 +25,6 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Common/Location.h>

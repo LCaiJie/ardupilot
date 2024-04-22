@@ -624,12 +624,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_Mission/AP_Mission.cpp
     GOBJECTN(mode_auto.mission, mission, "MIS_", AP_Mission),
 #endif
-    
-#if RANGEFINDER_ENABLED == ENABLED
-    // @Group: RNGFND
-    // @Path: ../libraries/AP_RangeFinder/AP_RangeFinder.cpp
-    GOBJECT(rangefinder,   "RNGFND", RangeFinder),
-#endif
 
 #if AP_TERRAIN_AVAILABLE
     // @Group: TERRAIN_
@@ -982,18 +976,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Bitmask: 0:Disable thrust loss check, 1:Disable yaw imbalance warning, 2:Release gripper on thrust loss
     // @User: Advanced
     AP_GROUPINFO("FLIGHT_OPTIONS", 44, ParametersG2, flight_options, 0),
-
-#if RANGEFINDER_ENABLED == ENABLED
-    // @Param: RNGFND_FILT
-    // @DisplayName: Rangefinder filter
-    // @Description: Rangefinder filter to smooth distance.  Set to zero to disable filtering
-    // @Units: Hz
-    // @Range: 0 5
-    // @Increment: 0.05
-    // @User: Standard
-    // @RebootRequired: True
-    AP_GROUPINFO("RNGFND_FILT", 45, ParametersG2, rangefinder_filt, RANGEFINDER_FILT_DEFAULT),
-#endif
 
 #if MODE_GUIDED_ENABLED == ENABLED
     // @Param: GUID_TIMEOUT

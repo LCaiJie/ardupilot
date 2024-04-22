@@ -24,7 +24,6 @@
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_RTC/AP_RTC.h>
 #include <GCS_MAVLink/GCS.h>
@@ -536,13 +535,6 @@ void AP_MSP_Telem_Backend::msp_handle_opflow(const MSP::msp_opflow_data_message_
 
 void AP_MSP_Telem_Backend::msp_handle_rangefinder(const MSP::msp_rangefinder_data_message_t &pkt)
 {
-#if HAL_MSP_RANGEFINDER_ENABLED
-    RangeFinder *rangefinder = AP::rangefinder();
-    if (rangefinder == nullptr) {
-        return;
-    }
-    rangefinder->handle_msp(pkt);
-#endif
 }
 
 void AP_MSP_Telem_Backend::msp_handle_gps(const MSP::msp_gps_data_message_t &pkt)

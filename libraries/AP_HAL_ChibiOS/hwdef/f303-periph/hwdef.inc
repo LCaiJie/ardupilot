@@ -117,7 +117,6 @@ define HAL_I2C_INTERNAL_MASK 0
 define GPS_MAX_RECEIVERS 1
 define GPS_MAX_INSTANCES 1
 define HAL_COMPASS_MAX_SENSORS 1
-define RANGEFINDER_MAX_INSTANCES 1
 
 
 # keep ROMFS uncompressed as we don't have enough RAM

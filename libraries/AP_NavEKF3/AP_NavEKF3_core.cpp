@@ -131,10 +131,6 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     if(frontend->sources.gps_yaw_enabled() && !storedYawAng.init(obs_buffer_length)) {
         return false;
     }
-    // Note: the use of dual range finders potentially doubles the amount of data to be stored
-    if(dal.rangefinder() && !storedRange.init(MIN(2*obs_buffer_length , imu_buffer_length))) {
-        return false;
-    }
     // Note: range beacon data is read one beacon at a time and can arrive at a high rate
 #if EK3_FEATURE_EXTERNAL_NAV
     if (frontend->sources.ext_nav_enabled() && !storedExtNav.init(extnav_buffer_length)) {
@@ -328,9 +324,6 @@ void NavEKF3_core::InitialiseVariables()
     memset(&filterStatus, 0, sizeof(filterStatus));
     activeHgtSource = AP_NavEKF_Source::SourceZ::BARO;
     prevHgtSource = activeHgtSource;
-    memset(&rngMeasIndex, 0, sizeof(rngMeasIndex));
-    memset(&storedRngMeasTime_ms, 0, sizeof(storedRngMeasTime_ms));
-    memset(&storedRngMeas, 0, sizeof(storedRngMeas));
     terrainHgtStable = true;
     ekfOriginHgtVar = 0.0f;
     ekfGpsRefHgt = 0.0;

@@ -263,15 +263,8 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
                 return false;
                 break;
             case AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER:
-                if (!copter.rangefinder_state.enabled || !copter.rangefinder.has_orientation(ROTATION_PITCH_270)) {
-                    check_failed(ARMING_CHECK_PARAMETERS, display_failure, failure_template, "no rangefinder");
+                    check_failed(ARMING_CHECK_PARAMETERS, display_failure, failure_template, "no TERRAIN_FROM_RANGEFINDER");
                     return false;
-                }
-                // check if RTL_ALT is higher than rangefinder's max range
-                if (copter.g.rtl_altitude > copter.rangefinder.max_distance_cm_orient(ROTATION_PITCH_270)) {
-                    check_failed(ARMING_CHECK_PARAMETERS, display_failure, failure_template, "RTL_ALT>RNGFND_MAX_CM");
-                    return false;
-                }
                 break;
             case AC_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE:
                 // these checks are done in AP_Arming

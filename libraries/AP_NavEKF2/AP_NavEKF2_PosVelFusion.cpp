@@ -944,23 +944,7 @@ void NavEKF2_core::selectHeightForFusion()
 {
     // Read range finder data and check for new data in the buffer
     // This data is used by both height and optical flow fusion processing
-    readRangeFinder();
     rangeDataToFuse = storedRange.recall(rangeDataDelayed,imuDataDelayed.time_ms);
-
-    // correct range data for the body frame position offset relative to the IMU
-    // the corrected reading is the reading that would have been taken if the sensor was
-    // co-located with the IMU
-    const auto *_rng = dal.rangefinder();
-    if (_rng && rangeDataToFuse) {
-        const auto *sensor = _rng->get_backend(rangeDataDelayed.sensor_idx);
-        if (sensor != nullptr) {
-            Vector3F posOffsetBody = sensor->get_pos_offset().toftype() - accelPosOffset;
-            if (!posOffsetBody.is_zero()) {
-                Vector3F posOffsetEarth = prevTnb.mul_transpose(posOffsetBody);
-                rangeDataDelayed.rng += posOffsetEarth.z / prevTnb.c.z;
-            }
-        }
-    }
 
     // read baro height data from the sensor and check for new data in the buffer
     readBaroData();
@@ -971,39 +955,6 @@ void NavEKF2_core::selectHeightForFusion()
     if (extNavUsedForPos) {
         // always use external navigation as the height source if using for position.
         activeHgtSource = HGT_SOURCE_EXTNAV;
-    } else if ((frontend->_altSource == 1) && _rng && rangeFinderDataIsFresh) {
-        // user has specified the range finder as a primary height source
-        activeHgtSource = HGT_SOURCE_RNG;
-    } else if ((frontend->_useRngSwHgt > 0) && ((frontend->_altSource == 0) || (frontend->_altSource == 2)) && _rng && rangeFinderDataIsFresh) {
-        // determine if we are above or below the height switch region
-        ftype rangeMaxUse = 1e-4f * (float)_rng->max_distance_cm_orient(ROTATION_PITCH_270) * (ftype)frontend->_useRngSwHgt;
-        bool aboveUpperSwHgt = (terrainState - stateStruct.position.z) > rangeMaxUse;
-        bool belowLowerSwHgt = (terrainState - stateStruct.position.z) < 0.7f * rangeMaxUse;
-
-        // If the terrain height is consistent and we are moving slowly, then it can be
-        // used as a height reference in combination with a range finder
-        // apply a hysteresis to the speed check to prevent rapid switching
-        ftype horizSpeed = stateStruct.velocity.xy().length();
-        bool dontTrustTerrain = ((horizSpeed > frontend->_useRngSwSpd) && filterStatus.flags.horiz_vel) || !terrainHgtStable;
-        ftype trust_spd_trigger = MAX((frontend->_useRngSwSpd - 1.0f),(frontend->_useRngSwSpd * 0.5f));
-        bool trustTerrain = (horizSpeed < trust_spd_trigger) && terrainHgtStable;
-
-        /*
-            * Switch between range finder and primary height source using height above ground and speed thresholds with
-            * hysteresis to avoid rapid switching. Using range finder for height requires a consistent terrain height
-            * which cannot be assumed if the vehicle is moving horizontally.
-        */
-        if ((aboveUpperSwHgt || dontTrustTerrain) && (activeHgtSource == HGT_SOURCE_RNG)) {
-            // cannot trust terrain or range finder so stop using range finder height
-            if (frontend->_altSource == 0) {
-                activeHgtSource = HGT_SOURCE_BARO;
-            } else if (frontend->_altSource == 2) {
-                activeHgtSource = HGT_SOURCE_GPS;
-            }
-        } else if (belowLowerSwHgt && trustTerrain && (prevTnb.c.z >= 0.7f)) {
-            // reliable terrain and range finder so start using range finder height
-            activeHgtSource = HGT_SOURCE_RNG;
-        }
     } else if (frontend->_altSource == 0) {
         activeHgtSource = HGT_SOURCE_BARO;
     } else if ((frontend->_altSource == 2) && ((imuSampleTime_ms - lastTimeGpsReceived_ms) < 500) && validOrigin && gpsAccuracyGood) {

@@ -108,12 +108,6 @@
 #define WIND_VEL_VARIANCE_MAX 400.0f
 #define WIND_VEL_VARIANCE_MIN 0.25f
 
-// maximum number of downward facing rangefinder instances available
-#if RANGEFINDER_MAX_INSTANCES > 1
-#define DOWNWARD_RANGEFINDER_MAX_INSTANCES 2
-#else
-#define DOWNWARD_RANGEFINDER_MAX_INSTANCES 1
-#endif
 
 // number of continuous valid GPS velocity samples required to reset yaw
 #define GPS_VEL_YAW_ALIGN_COUNT_THRESHOLD 5
@@ -902,10 +896,6 @@ private:
     // update inflight calculaton that determines if GPS data is good enough for reliable navigation
     void calcGpsGoodForFlight(void);
 
-    // Read the range finder and take new measurements if available
-    // Apply a median filter to range finder data
-    void readRangeFinder();
-
     // check if the vehicle has taken off during optical flow navigation by looking at inertial and range finder data
     void detectOptFlowTakeoff(void);
 
@@ -1272,9 +1262,6 @@ private:
     ftype rngOnGnd;                         // Expected range finder reading in metres when vehicle is on ground
     uint32_t lastRngMeasTime_ms;            // Timestamp of last range measurement
     bool terrainHgtStable;                  // true when the terrain height is stable enough to be used as a height reference
-    ftype storedRngMeas[DOWNWARD_RANGEFINDER_MAX_INSTANCES][3];              // Ringbuffer of stored range measurements for dual range sensors
-    uint32_t storedRngMeasTime_ms[DOWNWARD_RANGEFINDER_MAX_INSTANCES][3];    // Ringbuffers of stored range measurement times for dual range sensors
-    uint8_t rngMeasIndex[DOWNWARD_RANGEFINDER_MAX_INSTANCES];                // Current range measurement ringbuffer index for dual range sensors
 
     // body frame odometry fusion
 #if EK3_FEATURE_BODY_ODOM

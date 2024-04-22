@@ -7,7 +7,6 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <GCS_MAVLink/GCS_Dummy.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Baro/AP_Baro.h>

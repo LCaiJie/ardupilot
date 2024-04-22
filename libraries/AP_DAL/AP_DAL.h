@@ -3,7 +3,6 @@
 #include "AP_DAL_InertialSensor.h"
 #include "AP_DAL_Baro.h"
 #include "AP_DAL_GPS.h"
-#include "AP_DAL_RangeFinder.h"
 #include "AP_DAL_Compass.h"
 #include "AP_DAL_Airspeed.h"
 #include "AP_DAL_VisualOdom.h"
@@ -130,9 +129,6 @@ public:
     AP_DAL_Baro &baro() { return _baro; }
     AP_DAL_GPS &gps() { return _gps; }
 
-    AP_DAL_RangeFinder *rangefinder() {
-        return _rangefinder;
-    }
     AP_DAL_Airspeed *airspeed() {
         return _airspeed;
     }
@@ -255,16 +251,8 @@ public:
     }
 
     void handle_message(const log_RRNH &msg) {
-        if (_rangefinder == nullptr) {
-            _rangefinder = new AP_DAL_RangeFinder;
-        }
-        _rangefinder->handle_message(msg);
     }
     void handle_message(const log_RRNI &msg) {
-        if (_rangefinder == nullptr) {
-            _rangefinder = new AP_DAL_RangeFinder;
-        }
-        _rangefinder->handle_message(msg);
     }
 
     void handle_message(const log_RGPH &msg) {
@@ -340,7 +328,6 @@ private:
     AP_DAL_InertialSensor _ins;
     AP_DAL_Baro _baro;
     AP_DAL_GPS _gps;
-    AP_DAL_RangeFinder *_rangefinder;
     AP_DAL_Compass _compass;
     AP_DAL_Airspeed *_airspeed;
 #if HAL_VISUALODOM_ENABLED

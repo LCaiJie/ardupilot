@@ -1115,23 +1115,11 @@ void NavEKF3_core::selectHeightForFusion()
 {
     // Read range finder data and check for new data in the buffer
     // This data is used by both height and optical flow fusion processing
-    readRangeFinder();
     rangeDataToFuse = storedRange.recall(rangeDataDelayed,imuDataDelayed.time_ms);
 
     // correct range data for the body frame position offset relative to the IMU
     // the corrected reading is the reading that would have been taken if the sensor was
     // co-located with the IMU
-    const auto *_rng = dal.rangefinder();
-    if (_rng && rangeDataToFuse) {
-        auto *sensor = _rng->get_backend(rangeDataDelayed.sensor_idx);
-        if (sensor != nullptr) {
-            Vector3F posOffsetBody = sensor->get_pos_offset().toftype() - accelPosOffset;
-            if (!posOffsetBody.is_zero()) {
-                Vector3F posOffsetEarth = prevTnb.mul_transpose(posOffsetBody);
-                rangeDataDelayed.rng += posOffsetEarth.z / prevTnb.c.z;
-            }
-        }
-    }
 
     // read baro height data from the sensor and check for new data in the buffer
     readBaroData();
@@ -1145,47 +1133,6 @@ void NavEKF3_core::selectHeightForFusion()
     if ((frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::NONE)) {
         // user has specified no height sensor
         activeHgtSource = AP_NavEKF_Source::SourceZ::NONE;
-    } else if ((frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::RANGEFINDER) && _rng && rangeFinderDataIsFresh) {
-        // user has specified the range finder as a primary height source
-        activeHgtSource = AP_NavEKF_Source::SourceZ::RANGEFINDER;
-    } else if ((frontend->_useRngSwHgt > 0) && ((frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::BARO) || (frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::GPS)) && _rng && rangeFinderDataIsFresh) {
-        // determine if we are above or below the height switch region
-        ftype rangeMaxUse = 1e-4 * (ftype)_rng->max_distance_cm_orient(ROTATION_PITCH_270) * (ftype)frontend->_useRngSwHgt;
-        bool aboveUpperSwHgt = (terrainState - stateStruct.position.z) > rangeMaxUse;
-        bool belowLowerSwHgt = ((terrainState - stateStruct.position.z) < 0.7f * rangeMaxUse) && (imuSampleTime_ms - gndHgtValidTime_ms < 1000);
-
-        // If the terrain height is consistent and we are moving slowly, then it can be
-        // used as a height reference in combination with a range finder
-        // apply a hysteresis to the speed check to prevent rapid switching
-        bool dontTrustTerrain, trustTerrain;
-        if (filterStatus.flags.horiz_vel) {
-            // We can use the velocity estimate
-            ftype horizSpeed = stateStruct.velocity.xy().length();
-            dontTrustTerrain = (horizSpeed > frontend->_useRngSwSpd) || !terrainHgtStable;
-            ftype trust_spd_trigger = MAX((frontend->_useRngSwSpd - 1.0f),(frontend->_useRngSwSpd * 0.5f));
-            trustTerrain = (horizSpeed < trust_spd_trigger) && terrainHgtStable;
-        } else {
-            // We can't use the velocity estimate
-            dontTrustTerrain = !terrainHgtStable;
-            trustTerrain = terrainHgtStable;
-        }
-
-        /*
-            * Switch between range finder and primary height source using height above ground and speed thresholds with
-            * hysteresis to avoid rapid switching. Using range finder for height requires a consistent terrain height
-            * which cannot be assumed if the vehicle is moving horizontally.
-        */
-        if ((aboveUpperSwHgt || dontTrustTerrain) && (activeHgtSource == AP_NavEKF_Source::SourceZ::RANGEFINDER)) {
-            // cannot trust terrain or range finder so stop using range finder height
-            if (frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::BARO) {
-                activeHgtSource = AP_NavEKF_Source::SourceZ::BARO;
-            } else if (frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::GPS) {
-                activeHgtSource = AP_NavEKF_Source::SourceZ::GPS;
-            }
-        } else if (belowLowerSwHgt && trustTerrain && (prevTnb.c.z >= 0.7f)) {
-            // reliable terrain and range finder so start using range finder height
-            activeHgtSource = AP_NavEKF_Source::SourceZ::RANGEFINDER;
-        }
     } else if (frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::BARO) {
         activeHgtSource = AP_NavEKF_Source::SourceZ::BARO;
     } else if ((frontend->sources.getPosZSource() == AP_NavEKF_Source::SourceZ::GPS) && ((imuSampleTime_ms - lastTimeGpsReceived_ms) < 500) && validOrigin && gpsAccuracyGood) {

@@ -350,8 +350,6 @@ private:
     void update_land_and_crash_detectors();
     void update_land_detector();
 
-    // landing_gear.cpp
-    void landinggear_update();
 
 #if HAL_LOGGING_ENABLED
     // Log.cpp

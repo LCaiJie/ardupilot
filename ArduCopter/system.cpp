@@ -132,11 +132,6 @@ void Copter::init_ardupilot()
     barometer.set_log_baro_bit(MASK_LOG_IMU);
     barometer.calibrate();
 
-#if RANGEFINDER_ENABLED == ENABLED
-    // initialise rangefinder
-    init_rangefinder();
-#endif
-
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();

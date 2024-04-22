@@ -181,7 +181,6 @@ class TestBuildOptions(object):
                 # the following defines are known not to work on some
                 # or all vehicles:
                 feature_define_whitelist = set([
-                    'AP_RANGEFINDER_ENABLED',  # only at vehicle level ATM
                     'AC_AVOID_ENABLED',  # Rover doesn't obey this
                     'AC_OAPATHPLANNER_ENABLED',   # Rover doesn't obey this
                 ])

@@ -54,9 +54,6 @@ public:
 #if AP_PROXIMITY_TERARANGERTOWER_ENABLED
         TRTOWER = 3,
 #endif
-#if AP_PROXIMITY_RANGEFINDER_ENABLED
-        RangeFinder = 4,
-#endif
 #if AP_PROXIMITY_RPLIDARA2_ENABLED
         RPLidarA2 = 5,
 #endif

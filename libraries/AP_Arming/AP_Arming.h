@@ -204,8 +204,6 @@ protected:
     // all data loaded
     virtual bool terrain_database_required() const;
 
-    bool rangefinder_checks(bool report);
-
     bool fence_checks(bool report);
 
 #if HAL_HAVE_IMU_HEATER

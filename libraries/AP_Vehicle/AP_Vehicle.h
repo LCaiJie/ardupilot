@@ -38,7 +38,6 @@
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Notify/AP_Notify.h>                    // Notify library
 #include <AP_Param/AP_Param.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Relay/AP_Relay.h>                      // APM relay
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
@@ -295,7 +294,6 @@ protected:
 #if HAL_BUTTON_ENABLED
     AP_Button button;
 #endif
-    RangeFinder rangefinder;
 
 #if HAL_GYROFFT_ENABLED
     AP_GyroFFT gyro_fft;

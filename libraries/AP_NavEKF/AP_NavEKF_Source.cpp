@@ -329,7 +329,6 @@ bool AP_NavEKF_Source::pre_arm_check(bool requires_position, char *failure_msg, 
     bool beacon_required = false;
     bool compass_required = false;
     bool gps_required = false;
-    bool rangefinder_required = false;
     bool visualodom_required = false;
     bool optflow_required = false;
     bool wheelencoder_required = false;
@@ -388,7 +387,6 @@ bool AP_NavEKF_Source::pre_arm_check(bool requires_position, char *failure_msg, 
                 baro_required = true;
                 break;
             case SourceZ::RANGEFINDER:
-                rangefinder_required = true;
                 break;
             case SourceZ::GPS:
                 gps_required = true;
@@ -479,11 +477,6 @@ bool AP_NavEKF_Source::pre_arm_check(bool requires_position, char *failure_msg, 
 
     if (optflow_required && !dal.opticalflow_enabled()) {
         hal.util->snprintf(failure_msg, failure_msg_len, ekf_requires_msg, "OpticalFlow");
-        return false;
-    }
-
-    if (rangefinder_required && (dal.rangefinder() == nullptr || !dal.rangefinder()->has_orientation(ROTATION_PITCH_270))) {
-        hal.util->snprintf(failure_msg, failure_msg_len, ekf_requires_msg, "RangeFinder");
         return false;
     }
 

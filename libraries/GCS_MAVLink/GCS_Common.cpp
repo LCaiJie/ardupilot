@@ -32,8 +32,6 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
-#include <AP_RangeFinder/AP_RangeFinder_Backend.h>
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Gripper/AP_Gripper.h>
 #include <AC_Sprayer/AC_Sprayer.h>
@@ -370,109 +368,16 @@ bool GCS_MAVLINK::send_battery_status()
 }
 #endif  // AP_BATTERY_ENABLED
 
-#if AP_RANGEFINDER_ENABLED
-void GCS_MAVLINK::send_distance_sensor(const AP_RangeFinder_Backend *sensor, const uint8_t instance) const
-{
-    if (!sensor->has_data()) {
-        return;
-    }
-
-    int8_t quality_pct = sensor->signal_quality_pct();
-    // ardupilot defines this field as -1 is unknown, 0 is poor, 100 is excellent
-    // mavlink defines this field as 0 is unknown, 1 is invalid, 100 is perfect
-    uint8_t quality;
-    if (quality_pct == RangeFinder::SIGNAL_QUALITY_UNKNOWN) {
-        quality = 0;
-    } else if (quality_pct > 1 && quality_pct <= RangeFinder::SIGNAL_QUALITY_MAX) {
-        quality = quality_pct;
-    } else {
-        quality = 1;
-    }
-
-    mavlink_msg_distance_sensor_send(
-        chan,
-        AP_HAL::millis(),                        // time since system boot TODO: take time of measurement
-        sensor->min_distance_cm(),               // minimum distance the sensor can measure in centimeters
-        sensor->max_distance_cm(),               // maximum distance the sensor can measure in centimeters
-        sensor->distance_cm(),                   // current distance reading
-        sensor->get_mav_distance_sensor_type(),  // type from MAV_DISTANCE_SENSOR enum
-        instance,                                // onboard ID of the sensor == instance
-        sensor->orientation(),                   // direction the sensor faces from MAV_SENSOR_ORIENTATION enum
-        0,                                       // Measurement covariance in centimeters, 0 for unknown / invalid readings
-        0,                                       // horizontal FOV
-        0,                                       // vertical FOV
-        (const float *)nullptr,                  // quaternion of sensor orientation for MAV_SENSOR_ROTATION_CUSTOM
-        quality);                                // Signal quality of the sensor. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.
-}
-#endif  // AP_RANGEFINDER_ENABLED
-
 // send any and all distance_sensor messages.  This starts by sending
 // any distance sensors not used by a Proximity sensor, then sends the
 // proximity sensor ones.
 void GCS_MAVLINK::send_distance_sensor()
 {
-#if AP_RANGEFINDER_ENABLED
-    RangeFinder *rangefinder = RangeFinder::get_singleton();
-    if (rangefinder == nullptr) {
-        return;
-    }
-
-    // if we have a proximity backend that utilizes rangefinders cull
-    // sending them here, and allow the later proximity code to manage
-    // them
-    bool filter_possible_proximity_sensors = false;
-
-#if HAL_PROXIMITY_ENABLED
-    AP_Proximity *proximity = AP_Proximity::get_singleton();
-    if (proximity != nullptr) {
-        for (uint8_t i = 0; i < proximity->num_sensors(); i++) {
-#if AP_PROXIMITY_RANGEFINDER_ENABLED
-            if (proximity->get_type(i) == AP_Proximity::Type::RangeFinder) {
-                filter_possible_proximity_sensors = true;
-            }
-#endif
-        }
-    }
-#endif
-
-    for (uint8_t i = 0; i < RANGEFINDER_MAX_INSTANCES; i++) {
-        if (!HAVE_PAYLOAD_SPACE(chan, DISTANCE_SENSOR)) {
-            return;
-        }
-        AP_RangeFinder_Backend *sensor = rangefinder->get_backend(i);
-        if (sensor == nullptr) {
-            continue;
-        }
-        enum Rotation orient = sensor->orientation();
-        if (!filter_possible_proximity_sensors ||
-            (orient > ROTATION_YAW_315 && orient != ROTATION_PITCH_90)) {
-            send_distance_sensor(sensor, i);
-        }
-    }
-#endif  // AP_RANGEFINDER_ENABLED
 
 #if HAL_PROXIMITY_ENABLED
     send_proximity();
 #endif
 }
-
-#if AP_RANGEFINDER_ENABLED
-void GCS_MAVLINK::send_rangefinder() const
-{
-    RangeFinder *rangefinder = RangeFinder::get_singleton();
-    if (rangefinder == nullptr) {
-        return;
-    }
-    AP_RangeFinder_Backend *s = rangefinder->find_instance(ROTATION_PITCH_270);
-    if (s == nullptr) {
-        return;
-    }
-    mavlink_msg_rangefinder_send(
-            chan,
-            s->distance(),
-            s->voltage_mv() * 0.001f);
-}
-#endif
 
 #if HAL_PROXIMITY_ENABLED
 void GCS_MAVLINK::send_proximity()
@@ -972,9 +877,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_AHRS2,                 MSG_AHRS2},
         { MAVLINK_MSG_ID_HWSTATUS,              MSG_HWSTATUS},
         { MAVLINK_MSG_ID_WIND,                  MSG_WIND},
-#if AP_RANGEFINDER_ENABLED
-        { MAVLINK_MSG_ID_RANGEFINDER,           MSG_RANGEFINDER},
-#endif
         { MAVLINK_MSG_ID_DISTANCE_SENSOR,       MSG_DISTANCE_SENSOR},
             // request also does report:
         { MAVLINK_MSG_ID_TERRAIN_REQUEST,       MSG_TERRAIN},
@@ -1019,9 +921,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #endif
 #if HAL_WITH_ESC_TELEM
         { MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4,  MSG_ESC_TELEMETRY},
-#endif
-#if AP_RANGEFINDER_ENABLED && APM_BUILD_TYPE(APM_BUILD_Rover)
-        { MAVLINK_MSG_ID_WATER_DEPTH,           MSG_WATER_DEPTH},
 #endif
 #if HAL_HIGH_LATENCY2_ENABLED
         { MAVLINK_MSG_ID_HIGH_LATENCY2,         MSG_HIGH_LATENCY2},
@@ -3778,13 +3677,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_mag_cal(const mavlink_command_int_t &pack
 
 void GCS_MAVLINK::handle_distance_sensor(const mavlink_message_t &msg)
 {
-#if AP_RANGEFINDER_ENABLED
-    RangeFinder *rangefinder = AP::rangefinder();
-    if (rangefinder != nullptr) {
-        rangefinder->handle_msg(msg);
-    }
-#endif
-
 #if HAL_PROXIMITY_ENABLED
     AP_Proximity *proximity = AP::proximity();
     if (proximity != nullptr) {
@@ -5380,57 +5272,6 @@ void GCS_MAVLINK::send_generator_status() const
 }
 #endif
 
-#if AP_RANGEFINDER_ENABLED && APM_BUILD_TYPE(APM_BUILD_Rover)
-void GCS_MAVLINK::send_water_depth() const
-{
-    if (!HAVE_PAYLOAD_SPACE(chan, WATER_DEPTH)) {
-        return;
-    }
-
-    RangeFinder *rangefinder = RangeFinder::get_singleton();
-
-    if (rangefinder == nullptr || !rangefinder->has_orientation(ROTATION_PITCH_270)){
-        return;
-    } 
-
-    // get position
-    const AP_AHRS &ahrs = AP::ahrs();
-    Location loc;
-    IGNORE_RETURN(ahrs.get_location(loc));
-
-    for (uint8_t i=0; i<rangefinder->num_sensors(); i++) {
-        const AP_RangeFinder_Backend *s = rangefinder->get_backend(i);
-        
-        if (s == nullptr || s->orientation() != ROTATION_PITCH_270 || !s->has_data()) {
-            continue;
-        }
-
-        // get temperature
-        float temp_C;
-        if (!s->get_temp(temp_C)) {
-            temp_C = 0.0f;
-        }
-
-        const bool sensor_healthy = (s->status() == RangeFinder::Status::Good);
-
-        mavlink_msg_water_depth_send(
-            chan,
-            AP_HAL::millis(),   // time since system boot TODO: take time of measurement
-            i,                  // rangefinder instance
-            sensor_healthy,     // sensor healthy
-            loc.lat,            // latitude of vehicle
-            loc.lng,            // longitude of vehicle
-            loc.alt * 0.01f,    // altitude of vehicle (MSL)
-            ahrs.get_roll(),    // roll in radians
-            ahrs.get_pitch(),   // pitch in radians
-            ahrs.get_yaw(),     // yaw in radians
-            s->distance(),    // distance in meters
-            temp_C);            // temperature in degC
-    }
-
-}
-#endif  // AP_RANGEFINDER_ENABLED && APM_BUILD_TYPE(APM_BUILD_Rover)
-
 #if HAL_ADSB_ENABLED
 void GCS_MAVLINK::send_uavionix_adsb_out_status() const
 {
@@ -5623,13 +5464,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_FENCE_STATUS:
         CHECK_PAYLOAD_SIZE(FENCE_STATUS);
         send_fence_status();
-        break;
-#endif
-
-#if AP_RANGEFINDER_ENABLED
-    case MSG_RANGEFINDER:
-        CHECK_PAYLOAD_SIZE(RANGEFINDER);
-        send_rangefinder();
         break;
 #endif
 
@@ -5831,13 +5665,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         }
         break;
     }
-#endif
-
-#if AP_RANGEFINDER_ENABLED && APM_BUILD_TYPE(APM_BUILD_Rover)
-    case MSG_WATER_DEPTH:
-        CHECK_PAYLOAD_SIZE(WATER_DEPTH);
-        send_water_depth();
-        break;
 #endif
 
 #if HAL_HIGH_LATENCY2_ENABLED

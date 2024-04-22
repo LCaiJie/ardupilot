@@ -101,18 +101,6 @@ void GCS_Copter::update_vehicle_sensor_status_flags(void)
     }
 #endif
 
-#if RANGEFINDER_ENABLED == ENABLED
-    const RangeFinder *rangefinder = RangeFinder::get_singleton();
-    if (rangefinder && rangefinder->has_orientation(ROTATION_PITCH_270)) {
-        control_sensors_present |= MAV_SYS_STATUS_SENSOR_LASER_POSITION;
-    }
-    if (copter.rangefinder_state.enabled) {
-        control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_LASER_POSITION;
-        if (rangefinder && rangefinder->has_data_orient(ROTATION_PITCH_270)) {
-            control_sensors_health |= MAV_SYS_STATUS_SENSOR_LASER_POSITION;
-        }
-    }
-#endif
 
 #if AC_PRECLAND_ENABLED
     if (copter.precland.enabled()) {
