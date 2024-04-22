@@ -819,12 +819,6 @@ private:
     void log_rxm_raw(const struct ubx_rxm_raw &raw);
     void log_rxm_rawx(const struct ubx_rxm_rawx &raw);
 
-#if GPS_MOVING_BASELINE
-    // see if we should use uart2 for moving baseline config
-    bool mb_use_uart2(void) const {
-        return option_set(AP_GPS::DriverOptions::UBX_MBUseUart2)?true:false;
-    }
-#endif
 
     // structure for list of config key/value pairs for
     // specific configurations
@@ -862,19 +856,6 @@ private:
         uint8_t layers;
         int8_t fetch_index;
     } active_config;
-
-#if GPS_MOVING_BASELINE
-    // config for moving baseline base
-    static const config_list config_MB_Base_uart1[];
-    static const config_list config_MB_Base_uart2[];
-
-    // config for moving baseline rover
-    static const config_list config_MB_Rover_uart1[];
-    static const config_list config_MB_Rover_uart2[];
-
-    // RTCM3 parser for when in moving baseline base mode
-    RTCM3_Parser *rtcm3_parser;
-#endif // GPS_MOVING_BASELINE
 
     bool supports_l5;
     static const config_list config_M10[];

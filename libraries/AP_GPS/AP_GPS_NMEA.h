@@ -137,11 +137,6 @@ private:
 
     // parse VERSIONA field
     void parse_versiona_field(uint16_t term_number, const char *term);
-
-#if GPS_MOVING_BASELINE
-    // parse UNIHEADINGA field
-    void parse_uniheadinga_field(uint16_t term_number, const char *term);
-#endif
 #endif
 
 
@@ -245,15 +240,6 @@ private:
     } _versiona;
     bool _have_unicore_versiona;
 
-#if GPS_MOVING_BASELINE
-    // unicore UNIHEADINGA parsing
-    struct {
-        float baseline_length;
-        float heading;
-        float pitch;
-        float heading_sd;
-    } _uniheadinga;
-#endif
 #endif // AP_GPS_NMEA_UNICORE_ENABLED
     bool _expect_agrica;
 

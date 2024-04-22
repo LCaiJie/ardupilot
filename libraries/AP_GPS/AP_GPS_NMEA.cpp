@@ -483,28 +483,6 @@ bool AP_GPS_NMEA::_term_complete()
                 break;
             }
             case _GPS_SENTENCE_UNIHEADINGA: {
-#if GPS_MOVING_BASELINE
-                const auto &ag = _agrica;
-                const auto &uh = _uniheadinga;
-                if (now - _last_AGRICA_ms > 500 || ag.heading_status != 4) {
-                    // we need heading_status from AGRICA
-                    state.have_gps_yaw = false;
-                    break;
-                }
-                const float dist = uh.baseline_length;
-                const float bearing = uh.heading;
-                const float alt_diff = dist*tanf(radians(-uh.pitch));
-                state.relPosHeading = bearing;
-                state.relPosLength = dist;
-                state.relPosD = alt_diff;
-                state.relposheading_ts = now;
-                if (calculate_moving_base_yaw(bearing, dist, alt_diff)) {
-                    state.have_gps_yaw_accuracy = true;
-                    state.gps_yaw_accuracy = uh.heading_sd;
-                    _last_yaw_ms = now;
-                }
-                state.gps_yaw_configured = true;
-#endif // GPS_MOVING_BASELINE
                 break;
             }
 #endif // AP_GPS_NMEA_UNICORE_ENABLED
@@ -664,11 +642,6 @@ bool AP_GPS_NMEA::_term_complete()
         case _GPS_SENTENCE_VERSIONA + 1 ... _GPS_SENTENCE_VERSIONA + 20:
             parse_versiona_field(_term_number, _term);
             break;
-#if GPS_MOVING_BASELINE
-        case _GPS_SENTENCE_UNIHEADINGA + 1 ... _GPS_SENTENCE_UNIHEADINGA + 28: // UNIHEADINGA message
-            parse_uniheadinga_field(_term_number, _term);
-            break;
-#endif
 #endif
         }
     }
@@ -733,41 +706,6 @@ void AP_GPS_NMEA::parse_agrica_field(uint16_t term_number, const char *term)
         break;
     }
 }
-
-#if GPS_MOVING_BASELINE
-/*
-  parse a UNIHEADINGA message term
-
-  Example:
-    #UNIHEADINGA,79,GPS,FINE,2242,167498200,0,0,18,22;SOL_COMPUTED,L1_INT,2.7889,296.7233,-25.7710,0.0000,0.1127,0.1812,"999",49,37,37,0,3,00,1,51*d50af0ea
- */
-void AP_GPS_NMEA::parse_uniheadinga_field(uint16_t term_number, const char *term)
-{
-    const uint8_t hdr_align = 8;
-    if (term_number < hdr_align) {
-        // discard header;
-        return;
-    }
-    term_number -= hdr_align;
-    // useful for debugging
-    // ::printf("UNIHEADINGA[%u]=%s\n", unsigned(term_number), term);
-    auto &uh = _uniheadinga;
-    switch (term_number) {
-    case 4:
-        uh.baseline_length = atof(term);
-        break;
-    case 5:
-        uh.heading = atof(term);
-        break;
-    case 6:
-        uh.pitch = atof(term);
-        break;
-    case 8:
-        uh.heading_sd = atof(term);
-        break;
-    }
-}
-#endif // GPS_MOVING_BASELINE
 
 // parse VERSIONA fields
 void AP_GPS_NMEA::parse_versiona_field(uint16_t term_number, const char *term)

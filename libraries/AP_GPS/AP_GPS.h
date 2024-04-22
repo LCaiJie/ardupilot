@@ -33,7 +33,7 @@
    than 1 then redundant sensors may be available
  */
 #ifndef GPS_MAX_RECEIVERS
-#define GPS_MAX_RECEIVERS 2 // maximum number of physical GPS sensors allowed - does not include virtual GPS created by blending receiver data
+#define GPS_MAX_RECEIVERS 1 // maximum number of physical GPS sensors allowed - does not include virtual GPS created by blending receiver data
 #endif
 #if !defined(GPS_MAX_INSTANCES)
 #if GPS_MAX_RECEIVERS > 1
@@ -57,36 +57,17 @@
 
 #define UNIX_OFFSET_MSEC (17000ULL * 86400ULL + 52ULL * 10ULL * AP_MSEC_PER_WEEK - GPS_LEAPSECONDS_MILLIS)
 
-#ifndef GPS_MOVING_BASELINE
-#define GPS_MOVING_BASELINE GPS_MAX_RECEIVERS>1
-#endif
-
-#if GPS_MOVING_BASELINE
-#include "MovingBase.h"
-#endif // GPS_MOVING_BASELINE
 
 class AP_GPS_Backend;
-class RTCM3_Parser;
 
 /// @class AP_GPS
 /// GPS driver main class
 class AP_GPS
 {
-    friend class AP_GPS_ERB;
-    friend class AP_GPS_GSOF;
     friend class AP_GPS_MAV;
-    friend class AP_GPS_MSP;
-    friend class AP_GPS_ExternalAHRS;
     friend class AP_GPS_NMEA;
-    friend class AP_GPS_NOVA;
-    friend class AP_GPS_PX4;
-    friend class AP_GPS_SBF;
-    friend class AP_GPS_SBP;
-    friend class AP_GPS_SBP2;
-    friend class AP_GPS_SIRF;
     friend class AP_GPS_UBLOX;
     friend class AP_GPS_Backend;
-    friend class AP_GPS_DroneCAN;
 
 public:
     AP_GPS();
@@ -566,13 +547,6 @@ public:
         DoNotChange = 2,
     };
 
-#if GPS_MOVING_BASELINE
-    // methods used by UAVCAN GPS driver and AP_Periph for moving baseline
-    void inject_MBL_data(uint8_t* data, uint16_t length);
-    void get_RelPosHeading(uint32_t &timestamp, float &relPosHeading, float &relPosLength, float &relPosD, float &accHeading);
-    bool get_RTCMV3(const uint8_t *&bytes, uint16_t &len);
-    void clear_RTCMV3();
-#endif // GPS_MOVING_BASELINE
 
 protected:
 
@@ -597,9 +571,6 @@ protected:
     AP_Int8 _blend_mask;
     AP_Int16 _driver_options;
     AP_Int8 _primary;
-#if GPS_MOVING_BASELINE
-    MovingBase mb_params[GPS_MAX_RECEIVERS];
-#endif // GPS_MOVING_BASELINE
 
     uint32_t _log_gps_bit = -1;
 
@@ -773,21 +744,6 @@ private:
 
     // logging support
     void Write_GPS(uint8_t instance);
-
-#if AP_GPS_RTCM_DECODE_ENABLED
-    /*
-      per mavlink channel RTCM decoder, enabled with RTCM decode
-       option in GPS_DRV_OPTIONS
-    */
-    struct {
-        RTCM3_Parser *parsers[MAVLINK_COMM_NUM_BUFFERS];
-        uint32_t sent_crc[32];
-        uint8_t sent_idx;
-        uint16_t seen_mav_channels;
-    } rtcm;
-    bool parse_rtcm_injection(mavlink_channel_t chan, const mavlink_gps_rtcm_data_t &pkt);
-#endif
-
 };
 
 namespace AP {

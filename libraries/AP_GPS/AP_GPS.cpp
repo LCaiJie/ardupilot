@@ -28,16 +28,8 @@
 #include <climits>
 #include <AP_SerialManager/AP_SerialManager.h>
 
-#include "AP_GPS_NOVA.h"
-#include "AP_GPS_ERB.h"
-#include "AP_GPS_GSOF.h"
 #include "AP_GPS_NMEA.h"
-#include "AP_GPS_SBF.h"
-#include "AP_GPS_SBP.h"
-#include "AP_GPS_SBP2.h"
-#include "AP_GPS_SIRF.h"
 #include "AP_GPS_UBLOX.h"
-#include "AP_GPS_MAV.h"
 #include "GPS_Backend.h"
 #if HAL_SIM_GPS_ENABLED
 #include "AP_GPS_SITL.h"
@@ -48,9 +40,6 @@
 #include <AP_Logger/AP_Logger.h>
 #include "AP_GPS_FixType.h"
 
-#if AP_GPS_RTCM_DECODE_ENABLED
-#include "RTCM3_Parser.h"
-#endif
 
 #define GPS_RTK_INJECT_TO_ALL 127
 #ifndef GPS_MAX_RATE_MS
@@ -79,9 +68,6 @@ const uint32_t AP_GPS::_baudrates[] = {9600U, 115200U, 4800U, 19200U, 38400U, 57
 const char AP_GPS::_initialisation_blob[] =
 #if AP_GPS_UBLOX_ENABLED
     UBLOX_SET_BINARY_230400
-#endif
-#if AP_GPS_SIRF_ENABLED
-    SIRF_SET_BINARY
 #endif
 #if AP_GPS_NMEA_UNICORE_ENABLED
     NMEA_UNICORE_SETUP
@@ -371,20 +357,6 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
 #endif
 #endif //AP_GPS_SBF_ENABLED
 
-#if GPS_MOVING_BASELINE
-
-    // @Group: _MB1_
-    // @Path: MovingBase.cpp
-    AP_SUBGROUPINFO(mb_params[0], "_MB1_", 25, AP_GPS, MovingBase),
-
-#if GPS_MAX_RECEIVERS > 1
-    // @Group: _MB2_
-    // @Path: MovingBase.cpp
-    AP_SUBGROUPINFO(mb_params[1], "_MB2_", 26, AP_GPS, MovingBase),
-#endif // GPS_MAX_RECEIVERS > 1
-
-#endif // GPS_MOVING_BASELINE
-
 #if GPS_MAX_RECEIVERS > 1
     // @Param: _PRIMARY
     // @DisplayName: Primary GPS
@@ -589,20 +561,6 @@ void AP_GPS::send_blob_start(uint8_t instance)
     }
 #endif // AP_GPS_UBLOX_ENABLED
 
-#if GPS_MOVING_BASELINE && AP_GPS_UBLOX_ENABLED
-    if ((_type[instance] == GPS_TYPE_UBLOX_RTK_BASE ||
-         _type[instance] == GPS_TYPE_UBLOX_RTK_ROVER) &&
-        !option_set(DriverOptions::UBX_MBUseUart2)) {
-        // we use 460800 when doing moving baseline as we need
-        // more bandwidth. We don't do this if using UART2, as
-        // in that case the RTCMv3 data doesn't go over the
-        // link to the flight controller
-        static const char blob[] = UBLOX_SET_BINARY_460800;
-        send_blob_start(instance, blob, sizeof(blob));
-        return;
-    }
-#endif
-
     // the following devices don't have init blobs:
     const char *blob = nullptr;
     uint32_t blob_size = 0;
@@ -695,21 +653,12 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     // user has to explicitly set the MAV type, do not use AUTO
     // do not try to detect the MAV type, assume it's there
     case GPS_TYPE_MAV:
-#if AP_GPS_MAV_ENABLED
-        dstate->auto_detected_baud = false; // specified, not detected
-        return new AP_GPS_MAV(*this, state[instance], nullptr);
-#endif //AP_GPS_MAV_ENABLED
 
     // user has to explicitly set the UAVCAN type, do not use AUTO
     case GPS_TYPE_UAVCAN:
     case GPS_TYPE_UAVCAN_RTK_BASE:
     case GPS_TYPE_UAVCAN_RTK_ROVER:
         return nullptr; // We don't do anything here if UAVCAN is not supported
-#if AP_GPS_GSOF_ENABLED
-    case GPS_TYPE_GSOF:
-        dstate->auto_detected_baud = false; // specified, not detected
-        return new AP_GPS_GSOF(*this, state[instance], _port[instance]);
-#endif //AP_GPS_GSOF_ENABLED
     default:
         break;
     }
@@ -758,22 +707,10 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     }
 
     switch (_type[instance]) {
-#if AP_GPS_SBF_ENABLED
-    // by default the sbf/trimble gps outputs no data on its port, until configured.
-    case GPS_TYPE_SBF:
-    case GPS_TYPE_SBF_DUAL_ANTENNA:
-        return new AP_GPS_SBF(*this, state[instance], _port[instance]);
-#endif //AP_GPS_SBF_ENABLED
-#if AP_GPS_NOVA_ENABLED
-    case GPS_TYPE_NOVA:
-        return new AP_GPS_NOVA(*this, state[instance], _port[instance]);
-#endif //AP_GPS_NOVA_ENABLED
-
 #if HAL_SIM_GPS_ENABLED
     case GPS_TYPE_SITL:
         return new AP_GPS_SITL(*this, state[instance], _port[instance]);
 #endif  // HAL_SIM_GPS_ENABLED
-
     default:
         break;
     }
@@ -813,30 +750,6 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
             return new AP_GPS_UBLOX(*this, state[instance], _port[instance], role);
         }
 #endif  // AP_GPS_UBLOX_ENABLED
-#if AP_GPS_SBP2_ENABLED
-        if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_SBP) &&
-                 AP_GPS_SBP2::_detect(dstate->sbp2_detect_state, data)) {
-            return new AP_GPS_SBP2(*this, state[instance], _port[instance]);
-        }
-#endif //AP_GPS_SBP2_ENABLED
-#if AP_GPS_SBP_ENABLED
-        if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_SBP) &&
-                 AP_GPS_SBP::_detect(dstate->sbp_detect_state, data)) {
-            return new AP_GPS_SBP(*this, state[instance], _port[instance]);
-        }
-#endif //AP_GPS_SBP_ENABLED
-#if AP_GPS_SIRF_ENABLED
-        if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_SIRF) &&
-                 AP_GPS_SIRF::_detect(dstate->sirf_detect_state, data)) {
-            return new AP_GPS_SIRF(*this, state[instance], _port[instance]);
-        }
-#endif
-#if AP_GPS_ERB_ENABLED
-        if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_ERB) &&
-                 AP_GPS_ERB::_detect(dstate->erb_detect_state, data)) {
-            return new AP_GPS_ERB(*this, state[instance], _port[instance]);
-        }
-#endif // AP_GPS_ERB_ENABLED
 #if AP_GPS_NMEA_ENABLED
         if ((_type[instance] == GPS_TYPE_NMEA ||
                     _type[instance] == GPS_TYPE_HEMI ||
@@ -1021,57 +934,6 @@ void AP_GPS::update_instance(uint8_t instance)
     }
 #endif
 }
-
-
-#if GPS_MOVING_BASELINE
-void AP_GPS::get_RelPosHeading(uint32_t &timestamp, float &relPosHeading, float &relPosLength, float &relPosD, float &accHeading)
-{
-    for (uint8_t i=0; i< GPS_MAX_RECEIVERS; i++) {
-        if (drivers[i] &&
-            state[i].relposheading_ts != 0 &&
-            AP_HAL::millis() - state[i].relposheading_ts < 500) {
-           relPosHeading = state[i].relPosHeading;
-           relPosLength = state[i].relPosLength;
-           relPosD = state[i].relPosD;
-           accHeading = state[i].accHeading;
-           timestamp = state[i].relposheading_ts;
-        }
-    }
-}
-
-bool AP_GPS::get_RTCMV3(const uint8_t *&bytes, uint16_t &len)
-{
-    for (uint8_t i=0; i< GPS_MAX_RECEIVERS; i++) {
-        if (drivers[i] && _type[i] == GPS_TYPE_UBLOX_RTK_BASE) {
-            return drivers[i]->get_RTCMV3(bytes, len);
-        }
-    }
-    return false;
-}
-
-void AP_GPS::clear_RTCMV3()
-{
-    for (uint8_t i=0; i< GPS_MAX_RECEIVERS; i++) {
-        if (drivers[i] && _type[i] == GPS_TYPE_UBLOX_RTK_BASE) {
-            drivers[i]->clear_RTCMV3();
-        }
-    }
-}
-
-/*
-    inject Moving Baseline Data messages.
-*/
-void AP_GPS::inject_MBL_data(uint8_t* data, uint16_t length)
-{
-    for (uint8_t i=0; i< GPS_MAX_RECEIVERS; i++) {
-        if (_type[i] == GPS_TYPE_UBLOX_RTK_ROVER) {
-            // pass the data to the rover
-            inject_data(i, data, length);
-            break;
-        }
-    }
-}
-#endif //#if GPS_MOVING_BASELINE
 
 /*
   update all GPS instances
@@ -1607,88 +1469,9 @@ void AP_GPS::handle_gps_rtcm_data(mavlink_channel_t chan, const mavlink_message_
         return;
     }
 
-#if AP_GPS_RTCM_DECODE_ENABLED
-    if (!option_set(DriverOptions::DisableRTCMDecode)) {
-        const uint16_t mask = (1U << unsigned(chan));
-        rtcm.seen_mav_channels |= mask;
-        if (option_set(DriverOptions::AlwaysRTCMDecode) ||
-            (rtcm.seen_mav_channels & ~mask) != 0) {
-            /*
-              we are seeing RTCM on multiple mavlink channels. We will run
-              the data through a full per-channel RTCM decoder
-            */
-            if (parse_rtcm_injection(chan, packet)) {
-                return;
-            }
-        }
-    }
-#endif
 
     handle_gps_rtcm_fragment(packet.flags, packet.data, packet.len);
 }
-
-#if AP_GPS_RTCM_DECODE_ENABLED
-/*
-  fully parse RTCM data coming in from a MAVLink channel, when we have
-  a full message inject it to the GPS. This approach allows for 2 or
-  more MAVLink channels to be used for the same RTCM data, allowing
-  for redundent transports for maximum reliability at the cost of some
-  extra CPU and a bit of re-assembly lag
- */
-bool AP_GPS::parse_rtcm_injection(mavlink_channel_t chan, const mavlink_gps_rtcm_data_t &pkt)
-{
-    if (chan >= MAVLINK_COMM_NUM_BUFFERS) {
-        return false;
-    }
-    if (rtcm.parsers[chan] == nullptr) {
-        rtcm.parsers[chan] = new RTCM3_Parser();
-        if (rtcm.parsers[chan] == nullptr) {
-            return false;
-        }
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "GPS: RTCM parsing for chan %u", unsigned(chan));
-    }
-    for (uint16_t i=0; i<pkt.len; i++) {
-        if (rtcm.parsers[chan]->read(pkt.data[i])) {
-            // we have a full message, inject it
-            const uint8_t *buf = nullptr;
-            uint16_t len = rtcm.parsers[chan]->get_len(buf);
-
-            // see if we have already sent it. This prevents
-            // duplicates from multiple sources
-            const uint32_t crc = crc_crc32(0, buf, len);
-
-#if HAL_LOGGING_ENABLED
-            AP::logger().WriteStreaming("RTCM", "TimeUS,Chan,RTCMId,Len,CRC", "s#---", "F----", "QBHHI",
-                                        AP_HAL::micros64(),
-                                        uint8_t(chan),
-                                        rtcm.parsers[chan]->get_id(),
-                                        len,
-                                        crc);
-#endif
-            
-            bool already_seen = false;
-            for (uint8_t c=0; c<ARRAY_SIZE(rtcm.sent_crc); c++) {
-                if (rtcm.sent_crc[c] == crc) {
-                    // we have already sent this message
-                    already_seen = true;
-                    break;
-                }
-            }
-            if (already_seen) {
-                continue;
-            }
-            rtcm.sent_crc[rtcm.sent_idx] = crc;
-            rtcm.sent_idx = (rtcm.sent_idx+1) % ARRAY_SIZE(rtcm.sent_crc);
-
-            if (buf != nullptr && len > 0) {
-                inject_data(buf, len);
-            }
-            rtcm.parsers[chan]->reset();
-        }
-    }
-    return true;
-}
-#endif // AP_GPS_RTCM_DECODE_ENABLED
 
 void AP_GPS::Write_AP_Logger_Log_Startup_messages()
 {
