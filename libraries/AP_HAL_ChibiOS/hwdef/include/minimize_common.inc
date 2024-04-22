@@ -14,7 +14,6 @@ define HAL_HIGH_LATENCY2_ENABLED 0
 define HAL_GYROFFT_ENABLED 0
 
 # several notify backends are rare and not supported by default on smaller boards:
-define AP_NOTIFY_NCP5623_ENABLED 0
 
 
 # smaller boards lose some GPS support
@@ -55,7 +54,7 @@ define HAL_BARO_WIND_COMP_ENABLED 0
 
 
 # no Notify Display support:
-define HAL_DISPLAY_ENABLED 0
+
 
 # remove support for killing IMUs at runtime - a developer feature:
 define AP_INERTIALSENSOR_KILL_IMU_ENABLED 0
