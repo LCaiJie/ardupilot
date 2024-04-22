@@ -78,17 +78,11 @@ public:
 #if AP_PROXIMITY_CYGBOT_ENABLED
         CYGBOT_D1 = 13,
 #endif
-#if AP_PROXIMITY_DRONECAN_ENABLED
-        DroneCAN = 14,
-#endif
 #if AP_PROXIMITY_SCRIPTING_ENABLED
         Scripting = 15,
 #endif
 #if AP_PROXIMITY_LD06_ENABLED
         LD06 = 16,
-#endif
-#if AP_PROXIMITY_MR72_ENABLED
-        MR72 = 17,
 #endif
     };
 

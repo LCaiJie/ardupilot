@@ -53,7 +53,6 @@
 #if EXT_FLASH_SIZE_MB
 #include <AP_FlashIface/AP_FlashIface_JEDEC.h>
 #endif
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 
 // #pragma GCC optimize("O0")
 
@@ -249,14 +248,6 @@ jump_to_app()
 {
     const uint32_t *app_base = (const uint32_t *)(APP_START_ADDRESS);
 
-#if AP_CHECK_FIRMWARE_ENABLED
-    const auto ok = check_good_firmware();
-    if (ok != check_fw_result_t::CHECK_FW_OK) {
-        // bad firmware, don't try and boot
-        led_set(LED_BAD_FW);
-        return;
-    }
-#endif
     
     // If we have QSPI chip start it
 #if EXT_FLASH_SIZE_MB
@@ -292,18 +283,6 @@ jump_to_app()
     if (app_base[1] >= (APP_START_ADDRESS + board_info.fw_size)) {
         goto exit;
     }
-#endif
-
-#if HAL_USE_CAN == TRUE ||  HAL_NUM_CAN_IFACES
-    // for CAN firmware we start the watchdog before we run the
-    // application code, to ensure we catch a bad firmare. If we get a
-    // watchdog reset and the firmware hasn't changed the RTC flag to
-    // indicate that it has been running OK for 30s then we will stay
-    // in bootloader
-#ifndef DISABLE_WATCHDOG
-    stm32_watchdog_init();
-#endif
-    stm32_watchdog_pat();
 #endif
 
     flash_set_keep_unlocked(false);
@@ -512,11 +491,6 @@ bootloader(unsigned timeout)
 
             /* try to get a byte from the host */
             c = cin(0);
-#if HAL_USE_CAN == TRUE || HAL_NUM_CAN_IFACES
-            if (c < 0) {
-                can_update();
-            }
-#endif
         } while (c < 0);
 
         led_on(LED_ACTIVITY);

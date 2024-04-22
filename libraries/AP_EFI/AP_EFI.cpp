@@ -19,9 +19,6 @@
 
 #include "AP_EFI_Serial_MS.h"
 #include "AP_EFI_Serial_Lutan.h"
-#include "AP_EFI_NWPMU.h"
-#include "AP_EFI_DroneCAN.h"
-#include "AP_EFI_Currawong_ECU.h"
 #include "AP_EFI_Serial_Hirth.h"
 #include "AP_EFI_Scripting.h"
 #include "AP_EFI_MAV.h"
@@ -30,9 +27,6 @@
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Math/AP_Math.h>
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-#include <AP_CANManager/AP_CANManager.h>
-#endif
 
 extern const AP_HAL::HAL& hal;
 
@@ -104,21 +98,6 @@ void AP_EFI::init(void)
 #if AP_EFI_SERIAL_LUTAN_ENABLED
     case Type::Lutan:
         backend = new AP_EFI_Serial_Lutan(*this);
-        break;
-#endif
-#if AP_EFI_NWPWU_ENABLED
-    case Type::NWPMU:
-        backend = new AP_EFI_NWPMU(*this);
-        break;
-#endif
-#if AP_EFI_DRONECAN_ENABLED
-    case Type::DroneCAN:
-        backend = new AP_EFI_DroneCAN(*this);
-        break;
-#endif
-#if AP_EFI_CURRAWONG_ECU_ENABLED
-    case Type::CurrawongECU:
-        backend = new AP_EFI_Currawong_ECU(*this);
         break;
 #endif
 #if AP_EFI_SCRIPTING_ENABLED

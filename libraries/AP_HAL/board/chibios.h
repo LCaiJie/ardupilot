@@ -25,10 +25,6 @@
 #define HAL_GPIO_LED_OFF          1
 #endif
 
-#ifndef HAL_NUM_CAN_IFACES
-#define HAL_NUM_CAN_IFACES 0
-#endif
-
 #ifndef HAL_HAVE_BOARD_VOLTAGE
 #define HAL_HAVE_BOARD_VOLTAGE 0
 #endif

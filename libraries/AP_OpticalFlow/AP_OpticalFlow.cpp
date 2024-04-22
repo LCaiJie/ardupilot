@@ -9,7 +9,6 @@
 #include "AP_OpticalFlow_PX4Flow.h"
 #include "AP_OpticalFlow_CXOF.h"
 #include "AP_OpticalFlow_MAV.h"
-#include "AP_OpticalFlow_HereFlow.h"
 #include "AP_OpticalFlow_MSP.h"
 #include "AP_OpticalFlow_UPFLOW.h"
 #include <AP_Logger/AP_Logger.h>
@@ -155,9 +154,6 @@ void AP_OpticalFlow::init(uint32_t log_bit)
 #endif
         break;
     case Type::UAVCAN:
-#if AP_OPTICALFLOW_HEREFLOW_ENABLED
-        backend = new AP_OpticalFlow_HereFlow(*this);
-#endif
         break;
     case Type::MSP:
 #if HAL_MSP_OPTICALFLOW_ENABLED

@@ -55,8 +55,4 @@ private:
     bool wipe_storage;
 };
 
-#if HAL_NUM_CAN_IFACES
-typedef HALSITL::CANIface HAL_CANIface;
-#endif
-
 #endif  // CONFIG_HAL_BOARD == HAL_BOARD_SITL

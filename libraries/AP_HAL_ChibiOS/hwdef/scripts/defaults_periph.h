@@ -64,10 +64,6 @@
 #define HAL_TORQEEDO_ENABLED 0
 #endif
 
-#ifndef AP_KDECAN_ENABLED
-#define AP_KDECAN_ENABLED 0
-#endif
-
 #ifndef HAL_GENERATOR_ENABLED
 #define HAL_GENERATOR_ENABLED 0
 #endif
@@ -90,10 +86,6 @@
 
 #ifndef AP_STATS_ENABLED
 #define AP_STATS_ENABLED 0
-#endif
-
-#ifndef AP_VOLZ_ENABLED
-#define AP_VOLZ_ENABLED 0
 #endif
 
 #ifndef AP_ROBOTISSERVO_ENABLED
@@ -226,14 +218,6 @@
 #define AP_RANGEFINDER_DEFAULT_ORIENTATION ROTATION_NONE
 #endif
 
-// no CAN manager in AP_Periph:
-#define HAL_CANMANAGER_ENABLED 0
-
-// SLCAN is off by default:
-#ifndef AP_CAN_SLCAN_ENABLED
-#define AP_CAN_SLCAN_ENABLED 0
-#endif
-
 // Periphs don't use the FFT library:
 #ifndef HAL_GYROFFT_ENABLED
 #define HAL_GYROFFT_ENABLED 0
@@ -280,10 +264,6 @@
 // periph does not save temperature cals etc:
 #ifndef HAL_ENABLE_SAVE_PERSISTENT_PARAMS
 #define HAL_ENABLE_SAVE_PERSISTENT_PARAMS 0
-#endif
-
-#ifndef AP_WINCH_ENABLED
-#define AP_WINCH_ENABLED 0
 #endif
 
 #ifndef AP_VIDEOTX_ENABLED

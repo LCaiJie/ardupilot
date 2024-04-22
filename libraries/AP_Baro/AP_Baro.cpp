@@ -27,7 +27,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_CANManager/AP_CANManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_HAL/I2CDevice.h>
 
@@ -43,7 +42,6 @@
 #include "AP_Baro_DPS280.h"
 #include "AP_Baro_BMP388.h"
 #include "AP_Baro_Dummy.h"
-#include "AP_Baro_DroneCAN.h"
 #include "AP_Baro_MSP.h"
 #include "AP_Baro_ExternalAHRS.h"
 #include "AP_Baro_ICP101XX.h"
@@ -604,13 +602,6 @@ void AP_Baro::init(void)
         ADD_BACKEND(new AP_Baro_SITL(*this));
     }
 #endif
-#endif
-
-#if AP_BARO_DRONECAN_ENABLED
-    // Detect UAVCAN Modules, try as many times as there are driver slots
-    for (uint8_t i = 0; i < BARO_MAX_DRIVERS; i++) {
-        ADD_BACKEND(AP_Baro_DroneCAN::probe(*this));
-    }
 #endif
 
 #if AP_BARO_EXTERNALAHRS_ENABLED

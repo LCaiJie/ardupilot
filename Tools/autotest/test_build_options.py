@@ -184,7 +184,6 @@ class TestBuildOptions(object):
                     'AP_RANGEFINDER_ENABLED',  # only at vehicle level ATM
                     'AC_AVOID_ENABLED',  # Rover doesn't obey this
                     'AC_OAPATHPLANNER_ENABLED',   # Rover doesn't obey this
-                    'WINCH_ENABLED',  # Copter doesn't use this; should use AP_WINCH_ENABLED
                 ])
                 if define in compiled_in_feature_defines:
                     error = f"feature gated by {define} still compiled into ({target}); extract_features.py bug?"

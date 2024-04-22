@@ -286,12 +286,6 @@ const AP_Param::Info Tracker::var_info[] = {
     // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
     GOBJECT(BoardConfig,            "BRD_",       AP_BoardConfig),
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    // @Group: CAN_
-    // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
-    GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
-#endif
-
     // GPS driver
     // @Group: GPS
     // @Path: ../libraries/AP_GPS/AP_GPS.cpp

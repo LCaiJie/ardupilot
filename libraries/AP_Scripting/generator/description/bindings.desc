@@ -635,27 +635,7 @@ singleton AP_InertialSensor method get_temperature float uint8_t 0 INS_MAX_INSTA
 singleton AP_InertialSensor method get_gyro_health boolean uint8_t'skip_check
 singleton AP_InertialSensor method get_accel_health boolean uint8_t'skip_check
 
-singleton CAN manual get_device lua_get_CAN_device 1
-singleton CAN manual get_device2 lua_get_CAN_device2 1
-singleton CAN depends AP_SCRIPTING_CAN_SENSOR_ENABLED
-
-include AP_Scripting/AP_Scripting_CANSensor.h
 include AP_HAL/AP_HAL.h
-
-userdata AP_HAL::CANFrame depends AP_SCRIPTING_CAN_SENSOR_ENABLED
-userdata AP_HAL::CANFrame rename CANFrame
-userdata AP_HAL::CANFrame field id uint32_t'skip_check read write
-userdata AP_HAL::CANFrame field data'array int(ARRAY_SIZE(ud->data)) uint8_t'skip_check read write
-userdata AP_HAL::CANFrame field dlc uint8_t read write 0 int(ARRAY_SIZE(ud->data))
-userdata AP_HAL::CANFrame method id_signed int32_t
-userdata AP_HAL::CANFrame method isExtended boolean
-userdata AP_HAL::CANFrame method isRemoteTransmissionRequest boolean
-userdata AP_HAL::CANFrame method isErrorFrame boolean
-
-ap_object ScriptingCANBuffer depends AP_SCRIPTING_CAN_SENSOR_ENABLED
-ap_object ScriptingCANBuffer method write_frame boolean AP_HAL::CANFrame uint32_t'skip_check
-ap_object ScriptingCANBuffer method read_frame boolean AP_HAL::CANFrame'Null
-ap_object ScriptingCANBuffer method add_filter boolean uint32_t'skip_check uint32_t'skip_check
 
 include ../Tools/AP_Periph/AP_Periph.h depends defined(HAL_BUILD_AP_PERIPH)
 singleton AP_Periph_FW depends defined(HAL_BUILD_AP_PERIPH)
@@ -728,14 +708,6 @@ include APM_Control/AR_PosControl.h depends APM_BUILD_TYPE(APM_BUILD_Rover)
 singleton AR_PosControl depends APM_BUILD_TYPE(APM_BUILD_Rover)
 singleton AR_PosControl method get_srate void float'Ref
 
-include AP_Winch/AP_Winch.h
-singleton AP_Winch depends AP_WINCH_ENABLED && APM_BUILD_COPTER_OR_HELI
-singleton AP_Winch rename winch
-singleton AP_Winch method healthy boolean
-singleton AP_Winch method relax void
-singleton AP_Winch method release_length void float'skip_check
-singleton AP_Winch method set_desired_rate void float'skip_check
-singleton AP_Winch method get_rate_max float
 
 include AP_IOMCU/AP_IOMCU.h
 singleton AP_IOMCU depends HAL_WITH_IO_MCU

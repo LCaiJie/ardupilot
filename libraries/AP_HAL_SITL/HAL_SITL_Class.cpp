@@ -78,9 +78,6 @@ static SPIDeviceManager spi_mgr_instance;
 #endif
 static Util utilInstance(&sitlState);
 
-#if HAL_NUM_CAN_IFACES
-static HALSITL::CANIface* canDrivers[HAL_NUM_CAN_IFACES];
-#endif
 
 static Empty::WSPIDeviceManager wspi_mgr_instance;
 
@@ -112,11 +109,7 @@ HAL_SITL::HAL_SITL() :
 #if HAL_WITH_DSP
         &dspDriver,         /* dsp driver */
 #endif
-#if HAL_NUM_CAN_IFACES
-        (AP_HAL::CANIface**)canDrivers
-#else
         nullptr
-#endif
         ),           /* CAN */
     _sitl_state(&sitlState)
 {}

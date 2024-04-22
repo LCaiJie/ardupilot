@@ -46,17 +46,12 @@
 #include "AP_RangeFinder_HC_SR04.h"
 #include "AP_RangeFinder_Bebop.h"
 #include "AP_RangeFinder_BLPing.h"
-#include "AP_RangeFinder_DroneCAN.h"
 #include "AP_RangeFinder_Lanbao.h"
 #include "AP_RangeFinder_LeddarVu8.h"
 #include "AP_RangeFinder_SITL.h"
 #include "AP_RangeFinder_MSP.h"
-#include "AP_RangeFinder_USD1_CAN.h"
-#include "AP_RangeFinder_Benewake_CAN.h"
 #include "AP_RangeFinder_Lua.h"
 #include "AP_RangeFinder_NoopLoop.h"
-#include "AP_RangeFinder_TOFSenseP_CAN.h"
-#include "AP_RangeFinder_NRA24_CAN.h"
 #include "AP_RangeFinder_TOFSenseF_I2C.h"
 #include "AP_RangeFinder_JRE_Serial.h"
 
@@ -498,17 +493,6 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
         break;
 #endif
 
-#if AP_RANGEFINDER_DRONECAN_ENABLED
-    case Type::UAVCAN:
-        /*
-          the UAVCAN driver gets created when we first receive a
-          measurement. We take the instance slot now, even if we don't
-          yet have the driver
-         */
-        num_instances = MAX(num_instances, instance+1);
-        break;
-#endif
-
 #if AP_RANGEFINDER_GYUS42V2_ENABLED
     case Type::GYUS42v2:
         serial_create_fn = AP_RangeFinder_GYUS42v2::create;
@@ -529,17 +513,6 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
         break;
 #endif // HAL_MSP_RANGEFINDER_ENABLED
 
-#if AP_RANGEFINDER_USD1_CAN_ENABLED
-    case Type::USD1_CAN:
-        _add_backend(new AP_RangeFinder_USD1_CAN(state[instance], params[instance]), instance);
-        break;
-#endif
-#if AP_RANGEFINDER_BENEWAKE_CAN_ENABLED
-    case Type::Benewake_CAN:
-        _add_backend(new AP_RangeFinder_Benewake_CAN(state[instance], params[instance]), instance);
-        break;
-#endif
-
 #if AP_RANGEFINDER_LUA_ENABLED
     case Type::Lua_Scripting:
         _add_backend(new AP_RangeFinder_Lua(state[instance], params[instance]), instance);
@@ -552,16 +525,6 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
         break;
 #endif
 
-#if AP_RANGEFINDER_TOFSENSEP_CAN_ENABLED
-    case Type::TOFSenseP_CAN:
-        _add_backend(new AP_RangeFinder_TOFSenseP_CAN(state[instance], params[instance]), instance);
-        break;
-#endif
-#if AP_RANGEFINDER_NRA24_CAN_ENABLED
-    case Type::NRA24_CAN:
-        _add_backend(new AP_RangeFinder_NRA24_CAN(state[instance], params[instance]), instance);
-        break;
-#endif
 #if AP_RANGEFINDER_TOFSENSEF_I2C_ENABLED
     case Type::TOFSenseF_I2C: {
         uint8_t addr = TOFSENSEP_I2C_DEFAULT_ADDR;
@@ -867,18 +830,6 @@ bool RangeFinder::prearm_healthy(char *failure_msg, const uint8_t failure_msg_le
             break;
         }
 #endif  // AP_RANGEFINDER_ANALOG_ENABLED || AP_RANGEFINDER_PWM_ENABLED
-
-#if AP_RANGEFINDER_NRA24_CAN_ENABLED
-        case Type::NRA24_CAN: {
-            if (drivers[i]->status() == Status::NoData) {
-                // This sensor stops sending data if there is no relative motion. This will mostly happen during takeoff, before arming
-                // To avoid pre-arm failure, return true even though there is no data.
-                // This sensor also sends a "heartbeat" so we can differentiate between  "NoData" and "NotConnected"
-                return true;
-            }
-            break;
-        }
-#endif
 
         default:
             break;

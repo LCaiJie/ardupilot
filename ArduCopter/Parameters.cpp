@@ -556,12 +556,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
     GOBJECT(BoardConfig,            "BRD_",       AP_BoardConfig),
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    // @Group: CAN_
-    // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
-    GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
-#endif
-
 #if HAL_SPRAYER_ENABLED
     // @Group: SPRAY_
     // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
@@ -850,15 +844,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: ../libraries/AP_SmartRTL/AP_SmartRTL.cpp
     AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AP_SmartRTL),
 #endif
-
-#if AP_WINCH_ENABLED
-    // 22 was AP_WheelEncoder
-
-    // @Group: WINCH
-    // @Path: ../libraries/AP_Winch/AP_Winch.cpp
-    AP_SUBGROUPINFO(winch, "WINCH", 23, ParametersG2, AP_Winch),
-#endif
-
     // @Param: PILOT_SPEED_DN
     // @DisplayName: Pilot maximum vertical speed descending
     // @Description: The maximum vertical descending velocity the pilot may request in cm/s.  If 0 PILOT_SPEED_UP value is used.

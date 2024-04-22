@@ -530,22 +530,6 @@ bool AP_Arming_Copter::gcs_failsafe_check(bool display_failure)
 // check winch
 bool AP_Arming_Copter::winch_checks(bool display_failure) const
 {
-#if AP_WINCH_ENABLED
-    // pass if parameter or all arming checks disabled
-    if (!check_enabled(ARMING_CHECK_PARAMETERS)) {
-        return true;
-    }
-
-    const AP_Winch *winch = AP::winch();
-    if (winch == nullptr) {
-        return true;
-    }
-    char failure_msg[50] = {};
-    if (!winch->pre_arm_check(failure_msg, sizeof(failure_msg))) {
-        check_failed(display_failure, "%s", failure_msg);
-        return false;
-    }
-#endif
     return true;
 }
 

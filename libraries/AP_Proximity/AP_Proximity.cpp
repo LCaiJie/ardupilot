@@ -27,10 +27,8 @@
 #include "AP_Proximity_SITL.h"
 #include "AP_Proximity_AirSimSITL.h"
 #include "AP_Proximity_Cygbot_D1.h"
-#include "AP_Proximity_DroneCAN.h"
 #include "AP_Proximity_Scripting.h"
 #include "AP_Proximity_LD06.h"
-#include "AP_Proximity_MR72_CAN.h"
 
 
 #include <AP_Logger/AP_Logger.h>
@@ -215,23 +213,12 @@ void AP_Proximity::init()
         }
             break;
 # endif
-#if AP_PROXIMITY_DRONECAN_ENABLED
-        case  Type::DroneCAN:
-            num_instances = instance+1;
-        break;
-#endif
 #if AP_PROXIMITY_SCRIPTING_ENABLED
         case Type::Scripting:
             state[instance].instance = instance;
             drivers[instance] = new AP_Proximity_Scripting(*this, state[instance], params[instance]);
         break;
 #endif
-#if AP_PROXIMITY_MR72_ENABLED
-        case Type::MR72:
-            state[instance].instance = instance;
-            drivers[instance] = new AP_Proximity_MR72_CAN(*this, state[instance], params[instance]);
-            break;
-# endif
 #if AP_PROXIMITY_SITL_ENABLED
         case Type::SITL:
             state[instance].instance = instance;

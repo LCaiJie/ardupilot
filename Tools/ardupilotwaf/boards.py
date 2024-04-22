@@ -103,26 +103,6 @@ class Board:
                 ENABLE_ONVIF=0,
             )
 
-        # allow enable of OpenDroneID for any board
-        if cfg.options.enable_opendroneid:
-            env.ENABLE_OPENDRONEID = True
-            env.DEFINES.update(
-                AP_OPENDRONEID_ENABLED=1,
-            )
-            cfg.msg("Enabled OpenDroneID", 'yes')
-        else:
-            cfg.msg("Enabled OpenDroneID", 'no', color='YELLOW')
-
-        # allow enable of firmware ID checking for any board
-        if cfg.options.enable_check_firmware:
-            env.CHECK_FIRMWARE_ENABLED = True
-            env.DEFINES.update(
-                AP_CHECK_FIRMWARE_ENABLED=1,
-            )
-            cfg.msg("Enabled firmware ID checking", 'yes')
-        else:
-            cfg.msg("Enabled firmware ID checking", 'no', color='YELLOW')
-
         if cfg.options.enable_gps_logging:
             env.DEFINES.update(
                 AP_GPS_DEBUG_LOGGING_ENABLED=1,
@@ -441,26 +421,6 @@ class Board:
                 '-Wl,--gc-sections',
             ]
 
-        if self.with_can:
-            # for both AP_Perip and main fw enable deadlines
-            env.DEFINES.update(CANARD_ENABLE_DEADLINE = 1)
-
-            if not cfg.env.AP_PERIPH:
-                env.AP_LIBRARIES += [
-                    'AP_DroneCAN',
-                    'modules/DroneCAN/libcanard/*.c',
-                    ]
-                if cfg.options.enable_dronecan_tests:
-                    env.DEFINES.update(AP_TEST_DRONECAN_DRIVERS = 1)
-
-                env.DEFINES.update(
-                    DRONECAN_CXX_WRAPPERS = 1,
-                    USE_USER_HELPERS = 1,
-                    CANARD_ALLOCATE_SEM=1
-                )
-
-
-
         if cfg.options.build_dates:
             env.build_dates = True
 
@@ -655,7 +615,6 @@ class sitl(Board):
         cfg.define('HAL_WITH_SPI', 1)
         cfg.define('HAL_WITH_RAMTRON', 1)
         cfg.define('AP_GENERATOR_RICHENPOWER_ENABLED', 1)
-        cfg.define('AP_OPENDRONEID_ENABLED', 1)
         cfg.define('AP_SIGNED_FIRMWARE', 0)
 
         cfg.define('AP_NOTIFY_LP5562_BUS', 2)
@@ -666,21 +625,6 @@ class sitl(Board):
         except ValueError:
             pass
         env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=1']
-
-        if self.with_can:
-            cfg.define('HAL_NUM_CAN_IFACES', 2)
-            env.DEFINES.update(CANARD_MULTI_IFACE=1,
-                               CANARD_IFACE_ALL = 0x3,
-                               CANARD_ENABLE_CANFD = 1,
-                               CANARD_ENABLE_ASSERTS = 1)
-            if not cfg.options.force_32bit:
-                # needed for cygwin
-                env.CXXFLAGS += [ '-DCANARD_64_BIT=1' ]
-                env.CFLAGS += [ '-DCANARD_64_BIT=1' ]
-            if Utils.unversioned_sys_platform().startswith("linux"):
-                cfg.define('HAL_CAN_WITH_SOCKETCAN', 1)
-            else:
-                cfg.define('HAL_CAN_WITH_SOCKETCAN', 0)
 
         env.CXXFLAGS += [
             '-Werror=float-equal',
@@ -859,7 +803,6 @@ class sitl_periph(sitl):
             HAL_MAVLINK_BINDINGS_ENABLED = 1,
 
             AP_AIRSPEED_AUTOCAL_ENABLE = 0,
-            AP_CAN_SLCAN_ENABLED = 0,
             AP_ICENGINE_ENABLED = 0,
             AP_MISSION_ENABLED = 0,
             AP_RCPROTOCOL_ENABLED = 0,
@@ -872,7 +815,6 @@ class sitl_periph(sitl):
             COMPASS_LEARN_ENABLED = 0,
             COMPASS_MOT_ENABLED = 0,
             HAL_CAN_DEFAULT_NODE_ID = 0,
-            HAL_CANMANAGER_ENABLED = 0,
             HAL_GCS_ENABLED = 0,
             HAL_GENERATOR_ENABLED = 0,
             HAL_LOGGING_ENABLED = 0,
@@ -1218,9 +1160,6 @@ class chibios(Board):
             env.DEFINES.update(CANARD_ENABLE_CANFD=1)
         else:
             env.DEFINES.update(CANARD_ENABLE_TAO_OPTION=1)
-        if not cfg.options.bootloader and cfg.env.HAL_NUM_CAN_IFACES:
-            if int(cfg.env.HAL_NUM_CAN_IFACES) >= 1:
-                env.DEFINES.update(CANARD_IFACE_ALL=(1<<int(cfg.env.HAL_NUM_CAN_IFACES))-1)
         if cfg.options.Werror or cfg.env.CC_VERSION in gcc_whitelist:
             cfg.msg("Enabling -Werror", "yes")
             if '-Werror' not in env.CXXFLAGS:
@@ -1321,11 +1260,6 @@ class linux(Board):
             env.DEFINES.update(
                 HAL_FORCE_32BIT = 0,
             )
-        if self.with_can and cfg.options.board == 'linux':
-            cfg.env.HAL_NUM_CAN_IFACES = 2
-            cfg.define('HAL_NUM_CAN_IFACES', 2)
-            cfg.define('HAL_CANFD_SUPPORTED', 1)
-            cfg.define('CANARD_ENABLE_CANFD', 1)
         
         if self.with_can:
             env.DEFINES.update(CANARD_MULTI_IFACE=1,
@@ -1436,7 +1370,6 @@ class bbbmini(linux):
 
     def configure_env(self, cfg, env):
         super(bbbmini, self).configure_env(cfg, env)
-        cfg.env.HAL_NUM_CAN_IFACES = 1
         env.DEFINES.update(
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_BBBMINI',
         )
@@ -1449,7 +1382,6 @@ class blue(linux):
 
     def configure_env(self, cfg, env):
         super(blue, self).configure_env(cfg, env)
-        cfg.env.HAL_NUM_CAN_IFACES = 1
 
         env.DEFINES.update(
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_BLUE',
@@ -1463,7 +1395,6 @@ class pocket(linux):
 
     def configure_env(self, cfg, env):
         super(pocket, self).configure_env(cfg, env)
-        cfg.env.HAL_NUM_CAN_IFACES = 1
 
         env.DEFINES.update(
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_POCKET',

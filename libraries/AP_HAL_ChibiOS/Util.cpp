@@ -30,12 +30,11 @@
 #include <AP_InternalError/AP_InternalError.h>
 #include "sdcard.h"
 #include "shared_dma.h"
-#if defined(HAL_PWM_ALARM) || HAL_DSHOT_ALARM_ENABLED || HAL_CANMANAGER_ENABLED || HAL_USE_PWM == TRUE
+#if defined(HAL_PWM_ALARM) || HAL_DSHOT_ALARM_ENABLED || HAL_USE_PWM == TRUE
 #include <AP_Notify/AP_Notify.h>
 #endif
 #if HAL_ENABLE_SAVE_PERSISTENT_PARAMS
 #include <AP_InertialSensor/AP_InertialSensor.h>
-#include <AP_OpenDroneID/AP_OpenDroneID.h>
 #endif
 #ifndef HAL_BOOTLOADER_BUILD
 #include <AP_Logger/AP_Logger.h>
@@ -48,7 +47,6 @@ extern AP_IOMCU iomcu;
 #endif
 
 #if AP_SIGNED_FIRMWARE && !defined(HAL_BOOTLOADER_BUILD)
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 #endif
 
 
@@ -186,7 +184,7 @@ bool Util::toneAlarm_init(uint8_t types)
 #endif
     _toneAlarm_types = types;
 
-#if HAL_USE_PWM != TRUE && !HAL_DSHOT_ALARM_ENABLED && !HAL_CANMANAGER_ENABLED
+#if HAL_USE_PWM != TRUE && !HAL_DSHOT_ALARM_ENABLED
     // Nothing to do
     return false;
 #else
@@ -290,17 +288,6 @@ Util::FlashBootloader Util::flash_bootloader()
         Debug("failed to find %s\n", fw_name);
         return FlashBootloader::NOT_AVAILABLE;
     }
-
-#if AP_SIGNED_FIRMWARE
-    if (!AP_CheckFirmware::check_signed_bootloader(fw, fw_size)) {
-        // don't allow flashing of an unsigned bootloader in a secure
-        // setup. This prevents the easy mistake of leaving an
-        // unsigned bootloader in ROMFS, which would give a trivail
-        // way to bypass signing
-        AP_ROMFS::free(fw);
-        return FlashBootloader::NOT_SIGNED;
-    }
-#endif
 
     // make sure size is multiple of 32
     fw_size = (fw_size + 31U) & ~31U;
@@ -539,12 +526,6 @@ bool Util::get_persistent_params(ExpandingString &str) const
     const auto *ins = AP_InertialSensor::get_singleton();
     if (ins) {
         ins->get_persistent_params(str);
-    }
-#endif
-#if AP_OPENDRONEID_ENABLED
-    const auto *odid = AP_OpenDroneID::get_singleton();
-    if (odid) {
-        odid->get_persistent_params(str);
     }
 #endif
     if (str.has_failed_allocation() || str.get_length() <= strlen(persistent_header)) {

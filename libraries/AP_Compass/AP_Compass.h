@@ -385,9 +385,6 @@ private:
     void _probe_external_i2c_compasses(void);
     void _detect_backends(void);
     void probe_i2c_spi_compasses(void);
-#if AP_COMPASS_DRONECAN_ENABLED
-    void probe_dronecan_compasses(void);
-#endif
 
     // compass cal
     void _update_calibration_trampoline();
@@ -453,9 +450,6 @@ private:
 #endif
 #if AP_COMPASS_MMC3416_ENABLED
         DRIVER_MMC3416  =9,
-#endif
-#if AP_COMPASS_DRONECAN_ENABLED
-        DRIVER_UAVCAN   =11,
 #endif
 #if AP_COMPASS_QMC5883L_ENABLED
         DRIVER_QMC5883L =12,

@@ -24,13 +24,7 @@
 
 #include "SRV_Channel.h"
 #include <AP_Logger/AP_Logger.h>
-#include <AP_KDECAN/AP_KDECAN.h>
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-  #include <AP_CANManager/AP_CANManager.h>
-  #include <AP_DroneCAN/AP_DroneCAN.h>
-  #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
-#endif
 
 #if NUM_SERVO_CHANNELS == 0
 #pragma GCC diagnostic ignored "-Wtype-limits"
@@ -40,10 +34,6 @@ extern const AP_HAL::HAL& hal;
 
 SRV_Channel *SRV_Channels::channels;
 SRV_Channels *SRV_Channels::_singleton;
-
-#if AP_VOLZ_ENABLED
-AP_Volz_Protocol *SRV_Channels::volz_ptr;
-#endif
 
 #if AP_SBUSOUTPUT_ENABLED
 AP_SBusOut *SRV_Channels::sbus_ptr;
@@ -188,12 +178,6 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @User: Advanced
     // @Units: Hz
     AP_GROUPINFO("_RATE",  18, SRV_Channels, default_rate, 50),
-
-#if AP_VOLZ_ENABLED
-    // @Group: _VOLZ_
-    // @Path: ../AP_Volz_Protocol/AP_Volz_Protocol.cpp
-    AP_SUBGROUPINFO(volz, "_VOLZ_",  19, SRV_Channels, AP_Volz_Protocol),
-#endif
 
 #if AP_SBUSOUTPUT_ENABLED
     // @Group: _SBUS_
@@ -384,10 +368,6 @@ SRV_Channels::SRV_Channels(void)
     fetteconwire_ptr = &fetteconwire;
 #endif
 
-#if AP_VOLZ_ENABLED
-    volz_ptr = &volz;
-#endif
-
 #if AP_SBUSOUTPUT_ENABLED
     sbus_ptr = &sbus;
 #endif
@@ -515,11 +495,6 @@ void SRV_Channels::push()
 {
     hal.rcout->push();
 
-#if AP_VOLZ_ENABLED
-    // give volz library a chance to update
-    volz_ptr->update();
-#endif
-
 #if AP_SBUSOUTPUT_ENABLED
     // give sbus library a chance to update
     sbus_ptr->update();
@@ -539,41 +514,6 @@ void SRV_Channels::push()
     fetteconwire_ptr->update();
 #endif
 
-#if AP_KDECAN_ENABLED
-    if (AP::kdecan() != nullptr) {
-        AP::kdecan()->update();
-    }
-#endif
-
-#if HAL_ENABLE_DRONECAN_DRIVERS
-    // push outputs to CAN
-    uint8_t can_num_drivers = AP::can().get_num_drivers();
-    for (uint8_t i = 0; i < can_num_drivers; i++) {
-        switch (AP::can().get_driver_type(i)) {
-            case AP_CAN::Protocol::DroneCAN: {
-                AP_DroneCAN *ap_dronecan = AP_DroneCAN::get_dronecan(i);
-                if (ap_dronecan == nullptr) {
-                    continue;
-                }
-                ap_dronecan->SRV_push_servos();
-                break;
-            }
-#if HAL_PICCOLO_CAN_ENABLE
-            case AP_CAN::Protocol::PiccoloCAN: {
-                AP_PiccoloCAN *ap_pcan = AP_PiccoloCAN::get_pcan(i);
-                if (ap_pcan == nullptr) {
-                    continue;
-                }
-                ap_pcan->update();
-                break;
-            }
-#endif
-            case AP_CAN::Protocol::None:
-            default:
-                break;
-        }
-    }
-#endif // HAL_NUM_CAN_IFACES
 }
 
 void SRV_Channels::zero_rc_outputs()

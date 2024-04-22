@@ -23,7 +23,6 @@
 #if AP_FILESYSTEM_SYS_ENABLED
 
 #include <AP_Math/AP_Math.h>
-#include <AP_CANManager/AP_CANManager.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_Common/ExpandingString.h>
 
@@ -40,13 +39,6 @@ static const SysFileList sysfs_file_list[] = {
     {"memory.txt"},
     {"uarts.txt"},
     {"timers.txt"},
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    {"can_log.txt"},
-#endif
-#if HAL_NUM_CAN_IFACES > 0
-    {"can0_stats.txt"},
-    {"can1_stats.txt"},
-#endif
 #if !defined(HAL_BOOTLOADER_BUILD) && (defined(STM32F7) || defined(STM32H7))
     {"persistent.parm"},
 #endif
@@ -120,24 +112,7 @@ int AP_Filesystem_Sys::open(const char *fname, int flags, bool allow_absolute_pa
     if (strcmp(fname, "timers.txt") == 0) {
         hal.util->timer_info(*r.str);
     }
-#if HAL_CANMANAGER_ENABLED
-    if (strcmp(fname, "can_log.txt") == 0) {
-        AP::can().log_retrieve(*r.str);
-    }
-#endif
-#if HAL_NUM_CAN_IFACES > 0
-    int8_t can_stats_num = -1;
-    if (strcmp(fname, "can0_stats.txt") == 0) {
-        can_stats_num = 0;
-    } else if (strcmp(fname, "can1_stats.txt") == 0) {
-        can_stats_num = 1;
-    }
-    if (can_stats_num != -1 && can_stats_num < HAL_NUM_CAN_IFACES) {
-        if (hal.can[can_stats_num] != nullptr) {
-            hal.can[can_stats_num]->get_stats(*r.str);
-        }
-    }
-#endif
+
     if (strcmp(fname, "persistent.parm") == 0) {
         hal.util->load_persistent_params(*r.str);
     }

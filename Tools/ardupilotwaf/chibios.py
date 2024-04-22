@@ -442,30 +442,6 @@ def chibios_firmware(self):
         _upload_task = self.create_task('upload_fw', src=apj_target)
         _upload_task.set_run_after(generate_apj_task)
 
-def setup_canmgr_build(cfg):
-    '''enable CANManager build. By doing this here we can auto-enable CAN in
-    the build based on the presence of CAN pins in hwdef.dat except for AP_Periph builds'''
-    env = cfg.env
-    env.AP_LIBRARIES += [
-        'AP_DroneCAN',
-        'modules/DroneCAN/libcanard/*.c',
-        ]
-    env.INCLUDES += [
-        cfg.srcnode.find_dir('modules/DroneCAN/libcanard').abspath(),
-        ]
-    env.CFLAGS += ['-DHAL_CAN_IFACES=2']
-
-    if not env.AP_PERIPH:
-        env.DEFINES += [
-            'DRONECAN_CXX_WRAPPERS=1',
-            'USE_USER_HELPERS=1',
-            'CANARD_ENABLE_DEADLINE=1',
-            'CANARD_MULTI_IFACE=1',
-            'CANARD_ALLOCATE_SEM=1'
-            ]
-
-    cfg.get_board().with_can = True
-
 def setup_canperiph_build(cfg):
     '''enable CAN build for peripherals'''
     env = cfg.env
@@ -583,12 +559,6 @@ def configure(cfg):
     if ret != 0:
         cfg.fatal("Failed to process hwdef.dat ret=%d" % ret)
     load_env_vars(cfg.env)
-    if env.HAL_NUM_CAN_IFACES and not env.AP_PERIPH:
-        setup_canmgr_build(cfg)
-    if env.HAL_NUM_CAN_IFACES and env.AP_PERIPH and not env.BOOTLOADER:
-        setup_canperiph_build(cfg)
-    if env.HAL_NUM_CAN_IFACES and env.AP_PERIPH and int(env.HAL_NUM_CAN_IFACES)>1 and not env.BOOTLOADER:
-        env.DEFINES += [ 'CANARD_MULTI_IFACE=1' ]
     setup_optimization(cfg.env)
 
 def generate_hwdef_h(env):
@@ -625,8 +595,6 @@ def generate_hwdef_h(env):
 def pre_build(bld):
     '''pre-build hook to change dynamic sources'''
     load_env_vars(bld.env)
-    if bld.env.HAL_NUM_CAN_IFACES:
-        bld.get_board().with_can = True
     hwdef_h = os.path.join(bld.env.BUILDROOT, 'hwdef.h')
     if not os.path.exists(hwdef_h):
         print("Generating hwdef.h")

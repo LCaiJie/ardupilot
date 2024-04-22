@@ -122,9 +122,6 @@ public:
 #if AP_RANGEFINDER_BLPING_ENABLED
         BLPing = 23,
 #endif
-#if AP_RANGEFINDER_DRONECAN_ENABLED
-        UAVCAN = 24,
-#endif
 #if AP_RANGEFINDER_BENEWAKE_TFMINIPLUS_ENABLED
         BenewakeTFminiPlus = 25,
 #endif
@@ -147,12 +144,6 @@ public:
 #if HAL_MSP_RANGEFINDER_ENABLED
         MSP = 32,
 #endif
-#if AP_RANGEFINDER_USD1_CAN_ENABLED
-        USD1_CAN = 33,
-#endif
-#if AP_RANGEFINDER_BENEWAKE_CAN_ENABLED
-        Benewake_CAN = 34,
-#endif
 #if AP_RANGEFINDER_TERARANGER_SERIAL_ENABLED
         TeraRanger_Serial = 35,
 #endif
@@ -161,12 +152,6 @@ public:
 #endif
 #if AP_RANGEFINDER_NOOPLOOP_ENABLED
         NoopLoop_P = 37,
-#endif
-#if AP_RANGEFINDER_TOFSENSEP_CAN_ENABLED
-        TOFSenseP_CAN = 38,
-#endif
-#if AP_RANGEFINDER_NRA24_CAN_ENABLED
-        NRA24_CAN = 39,
 #endif
 #if AP_RANGEFINDER_TOFSENSEF_I2C_ENABLED
         TOFSenseF_I2C = 40,

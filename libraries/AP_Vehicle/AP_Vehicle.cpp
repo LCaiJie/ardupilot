@@ -15,7 +15,6 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Motors/AP_Motors.h>
 #include <AR_Motors/AP_MotorsUGV.h>
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 #include <GCS_MAVLink/GCS.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <AP_HAL_ChibiOS/sdcard.h>
@@ -98,22 +97,10 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(esc_telem, "ESC_TLM", 12, AP_Vehicle, AP_ESC_Telem),
 #endif
 
-#if AP_AIS_ENABLED
-    // @Group: AIS_
-    // @Path: ../AP_AIS/AP_AIS.cpp
-    AP_SUBGROUPINFO(ais, "AIS_",  13, AP_Vehicle, AP_AIS),
-#endif
-
 #if AP_FENCE_ENABLED
     // @Group: FENCE_
     // @Path: ../AC_Fence/AC_Fence.cpp
     AP_SUBGROUPINFO(fence, "FENCE_", 14, AP_Vehicle, AC_Fence),
-#endif
-
-#if AP_OPENDRONEID_ENABLED
-    // @Group: DID_
-    // @Path: ../AP_OpenDroneID/AP_OpenDroneID.cpp
-    AP_SUBGROUPINFO(opendroneid, "DID_", 15, AP_Vehicle, AP_OpenDroneID),
 #endif
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
@@ -132,12 +119,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     // @Group: DDS
     // @Path: ../AP_DDS/AP_DDS_Client.cpp
     AP_SUBGROUPPTR(dds_client, "DDS", 18, AP_Vehicle, AP_DDS_Client),
-#endif
-
-#if AP_KDECAN_ENABLED
-    // @Group: KDE_
-    // @Path: ../AP_KDECAN/AP_KDECAN.cpp
-    AP_SUBGROUPINFO(kdecan, "KDE_",  19, AP_Vehicle, AP_KDECAN),
 #endif
 
 #if APM_BUILD_COPTER_OR_HELI || APM_BUILD_TYPE(APM_BUILD_ArduPlane) || APM_BUILD_TYPE(APM_BUILD_Rover)
@@ -271,10 +252,6 @@ void AP_Vehicle::setup()
                         AP::fwversion().fw_string,
                         (unsigned)hal.util->available_memory());
 
-#if AP_CHECK_FIRMWARE_ENABLED
-    check_firmware_print();
-#endif
-
     // validate the static parameter table, then load persistent
     // values from storage:
     AP_Param::check_var_info();
@@ -389,10 +366,6 @@ void AP_Vehicle::setup()
 
     send_watchdog_reset_statustext();
 
-#if AP_OPENDRONEID_ENABLED
-    opendroneid.init();
-#endif
-
 // init EFI monitoring
 #if HAL_EFI_ENABLED
     efi.init();
@@ -400,14 +373,6 @@ void AP_Vehicle::setup()
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
     temperature_sensor.init();
-#endif
-
-#if AP_KDECAN_ENABLED
-    kdecan.init();
-#endif
-
-#if AP_AIS_ENABLED
-    ais.init();
 #endif
 
 #if HAL_NMEA_OUTPUT_ENABLED
@@ -531,9 +496,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #if HAL_GENERATOR_ENABLED
     SCHED_TASK_CLASS(AP_Generator, &vehicle.generator,      update,                   10,  50, 235),
 #endif
-#if AP_OPENDRONEID_ENABLED
-    SCHED_TASK_CLASS(AP_OpenDroneID, &vehicle.opendroneid,  update,                   10,  50, 236),
-#endif
 #if AP_NETWORKING_ENABLED
     SCHED_TASK_CLASS(AP_Networking, &vehicle.networking,    update,                   10,  50, 238),
 #endif
@@ -548,9 +510,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #endif
 #if AP_FENCE_ENABLED
     SCHED_TASK_CLASS(AC_Fence,     &vehicle.fence,          update,                   10, 100, 248),
-#endif
-#if AP_AIS_ENABLED
-    SCHED_TASK_CLASS(AP_AIS,       &vehicle.ais,            update,                    5, 100, 249),
 #endif
 #if HAL_EFI_ENABLED
     SCHED_TASK_CLASS(AP_EFI,       &vehicle.efi,            update,                   50, 200, 250),

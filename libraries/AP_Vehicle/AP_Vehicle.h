@@ -30,7 +30,6 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>     // board configuration library
-#include <AP_CANManager/AP_CANManager.h>
 #include <AP_Button/AP_Button.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_EFI/AP_EFI.h>
@@ -45,7 +44,6 @@
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
-#include <AP_OpenDroneID/AP_OpenDroneID.h>
 #include <AP_Hott_Telem/AP_Hott_Telem.h>
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
@@ -60,12 +58,9 @@
 #include <AP_TemperatureSensor/AP_TemperatureSensor.h>
 #include <SITL/SITL.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
-#include <AP_AIS/AP_AIS.h>
 #include <AP_NMEA_Output/AP_NMEA_Output.h>
 #include <AC_Fence/AC_Fence.h>
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 #include <Filter/LowPassFilter.h>
-#include <AP_KDECAN/AP_KDECAN.h>
 #include <Filter/AP_Filter.h>
 
 class AP_DDS_Client;
@@ -284,11 +279,6 @@ protected:
     // board specific config
     AP_BoardConfig BoardConfig;
 
-#if HAL_CANMANAGER_ENABLED
-    // board specific config for CAN bus
-    AP_CANManager can_mgr;
-#endif
-
     // main loop scheduler
     AP_Scheduler scheduler;
 
@@ -347,10 +337,6 @@ protected:
     AP_ESC_Telem esc_telem;
 #endif
 
-#if AP_OPENDRONEID_ENABLED
-    AP_OpenDroneID opendroneid;
-#endif
-
 #if HAL_MSP_ENABLED
     AP_MSP msp;
 #endif
@@ -384,17 +370,8 @@ protected:
     AP_Airspeed airspeed;
 #endif
 
-#if AP_AIS_ENABLED
-    // Automatic Identification System - for tracking sea-going vehicles
-    AP_AIS ais;
-#endif
-
 #if HAL_NMEA_OUTPUT_ENABLED
     AP_NMEA_Output nmea;
-#endif
-
-#if AP_KDECAN_ENABLED
-    AP_KDECAN kdecan;
 #endif
 
 #if AP_FENCE_ENABLED

@@ -114,24 +114,6 @@ const AP_Param::GroupInfo SIM::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("CAN_SRV_MSK",   29, SIM,  can_servo_mask, 0),
 
-#if HAL_NUM_CAN_IFACES > 0
-    // @Param: CAN_TYPE1
-    // @DisplayName: transport type for first CAN interface
-    // @Description: transport type for first CAN interface
-    // @Values: 0:MulticastUDP,1:SocketCAN
-    // @User: Advanced
-    AP_GROUPINFO("CAN_TYPE1", 30, SIM,  can_transport[0], uint8_t(CANTransport::MulticastUDP)),
-#endif
-
-#if HAL_NUM_CAN_IFACES > 1
-    // @Param: CAN_TYPE2
-    // @DisplayName: transport type for second CAN interface
-    // @Description: transport type for second CAN interface
-    // @Values: 0:MulticastUDP,1:SocketCAN
-    // @User: Advanced
-    AP_GROUPINFO("CAN_TYPE2", 31, SIM,  can_transport[1], uint8_t(CANTransport::MulticastUDP)),
-#endif
-
     AP_GROUPINFO("SONAR_SCALE",   32, SIM,  sonar_scale, 12.1212f),
     // @Param: FLOW_ENABLE
     // @DisplayName: Opflow Enable

@@ -662,58 +662,6 @@ int AP_HAL__UARTDriver_readstring(lua_State *L) {
     return 1;
 }
 
-#if AP_SCRIPTING_CAN_SENSOR_ENABLED
-int lua_get_CAN_device(lua_State *L) {
-
-    // Allow : and . access
-    const int arg_offset = (luaL_testudata(L, 1, "CAN") != NULL) ? 1 : 0;
-
-    binding_argcheck(L, 1 + arg_offset);
-
-    const uint32_t raw_buffer_len = get_uint32(L, 1 + arg_offset, 1, 25);
-    const uint32_t buffer_len = static_cast<uint32_t>(raw_buffer_len);
-
-    auto *scripting = AP::scripting();
-
-    if (scripting->_CAN_dev == nullptr) {
-        scripting->_CAN_dev = new ScriptingCANSensor(AP_CAN::Protocol::Scripting);
-        if (scripting->_CAN_dev == nullptr) {
-            return luaL_argerror(L, 1, "CAN device nullptr");
-        }
-    }
-
-    new_ScriptingCANBuffer(L);
-    *((ScriptingCANBuffer**)luaL_checkudata(L, -1, "ScriptingCANBuffer")) = scripting->_CAN_dev->add_buffer(buffer_len);
-
-    return 1;
-}
-
-int lua_get_CAN_device2(lua_State *L) {
-
-    // Allow : and . access
-    const int arg_offset = (luaL_testudata(L, 1, "CAN") != NULL) ? 1 : 0;
-
-    binding_argcheck(L, 1 + arg_offset);
-
-    const uint32_t raw_buffer_len = get_uint32(L, 1 + arg_offset, 1, 25);
-    const uint32_t buffer_len = static_cast<uint32_t>(raw_buffer_len);
-
-    auto *scripting = AP::scripting();
-
-    if (scripting->_CAN_dev2 == nullptr) {
-        scripting->_CAN_dev2 = new ScriptingCANSensor(AP_CAN::Protocol::Scripting2);
-        if (scripting->_CAN_dev2 == nullptr) {
-            return luaL_argerror(L, 1, "CAN device nullptr");
-        }
-    }
-
-    new_ScriptingCANBuffer(L);
-    *((ScriptingCANBuffer**)luaL_checkudata(L, -1, "ScriptingCANBuffer")) = scripting->_CAN_dev2->add_buffer(buffer_len);
-
-    return 1;
-}
-#endif // AP_SCRIPTING_CAN_SENSOR_ENABLED
-
 /*
   directory listing, return table of files in a directory
  */

@@ -34,7 +34,6 @@
 #include "DiscreteRGBLed.h"
 #include "DiscoLED.h"
 #include "Led_Sysfs.h"
-#include "DroneCAN_RGB_LED.h"
 #include "SITL_SFML_LED.h"
 #include <stdio.h>
 #include "AP_BoardLED2.h"
@@ -81,11 +80,7 @@ AP_Notify *AP_Notify::_singleton;
 // all I2C_LEDS
 #define I2C_LEDS (ALL_TOSHIBALED_I2C | ALL_NCP5623_I2C | ALL_LP5562_I2C | ALL_IS31FL3195_I2C)
 
-#if AP_NOTIFY_DRONECAN_LED_ENABLED
-#define DRONECAN_LEDS Notify_LED_DroneCAN
-#else
 #define DRONECAN_LEDS 0
-#endif
 
 #ifndef DEFAULT_NTF_LED_TYPES
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
@@ -130,12 +125,7 @@ AP_Notify *AP_Notify::_singleton;
 #endif // DEFAULT_NTF_LED_TYPES
 
 #ifndef BUZZER_ENABLE_DEFAULT
-#if HAL_CANMANAGER_ENABLED
-// Enable Buzzer messages over UAVCAN
-#define BUZZER_ENABLE_DEFAULT (Notify_Buzz_Builtin | Notify_Buzz_UAVCAN)
-#else
 #define BUZZER_ENABLE_DEFAULT Notify_Buzz_Builtin
-#endif
 #endif
 
 #ifndef BUILD_DEFAULT_BUZZER_TYPE
@@ -367,11 +357,6 @@ void AP_Notify::add_backends(void)
                 }
                 break;
 #endif
-#if AP_NOTIFY_DRONECAN_LED_ENABLED
-            case Notify_LED_DroneCAN:
-                ADD_BACKEND(new DroneCAN_RGB_LED());
-                break;
-#endif // AP_NOTIFY_DRONECAN_LED_ENABLED
 #if AP_NOTIFY_SCRIPTING_LED_ENABLED
             case Notify_LED_Scripting:
                 ADD_BACKEND(new ScriptingLED());

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GCS_MAVLink/GCS.h>
-#include <AP_Winch/AP_Winch_config.h>
 
 #ifndef AC_MAVLINK_SOLO_BUTTON_COMMAND_HANDLING_ENABLED
 #define AC_MAVLINK_SOLO_BUTTON_COMMAND_HANDLING_ENABLED 1
@@ -76,10 +75,6 @@ private:
 
     void send_pid_tuning() override;
 
-#if AP_WINCH_ENABLED
-    void send_winch_status() const override;
-#endif
-
     void send_wind() const;
 
 #if HAL_HIGH_LATENCY2_ENABLED
@@ -109,9 +104,5 @@ private:
 
     MAV_RESULT handle_MAV_CMD_MISSION_START(const mavlink_command_int_t &packet);
     MAV_RESULT handle_MAV_CMD_NAV_TAKEOFF(const mavlink_command_int_t &packet);
-
-#if AP_WINCH_ENABLED
-    MAV_RESULT handle_MAV_CMD_DO_WINCH(const mavlink_command_int_t &packet);
-#endif
 
 };

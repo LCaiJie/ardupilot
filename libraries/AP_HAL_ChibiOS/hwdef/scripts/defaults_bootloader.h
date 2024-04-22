@@ -20,8 +20,6 @@
 #define AP_INERTIALSENSOR_ENABLED 0
 #endif
 
-#define HAL_MAX_CAN_PROTOCOL_DRIVERS 0
-
 // bootloader does not save temperature cals etc:
 #ifndef HAL_ENABLE_SAVE_PERSISTENT_PARAMS
 #define HAL_ENABLE_SAVE_PERSISTENT_PARAMS 0

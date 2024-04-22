@@ -57,10 +57,6 @@
 #define HAL_BinarySemaphore HALSITL::BinarySemaphore
 #endif
 
-#ifndef HAL_NUM_CAN_IFACES
-#define HAL_NUM_CAN_IFACES 0
-#endif
-
 #ifndef HAL_BOARD_STORAGE_DIRECTORY
 #define HAL_BOARD_STORAGE_DIRECTORY "."
 #endif

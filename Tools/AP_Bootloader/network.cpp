@@ -23,9 +23,7 @@
 #include <AP_ROMFS/AP_ROMFS.h>
 #include "support.h"
 #include "bl_protocol.h"
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 #include "app_comms.h"
-#include "can.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <AP_HAL_ChibiOS/hwdef/common/flash.h>

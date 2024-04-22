@@ -22,18 +22,10 @@ void Copter::init_ardupilot()
 #endif
 
     BoardConfig.init();
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    can_mgr.init();
-#endif
 
     // init cargo gripper
 #if AP_GRIPPER_ENABLED
     g2.gripper.init();
-#endif
-
-    // init winch
-#if AP_WINCH_ENABLED
-    g2.winch.init();
 #endif
 
     // initialise notify system

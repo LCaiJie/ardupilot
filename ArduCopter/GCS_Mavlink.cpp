@@ -311,18 +311,6 @@ void GCS_MAVLINK_Copter::send_pid_tuning()
     }
 }
 
-#if AP_WINCH_ENABLED
-// send winch status message
-void GCS_MAVLINK_Copter::send_winch_status() const
-{
-    AP_Winch *winch = AP::winch();
-    if (winch == nullptr) {
-        return;
-    }
-    winch->send_status(*this);
-}
-#endif
-
 uint8_t GCS_MAVLINK_Copter::sysid_my_gcs() const
 {
     return copter.g.sysid_my_gcs;
@@ -572,9 +560,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #if HAL_GENERATOR_ENABLED
     MSG_GENERATOR_STATUS,
 #endif
-#if AP_WINCH_ENABLED
-    MSG_WINCH_STATUS,
-#endif
 #if HAL_EFI_ENABLED
     MSG_EFI_STATUS,
 #endif
@@ -584,9 +569,6 @@ static const ap_message STREAM_PARAMS_msgs[] = {
 };
 static const ap_message STREAM_ADSB_msgs[] = {
     MSG_ADSB_VEHICLE,
-#if AP_AIS_ENABLED
-    MSG_AIS_VESSEL,
-#endif
 };
 
 const struct GCS_MAVLINK::stream_entries GCS_MAVLINK::all_stream_entries[] = {
@@ -814,12 +796,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
     case MAV_CMD_MISSION_START:
         return handle_MAV_CMD_MISSION_START(packet);
 #endif
-
-#if AP_WINCH_ENABLED
-    case MAV_CMD_DO_WINCH:
-        return handle_MAV_CMD_DO_WINCH(packet);
-#endif
-
     case MAV_CMD_NAV_LOITER_UNLIM:
         if (!copter.set_mode(Mode::Number::LOITER, ModeReason::GCS_COMMAND)) {
             return MAV_RESULT_FAILED;
@@ -983,31 +959,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_MOTOR_TEST(const mavlink_comman
                                                (uint8_t)packet.x);
 }
 
-#if AP_WINCH_ENABLED
-MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_WINCH(const mavlink_command_int_t &packet)
-{
-        // param1 : winch number (ignored)
-        // param2 : action (0=relax, 1=relative length control, 2=rate control). See WINCH_ACTIONS enum.
-        if (!copter.g2.winch.enabled()) {
-            return MAV_RESULT_FAILED;
-        }
-        switch ((uint8_t)packet.param2) {
-        case WINCH_RELAXED:
-            copter.g2.winch.relax();
-            return MAV_RESULT_ACCEPTED;
-        case WINCH_RELATIVE_LENGTH_CONTROL: {
-            copter.g2.winch.release_length(packet.param3);
-            return MAV_RESULT_ACCEPTED;
-        }
-        case WINCH_RATE_CONTROL:
-            copter.g2.winch.set_desired_rate(packet.param4);
-            return MAV_RESULT_ACCEPTED;
-        default:
-            break;
-        }
-        return MAV_RESULT_FAILED;
-}
-#endif  // AP_WINCH_ENABLED
 
 #if AC_MAVLINK_SOLO_BUTTON_COMMAND_HANDLING_ENABLED
 MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_SOLO_BTN_FLY_CLICK(const mavlink_command_int_t &packet)

@@ -25,7 +25,6 @@
 #define HAL_CPU_CLASS HAL_CPU_CLASS_150
 #define HAL_WITH_DRONECAN 0
 #define HAL_WITH_UAVCAN 0
-#define HAL_MAX_CAN_PROTOCOL_DRIVERS 0
 #define HAL_HAVE_SAFETY_SWITCH 0
 #define HAL_HAVE_BOARD_VOLTAGE 0
 #define HAL_HAVE_SERVO_VOLTAGE 0
@@ -42,7 +41,6 @@
 #define HAL_BinarySemaphore ESP32::BinarySemaphore
 #endif
 
-#define HAL_NUM_CAN_IFACES 0
 #define HAL_MEM_CLASS HAL_MEM_CLASS_192
 
 // disable uncommon stuff that we'd otherwise get 

@@ -48,21 +48,11 @@
 #include <AP_Button/AP_Button.h>
 #include <AP_FETtecOneWire/AP_FETtecOneWire.h>
 #include <AP_RPM/AP_RPM.h>
-#include <AP_OpenDroneID/AP_OpenDroneID.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Scheduler/AP_Scheduler.h>
-#include <AP_KDECAN/AP_KDECAN.h>
 #include <AP_Vehicle/AP_Vehicle.h>
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-  #include <AP_CANManager/AP_CANManager.h>
-  #include <AP_Common/AP_Common.h>
-  #include <AP_Vehicle/AP_Vehicle_Type.h>
-
-  #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
-  #include <AP_DroneCAN/AP_DroneCAN.h>
-#endif
 
 #include <AP_Logger/AP_Logger.h>
 
@@ -1202,69 +1192,6 @@ bool AP_Arming::proximity_checks(bool report) const
 }
 #endif  // HAL_PROXIMITY_ENABLED
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS && HAL_CANMANAGER_ENABLED
-bool AP_Arming::can_checks(bool report)
-{
-    if (check_enabled(ARMING_CHECK_SYSTEM)) {
-        char fail_msg[50] = {};
-        (void)fail_msg; // might be left unused
-        uint8_t num_drivers = AP::can().get_num_drivers();
-
-        for (uint8_t i = 0; i < num_drivers; i++) {
-            switch (AP::can().get_driver_type(i)) {
-                case AP_CAN::Protocol::PiccoloCAN: {
-#if HAL_PICCOLO_CAN_ENABLE
-                    AP_PiccoloCAN *ap_pcan = AP_PiccoloCAN::get_pcan(i);
-
-                    if (ap_pcan != nullptr && !ap_pcan->pre_arm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
-                        check_failed(ARMING_CHECK_SYSTEM, report, "PiccoloCAN: %s", fail_msg);
-                        return false;
-                    }
-
-#else
-                    check_failed(ARMING_CHECK_SYSTEM, report, "PiccoloCAN not enabled");
-                    return false;
-#endif
-                    break;
-                }
-                case AP_CAN::Protocol::DroneCAN:
-                {
-#if HAL_ENABLE_DRONECAN_DRIVERS
-                    AP_DroneCAN *ap_dronecan = AP_DroneCAN::get_dronecan(i);
-                    if (ap_dronecan != nullptr && !ap_dronecan->prearm_check(fail_msg, ARRAY_SIZE(fail_msg))) {
-                        check_failed(ARMING_CHECK_SYSTEM, report, "DroneCAN: %s", fail_msg);
-                        return false;
-                    }
-#endif
-                    break;
-                }
-                case AP_CAN::Protocol::USD1:
-                case AP_CAN::Protocol::TOFSenseP:
-                case AP_CAN::Protocol::NanoRadar:
-                case AP_CAN::Protocol::Benewake:
-                {
-                    for (uint8_t j = i; j; j--) {
-                        if (AP::can().get_driver_type(i) == AP::can().get_driver_type(j-1)) {
-                            check_failed(ARMING_CHECK_SYSTEM, report, "Same rfnd on different CAN ports");
-                            return false;
-                        }
-                    }
-                    break;
-                }
-                case AP_CAN::Protocol::EFI_NWPMU:
-                case AP_CAN::Protocol::None:
-                case AP_CAN::Protocol::Scripting:
-                case AP_CAN::Protocol::Scripting2:
-                case AP_CAN::Protocol::KDECAN:
-
-                    break;
-            }
-        }
-    }
-    return true;
-}
-#endif  // HAL_MAX_CAN_PROTOCOL_DRIVERS && HAL_CANMANAGER_ENABLED
-
 
 #if AP_FENCE_ENABLED
 bool AP_Arming::fence_checks(bool display_failure)
@@ -1470,21 +1397,6 @@ bool AP_Arming::generator_checks(bool display_failure) const
 }
 #endif  // HAL_GENERATOR_ENABLED
 
-#if AP_OPENDRONEID_ENABLED
-// OpenDroneID Checks
-bool AP_Arming::opendroneid_checks(bool display_failure)
-{
-    auto &opendroneid = AP::opendroneid();
-
-    char failure_msg[50] {};
-    if (!opendroneid.pre_arm_check(failure_msg, sizeof(failure_msg))) {
-        check_failed(display_failure, "OpenDroneID: %s", failure_msg);
-        return false;
-    }
-    return true;
-}
-#endif  // AP_OPENDRONEID_ENABLED
-
 //Check for multiple RC in serial protocols
 bool AP_Arming::serial_protocol_checks(bool display_failure)
 {
@@ -1562,9 +1474,6 @@ bool AP_Arming::pre_arm_checks(bool report)
         &  board_voltage_checks(report)
         &  system_checks(report)
         &  terrain_checks(report)
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS && HAL_CANMANAGER_ENABLED
-        &  can_checks(report)
-#endif
 #if HAL_GENERATOR_ENABLED
         &  generator_checks(report)
 #endif
@@ -1588,9 +1497,6 @@ bool AP_Arming::pre_arm_checks(bool report)
 #endif
 #if AP_FENCE_ENABLED
         &  fence_checks(report)
-#endif
-#if AP_OPENDRONEID_ENABLED
-        &  opendroneid_checks(report)
 #endif
         &  serial_protocol_checks(report)
         &  estop_checks(report);
@@ -1646,9 +1552,6 @@ bool AP_Arming::arm_checks(AP_Arming::Method method)
 bool AP_Arming::mandatory_checks(bool report)
 {
     bool ret = true;
-#if AP_OPENDRONEID_ENABLED
-    ret &= opendroneid_checks(report);
-#endif
     ret &= rc_in_calibration_check(report);
     ret &= serial_protocol_checks(report);
     return ret;
@@ -1785,14 +1688,6 @@ void AP_Arming::send_arm_disarm_statustext(const char *str) const
 
 AP_Arming::Required AP_Arming::arming_required() const
 {
-#if AP_OPENDRONEID_ENABLED
-    // cannot be disabled if OpenDroneID is present
-    if (AP_OpenDroneID::get_singleton() != nullptr && AP::opendroneid().enabled()) {
-        if (require != Required::YES_MIN_PWM && require != Required::YES_ZERO_PWM) {
-            return Required::YES_MIN_PWM;
-        }
-    }
-#endif
     return require;
 }
 

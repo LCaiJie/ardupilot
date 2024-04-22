@@ -118,9 +118,6 @@ static ChibiOS::Flash flashDriver;
 static Empty::Flash flashDriver;
 #endif
 
-#if HAL_NUM_CAN_IFACES > 0
-static ChibiOS::CANIface* canDrivers[HAL_NUM_CAN_IFACES];
-#endif
 
 #if HAL_USE_WSPI == TRUE && defined(HAL_WSPI_DEVICE_LIST)
 static ChibiOS::WSPIDeviceManager wspiDeviceManager;
@@ -167,11 +164,7 @@ HAL_ChibiOS::HAL_ChibiOS() :
 #if HAL_WITH_DSP
         &dspDriver,
 #endif
-#if HAL_NUM_CAN_IFACES
-        (AP_HAL::CANIface**)canDrivers
-#else
         nullptr
-#endif
         )
 {}
 

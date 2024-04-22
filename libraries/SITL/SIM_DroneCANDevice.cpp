@@ -24,7 +24,6 @@
 #include <AP_Baro/AP_Baro_SITL.h>
 #include <dronecan_msgs.h>
 #include <SITL/SITL.h>
-#include <AP_DroneCAN/AP_Canard_iface.h>
 
 
 using namespace SITL;

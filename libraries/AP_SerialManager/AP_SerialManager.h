@@ -55,7 +55,6 @@ public:
         SerialProtocol_Robotis = 19,
         SerialProtocol_NMEAOutput = 20,
         SerialProtocol_WindVane = 21,
-        SerialProtocol_SLCAN = 22,
         SerialProtocol_RCIN = 23,
         SerialProtocol_EFI = 24,                   // EFI serial protocol
         SerialProtocol_LTM_Telem = 25,

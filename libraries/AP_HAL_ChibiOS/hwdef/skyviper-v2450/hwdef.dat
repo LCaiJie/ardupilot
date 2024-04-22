@@ -70,7 +70,6 @@ define AP_OPTICALFLOW_ENABLED 0
 define AP_FRSKY_TELEM_ENABLED 0
 define HAL_ADSB_SAGETECH_ENABLED 0
 define HAL_ADSB_UAVIONIX_MAVLINK_ENABLED 0
-define AP_AIS_ENABLED 0
 define AP_BATTERY_BACKEND_DEFAULT_ENABLED 0
 define AP_BATTERY_ANALOG_ENABLED 1
 define HAL_CRSF_TELEM_ENABLED 0
@@ -81,7 +80,6 @@ define HAL_HOTT_TELEM_ENABLED 0
 define HAL_MSP_SENSORS_ENABLED 0
 define HAL_NMEA_OUTPUT_ENABLED 0
 define HAL_PARACHUTE_ENABLED 0
-define HAL_PICCOLO_CAN_ENABLE 0
 define HAL_RUNCAM_ENABLED 0
 define AP_SMARTAUDIO_ENABLED 0
 define HAL_SPEKTRUM_TELEM_ENABLED 0
@@ -95,7 +93,6 @@ define HAL_DISPLAY_ENABLED 0
 # serially-attached actuators aren't relevant on SkyViper:
 define AP_FETTEC_ONEWIRE_ENABLED 0
 define AP_ROBOTISSERVO_ENABLED 0
-define AP_VOLZ_ENABLED 0
 define HAL_SUPPORT_RCOUT_SERIAL 0
 define HAL_TORQEEDO_ENABLED 0
 
@@ -157,10 +154,6 @@ define EK3_FEATURE_BODY_ODOM 0
 
 // video on SkyViper is via the Sonix
 define AP_VIDEOTX_ENABLED 0
-
-// good luck fitting a winch onto SkyViper:
-define AP_WINCH_ENABLED 0
-
 
 # SkyViper uses AP_Radio, which does its own RC protocol decoding:
 define AP_RCPROTOCOL_ENABLED 0

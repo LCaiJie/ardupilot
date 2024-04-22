@@ -627,9 +627,6 @@ private:
 #if PARACHUTE == ENABLED
     void do_parachute(const AP_Mission::Mission_Command& cmd);
 #endif
-#if AP_WINCH_ENABLED
-    void do_winch(const AP_Mission::Mission_Command& cmd);
-#endif
     void do_payload_place(const AP_Mission::Mission_Command& cmd);
     void do_RTL(void);
 #if AP_SCRIPTING_ENABLED

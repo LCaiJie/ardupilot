@@ -257,9 +257,6 @@ static Empty::DSP dspDriver;
 static Empty::Flash flashDriver;
 static Empty::WSPIDeviceManager wspi_mgr_instance;
 
-#if HAL_NUM_CAN_IFACES
-static CANIface* canDrivers[HAL_NUM_CAN_IFACES];
-#endif
 
 HAL_Linux::HAL_Linux() :
     AP_HAL::HAL(
@@ -289,11 +286,7 @@ HAL_Linux::HAL_Linux() :
 #if HAL_WITH_DSP
         &dspDriver,
 #endif
-#if HAL_NUM_CAN_IFACES
-        (AP_HAL::CANIface**)canDrivers
-#else
         nullptr
-#endif
         )
 {}
 

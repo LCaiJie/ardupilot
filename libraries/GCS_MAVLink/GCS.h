@@ -23,7 +23,6 @@
 #include <AP_GPS/AP_GPS.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_RangeFinder/AP_RangeFinder_config.h>
-#include <AP_Winch/AP_Winch_config.h>
 
 #include "ap_message.h"
 
@@ -385,9 +384,6 @@ public:
     void send_set_position_target_global_int(uint8_t target_system, uint8_t target_component, const Location& loc);
     void send_rpm() const;
     void send_generator_status() const;
-#if AP_WINCH_ENABLED
-    virtual void send_winch_status() const {};
-#endif
     void send_water_depth() const;
     int8_t battery_remaining_pct(const uint8_t instance) const;
 
@@ -667,9 +663,6 @@ protected:
       handle MAV_CMD_CAN_FORWARD and CAN_FRAME messages for CAN over MAVLink
      */
     void can_frame_callback(uint8_t bus, const AP_HAL::CANFrame &);
-#if HAL_CANMANAGER_ENABLED
-    MAV_RESULT handle_can_forward(const mavlink_command_int_t &packet, const mavlink_message_t &msg);
-#endif
     void handle_can_frame(const mavlink_message_t &msg) const;
 
     void handle_optical_flow(const mavlink_message_t &msg);

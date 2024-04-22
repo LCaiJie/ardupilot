@@ -25,10 +25,6 @@
 
 #include <AP_HAL/AP_HAL.h>
 
-#if HAL_ENABLE_DRONECAN_DRIVERS
-#include "AP_BattMonitor_DroneCAN.h"
-#endif
-
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Logger/AP_Logger.h>
 #include <GCS_MAVLink/GCS.h>
@@ -486,11 +482,6 @@ AP_BattMonitor::init()
 #if AP_BATTERY_BEBOP_ENABLED
             case Type::BEBOP:
                 drivers[instance] = new AP_BattMonitor_Bebop(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_UAVCAN_BATTERYINFO_ENABLED
-            case Type::UAVCAN_BatteryInfo:
-                drivers[instance] = new AP_BattMonitor_DroneCAN(*this, state[instance], AP_BattMonitor_DroneCAN::UAVCAN_BATTERY_INFO, _params[instance]);
                 break;
 #endif
 #if AP_BATTERY_ESC_ENABLED

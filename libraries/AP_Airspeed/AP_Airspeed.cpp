@@ -49,7 +49,6 @@
 #include "AP_Airspeed_analog.h"
 #include "AP_Airspeed_ASP5033.h"
 #include "AP_Airspeed_Backend.h"
-#include "AP_Airspeed_DroneCAN.h"
 #include "AP_Airspeed_NMEA.h"
 #include "AP_Airspeed_MSP.h"
 #include "AP_Airspeed_External.h"
@@ -420,9 +419,6 @@ void AP_Airspeed::allocate()
 #endif
             break;
         case TYPE_UAVCAN:
-#if AP_AIRSPEED_DRONECAN_ENABLED
-            sensor[i] = AP_Airspeed_DroneCAN::probe(*this, i, uint32_t(param[i].bus_id.get()));
-#endif
             break;
         case TYPE_NMEA_WATER:
 #if AP_AIRSPEED_NMEA_ENABLED
@@ -451,19 +447,6 @@ void AP_Airspeed::allocate()
             num_sensors = i+1;
         }
     }
-
-#if AP_AIRSPEED_DRONECAN_ENABLED
-    // we need a 2nd pass for DroneCAN sensors so we can match order by DEVID
-    // the 2nd pass accepts any devid
-    for (uint8_t i=0; i<AIRSPEED_MAX_SENSORS; i++) {
-        if (sensor[i] == nullptr && (enum airspeed_type)param[i].type.get() == TYPE_UAVCAN) {
-            sensor[i] = AP_Airspeed_DroneCAN::probe(*this, i, 0);
-            if (sensor[i] != nullptr) {
-                num_sensors = i+1;
-            }
-        }
-    }
-#endif // AP_AIRSPEED_DRONECAN_ENABLED
 #endif // HAL_AIRSPEED_PROBE_LIST
 
     // set DEVID to zero for any sensors not found. This allows backends to order

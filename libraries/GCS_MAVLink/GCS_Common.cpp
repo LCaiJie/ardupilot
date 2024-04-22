@@ -51,17 +51,13 @@
 #include <AP_Proximity/AP_Proximity.h>
 #include <AP_Scripting/AP_Scripting.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <AP_Winch/AP_Winch.h>
-#include <AP_OpenDroneID/AP_OpenDroneID.h>
 #include <AP_OSD/AP_OSD.h>
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <AP_RPM/AP_RPM.h>
-#include <AP_AIS/AP_AIS.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_Frsky_Telem/AP_Frsky_Telem.h>
 #include <RC_Channel/RC_Channel.h>
 #include <AP_VisualOdom/AP_VisualOdom.h>
-#include <AP_KDECAN/AP_KDECAN.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 #include <AP_Landing/AP_Landing_config.h>
 
@@ -83,13 +79,6 @@
 #include <SITL/SITL.h>
 #endif
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-  #include <AP_CANManager/AP_CANManager.h>
-  #include <AP_Common/AP_Common.h>
-
-  #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
-  #include <AP_DroneCAN/AP_DroneCAN.h>
-#endif
 
 #include <AP_BattMonitor/AP_BattMonitor_config.h>
 #if AP_BATTERY_ENABLED
@@ -1029,9 +1018,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #if HAL_GENERATOR_ENABLED
         { MAVLINK_MSG_ID_GENERATOR_STATUS,      MSG_GENERATOR_STATUS},
 #endif
-#if AP_WINCH_ENABLED
-        { MAVLINK_MSG_ID_WINCH_STATUS,          MSG_WINCH_STATUS},
-#endif
 #if HAL_WITH_ESC_TELEM
         { MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4,  MSG_ESC_TELEMETRY},
 #endif
@@ -1040,9 +1026,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #endif
 #if HAL_HIGH_LATENCY2_ENABLED
         { MAVLINK_MSG_ID_HIGH_LATENCY2,         MSG_HIGH_LATENCY2},
-#endif
-#if AP_AIS_ENABLED
-        { MAVLINK_MSG_ID_AIS_VESSEL,            MSG_AIS_VESSEL},
 #endif
 #if AP_MAVLINK_MSG_UAVIONIX_ADSB_OUT_STATUS_ENABLED
         { MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS, MSG_UAVIONIX_ADSB_OUT_STATUS},
@@ -3801,23 +3784,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_mag_cal(const mavlink_command_int_t &pack
 }
 #endif  // COMPASS_CAL_ENABLED
 
-#if HAL_CANMANAGER_ENABLED
-/*
-  handle MAV_CMD_CAN_FORWARD
- */
-MAV_RESULT GCS_MAVLINK::handle_can_forward(const mavlink_command_int_t &packet, const mavlink_message_t &msg)
-{
-    return AP::can().handle_can_forward(chan, packet, msg) ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
-}
-
-/*
-  handle CAN_FRAME messages
- */
-void GCS_MAVLINK::handle_can_frame(const mavlink_message_t &msg) const
-{
-    AP::can().handle_can_frame(msg);
-}
-#endif  // HAL_CANMANAGER_ENABLED
 
 void GCS_MAVLINK::handle_distance_sensor(const mavlink_message_t &msg)
 {
@@ -4123,37 +4089,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
         handle_named_value(msg);
         break;
-
-#if HAL_CANMANAGER_ENABLED
-    case MAVLINK_MSG_ID_CAN_FRAME:
-    case MAVLINK_MSG_ID_CANFD_FRAME:
-        handle_can_frame(msg);
-        break;
-#endif
-
-#if HAL_CANMANAGER_ENABLED
-    case MAVLINK_MSG_ID_CAN_FILTER_MODIFY:
-        AP::can().handle_can_filter_modify(msg);
-        break;
-#endif
-
-#if AP_OPENDRONEID_ENABLED
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS:
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_OPERATOR_ID:
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_SELF_ID:
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_BASIC_ID:
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM:
-    case MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE:
-        AP::opendroneid().handle_msg(chan, msg);
-        break;
-#endif
-
-#if AP_SIGNED_FIRMWARE
-    case MAVLINK_MSG_ID_SECURE_COMMAND:
-    case MAVLINK_MSG_ID_SECURE_COMMAND_REPLY:
-        AP_CheckFirmware::handle_msg(chan, msg);
-        break;
-#endif
 
 #if AP_EFI_MAV_ENABLED
     case MAVLINK_MSG_ID_EFI_STATUS:
@@ -5003,11 +4938,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
 #if AP_BATTERY_ENABLED
     case MAV_CMD_BATTERY_RESET:
         return handle_command_battery_reset(packet);
-#endif
-
-#if HAL_CANMANAGER_ENABLED
-    case MAV_CMD_CAN_FORWARD:
-        return handle_can_forward(packet, msg);
 #endif
 
 #if HAL_HIGH_LATENCY2_ENABLED
@@ -5912,13 +5842,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     }
 #endif
 
-#if AP_WINCH_ENABLED
-    case MSG_WINCH_STATUS:
-        CHECK_PAYLOAD_SIZE(WINCH_STATUS);
-        send_winch_status();
-        break;
-#endif
-
 #if AP_RANGEFINDER_ENABLED && APM_BUILD_TYPE(APM_BUILD_Rover)
     case MSG_WATER_DEPTH:
         CHECK_PAYLOAD_SIZE(WATER_DEPTH);
@@ -5932,16 +5855,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         send_high_latency2();
         break;
 #endif // HAL_HIGH_LATENCY2_ENABLED
-
-#if AP_AIS_ENABLED
-    case MSG_AIS_VESSEL: {
-        AP_AIS *ais = AP_AIS::get_singleton();
-        if (ais) {
-            ais->send(chan);
-        }
-        break;
-    }
-#endif
 
 #if AP_MAVLINK_MSG_UAVIONIX_ADSB_OUT_STATUS_ENABLED
     case MSG_UAVIONIX_ADSB_OUT_STATUS:

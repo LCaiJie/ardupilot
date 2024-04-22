@@ -24,10 +24,6 @@
 #include <AR_Motors/AP_MotorsUGV.h>
 #endif
 
-#if AP_RELAY_DRONECAN_ENABLED
-#include <AP_DroneCAN/AP_DroneCAN.h>
-#include <AP_CANManager/AP_CANManager.h>
-#endif
 
 #if AP_SIM_ENABLED
 #include <SITL/SITL.h>
@@ -359,9 +355,6 @@ void AP_Relay::init()
         }
 
         // Make sure any DroneCAN pin is enabled for streaming
-#if AP_RELAY_DRONECAN_ENABLED
-        dronecan.enable_pin(pin);
-#endif
 
     }
 }
@@ -446,11 +439,7 @@ bool AP_Relay::arming_checks(size_t buflen, char *buffer) const
             continue;
         }
 
-#if AP_RELAY_DRONECAN_ENABLED
-        const bool DroneCAN_pin = dronecan.valid_pin(pin);
-#else
         const bool DroneCAN_pin = false;
-#endif
 
         if (!DroneCAN_pin && !hal.gpio->valid_pin(pin)) {
             // Check GPIO pin is valid
@@ -498,13 +487,6 @@ bool AP_Relay::get_pin(const int16_t pin) const
         return false;
     }
 
-#if AP_RELAY_DRONECAN_ENABLED
-    if (dronecan.valid_pin(pin)) {
-        // Virtual DroneCAN pin
-        return dronecan.get_pin(pin);
-    }
-#endif
-
     // Real GPIO pin
     hal.gpio->pinMode(pin, HAL_GPIO_OUTPUT);
     return (bool)hal.gpio->read(pin);
@@ -517,14 +499,6 @@ void AP_Relay::set_pin(const int16_t pin, const bool value)
         // invalid pin
         return;
     }
-
-#if AP_RELAY_DRONECAN_ENABLED
-    if (dronecan.valid_pin(pin)) {
-        // Virtual DroneCAN pin
-        dronecan.set_pin(pin, value);
-        return;
-    }
-#endif
 
     // Real GPIO pin
     hal.gpio->pinMode(pin, HAL_GPIO_OUTPUT);
@@ -549,91 +523,6 @@ bool AP_Relay::enabled(AP_Relay_Params::FUNCTION function) const
     return false;
 }
 
-#if AP_RELAY_DRONECAN_ENABLED
-// Return true if pin number is a virtual DroneCAN pin
-bool AP_Relay::DroneCAN::valid_pin(int16_t pin) const
-{
-    switch(pin) {
-        case (int16_t)AP_Relay_Params::VIRTUAL_PINS::DroneCAN_0 ... (int16_t)AP_Relay_Params::VIRTUAL_PINS::DroneCAN_15:
-            return true;
-        default:
-            return false;
-    }
-}
-
-// Enable streaming of pin number
-void AP_Relay::DroneCAN::enable_pin(int16_t pin)
-{
-    if (!valid_pin(pin)) {
-        return;
-    }
-
-    const uint8_t index = hardpoint_index(pin);
-    state[index].enabled = true;
-}
-
-// Get the hardpoint index of given pin number
-uint8_t AP_Relay::DroneCAN::hardpoint_index(const int16_t pin) const
-{
-    return pin - (int16_t)AP_Relay_Params::VIRTUAL_PINS::DroneCAN_0;
-}
-
-// Set DroneCAN relay state from pin number
-void AP_Relay::DroneCAN::set_pin(const int16_t pin, const bool value)
-{
-    const uint8_t index = hardpoint_index(pin);
-
-    // Set pin and ensure enabled for streaming
-    state[index].enabled = true;
-    state[index].value = value;
-
-    // Broadcast msg on all channels
-    // Just a single send, rely on streaming to fill in any lost packet
-
-    uavcan_equipment_hardpoint_Command msg {};
-    msg.hardpoint_id = index;
-    msg.command = state[index].value;
-
-    uint8_t can_num_drivers = AP::can().get_num_drivers();
-    for (uint8_t i = 0; i < can_num_drivers; i++) {
-        auto *ap_dronecan = AP_DroneCAN::get_dronecan(i);
-        if (ap_dronecan != nullptr) {
-            ap_dronecan->relay_hardpoint.broadcast(msg);
-        }
-    }
-
-}
-
-// Get relay state from pin number, this relies on a cached value, assume remote pin is in sync
-bool AP_Relay::DroneCAN::get_pin(const int16_t pin) const
-{
-    const uint8_t index = hardpoint_index(pin);
-    return state[index].value;
-}
-
-// Populate message and update index with the sent command
-// This will allow the caller to cycle through each enabled pin
-bool AP_Relay::DroneCAN::populate_next_command(uint8_t &index, uavcan_equipment_hardpoint_Command &msg) const
-{
-    // Find the next enabled index
-    for (uint8_t i = 0; i < ARRAY_SIZE(state); i++) {
-        // Look for next index, wrapping back to 0 as needed
-        const uint8_t new_index = (index + 1 + i) % ARRAY_SIZE(state);
-        if (!state[new_index].enabled) {
-            // This index is not being used
-            continue;
-        }
-
-        // Update command and index then return
-        msg.hardpoint_id = new_index;
-        msg.command = state[new_index].value;
-        index = new_index;
-        return true;
-    }
-
-    return false;
-}
-#endif // AP_RELAY_DRONECAN_ENABLED
 
 #if AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
 // this method may only return false if there is no space in the

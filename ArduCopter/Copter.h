@@ -71,7 +71,6 @@
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AC_PrecLand/AC_PrecLand_config.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_Winch/AP_Winch_config.h>
 
 // Configuration
 #include "defines.h"
@@ -137,9 +136,6 @@
 #endif
 #if TOY_MODE_ENABLED == ENABLED
  # include "toy_mode.h"
-#endif
-#if AP_WINCH_ENABLED
- # include <AP_Winch/AP_Winch.h>
 #endif
 #include <AP_RPM/AP_RPM.h>
 

@@ -734,13 +734,6 @@ class ChibiOSHWDef(object):
         for i in range(len(can_order)):
             can_rev_order[can_order[i]-1] = i
 
-        f.write('#define HAL_CAN_INTERFACE_LIST %s\n' % ','.join([str(i-1) for i in can_order]))
-        f.write('#define HAL_CAN_INTERFACE_REV_LIST %s\n' % ','.join([str(i) for i in can_rev_order]))
-        f.write('#define HAL_CAN_BASE_LIST %s\n' % ','.join(base_list))
-        f.write('#define HAL_NUM_CAN_IFACES %d\n' % len(base_list))
-        if 'CAN' in self.bytype and self.mcu_type.startswith("STM32F3"):
-            f.write('#define CAN1_BASE CAN_BASE\n')
-        self.env_vars['HAL_NUM_CAN_IFACES'] = str(len(base_list))
 
         if self.mcu_series.startswith("STM32H7") and not self.is_bootloader_fw():
             # set maximum supported canfd bit rate in MBits/sec
@@ -1604,15 +1597,6 @@ INCLUDE common.ld
         f.write('#define HAL_WSPI_BUS_LIST %s\n\n' % ','.join(devlist))
         self.write_WSPI_table(f)
 
-    def write_check_firmware(self, f):
-        '''add AP_CHECK_FIRMWARE_ENABLED if needed'''
-        if self.is_periph_fw() or self.intdefines.get('AP_OPENDRONEID_ENABLED', 0) == 1:
-            f.write('''
-#ifndef AP_CHECK_FIRMWARE_ENABLED
-#define AP_CHECK_FIRMWARE_ENABLED 1
-#endif
-''')
-
     def parse_spi_device(self, dev):
         '''parse a SPI:xxx device item'''
         a = dev.split(':')
@@ -1933,13 +1917,11 @@ INCLUDE common.ld
             f.write('#define HAL_HAVE_DUAL_USB_CDC 1\n')
             if not self.is_periph_fw():
                 f.write('''
-#if defined(HAL_NUM_CAN_IFACES) && HAL_NUM_CAN_IFACES
 #ifndef HAL_OTG2_PROTOCOL
 #define HAL_OTG2_PROTOCOL SerialProtocol_MAVLink2
 #endif
 #define DEFAULT_SERIAL%d_PROTOCOL HAL_OTG2_PROTOCOL
 #define DEFAULT_SERIAL%d_BAUD 115200
-#endif
 ''' % (OTG2_index, OTG2_index))
 
         f.write('#define HAL_SERIAL_DEVICE_LIST %s\n\n' % ','.join(devlist))
@@ -2577,8 +2559,6 @@ Please run: Tools/scripts/build_bootloaders.py %s
         self.write_BARO_config(f)
         self.write_AIRSPEED_config(f)
         self.write_board_validate_macro(f)
-        self.write_check_firmware(f)
-
         self.write_peripheral_enable(f)
 
         if os.path.exists(self.processed_defaults_filepath()):

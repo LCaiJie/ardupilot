@@ -28,7 +28,6 @@ define HAL_HOTT_TELEM_ENABLED 0
 # smaller boards lose some GPS support
 define AP_GPS_BACKEND_DEFAULT_ENABLED 0
 define AP_GPS_UBLOX_ENABLED 1
-define AP_GPS_DRONECAN_ENABLED HAL_ENABLE_DRONECAN_DRIVERS
 undef HAL_MSP_GPS_ENABLED
 define HAL_MSP_GPS_ENABLED HAL_MSP_SENSORS_ENABLED
 
@@ -41,15 +40,8 @@ define AP_LTM_TELEM_ENABLED 0
 # various structures increase the flash size when using >16 servos:
 define NUM_SERVO_CHANNELS 16
 
-# no Winch if minimized:
-define AP_WINCH_ENABLED 0
-
 # prune out some odd camera backends:
 # no SLCAN on these boards (use can-over-mavlink if required)
-define AP_CAN_SLCAN_ENABLED 0
-
-# no PiccoloCAN:
-define HAL_PICCOLO_CAN_ENABLE 0
 
 
 # restricted battery backends:
@@ -57,7 +49,6 @@ define AP_BATTERY_BACKEND_DEFAULT_ENABLED 0
 define AP_BATTERY_ANALOG_ENABLED 1
 define AP_BATTERY_ESC_ENABLED HAL_WITH_ESC_TELEM
 define AP_BATTERY_WATT_MAX_ENABLED 0
-define AP_BATTERY_UAVCAN_BATTERYINFO_ENABLED HAL_ENABLE_DRONECAN_DRIVERS
 define AP_BATTERY_SUM_ENABLED 1
 define AP_BATTERY_SYNTHETIC_CURRENT_ENABLED 1
 define AP_BATTERY_SMBUS_ENABLED 1
@@ -117,7 +108,6 @@ define AP_AIRSPEED_ANALOG_ENABLED 1
 define AP_AIRSPEED_MS5525_ENABLED 1
 define AP_AIRSPEED_SDP3X_ENABLED 1
 define AP_AIRSPEED_NMEA_ENABLED 1  # additional checks for vehicle type in .cpp
-define AP_AIRSPEED_DRONECAN_ENABLED HAL_ENABLE_DRONECAN_DRIVERS
 
 # don't need payload place mission items on these boards, it's very niche:
 define AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED 0

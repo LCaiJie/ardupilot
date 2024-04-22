@@ -9,9 +9,6 @@ void Tracker::init_ardupilot()
     stats.init();
 
     BoardConfig.init();
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    can_mgr.init();
-#endif
 
     // initialise notify
     notify.init();

@@ -32,7 +32,6 @@
 #include "AP_RCProtocol_ST24.h"
 #include "AP_RCProtocol_FPort.h"
 #include "AP_RCProtocol_FPort2.h"
-#include "AP_RCProtocol_DroneCAN.h"
 #include "AP_RCProtocol_GHST.h"
 #include <AP_Math/AP_Math.h>
 #include <RC_Channel/RC_Channel.h>
@@ -79,9 +78,6 @@ void AP_RCProtocol::init()
 #endif
 #if AP_RCPROTOCOL_FPORT_ENABLED
     backend[AP_RCProtocol::FPORT] = new AP_RCProtocol_FPort(*this, true);
-#endif
-#if AP_RCPROTOCOL_DRONECAN_ENABLED
-    backend[AP_RCProtocol::DRONECAN] = new AP_RCProtocol_DroneCAN(*this);
 #endif
 #if AP_RCPROTOCOL_GHST_ENABLED
     backend[AP_RCProtocol::GHST] = new AP_RCProtocol_GHST(*this);
@@ -377,22 +373,6 @@ bool AP_RCProtocol::new_input()
         }
     }
 
-#if AP_RCPROTOCOL_DRONECAN_ENABLED
-    uint32_t now = AP_HAL::millis();
-    if (should_search(now)) {
-        if (backend[AP_RCProtocol::DRONECAN] != nullptr &&
-            backend[AP_RCProtocol::DRONECAN]->new_input()) {
-            _detected_protocol = AP_RCProtocol::DRONECAN;
-            _last_input_ms = now;
-        }
-    } else if (_detected_protocol == AP_RCProtocol::DRONECAN) {
-        _new_input = backend[AP_RCProtocol::DRONECAN]->new_input();
-        if (_new_input) {
-            _last_input_ms = now;
-        }
-    }
-#endif
-
     bool ret = _new_input;
     _new_input = false;
     return ret;
@@ -504,10 +484,6 @@ const char *AP_RCProtocol::protocol_name_from_protocol(rcprotocol_t protocol)
 #if AP_RCPROTOCOL_FPORT2_ENABLED
     case FPORT2:
         return "FPORT2";
-#endif
-#if AP_RCPROTOCOL_DRONECAN_ENABLED
-    case DRONECAN:
-        return "DroneCAN";
 #endif
 #if AP_RCPROTOCOL_GHST_ENABLED
     case GHST:

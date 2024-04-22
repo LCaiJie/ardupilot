@@ -49,11 +49,7 @@ public:
 #if HAL_WITH_DSP
         AP_HAL::DSP*        _dsp,
 #endif
-#if HAL_NUM_CAN_IFACES > 0
-        AP_HAL::CANIface* _can_ifaces[HAL_NUM_CAN_IFACES])
-#else
         AP_HAL::CANIface** _can_ifaces)
-#endif
         :
         serial_array{
             _serial0,
@@ -86,16 +82,6 @@ public:
 #endif
         flash(_flash)
     {
-#if HAL_NUM_CAN_IFACES > 0
-        if (_can_ifaces == nullptr) {
-            for (uint8_t i = 0; i < HAL_NUM_CAN_IFACES; i++)
-                can[i] = nullptr;
-        } else {
-            for (uint8_t i = 0; i < HAL_NUM_CAN_IFACES; i++)
-                can[i] = _can_ifaces[i];
-        }
-#endif
-
         AP_HAL::init();
     }
 
@@ -132,11 +118,7 @@ public:
     AP_HAL::OpticalFlow *opticalflow;
     AP_HAL::Flash       *flash;
     AP_HAL::DSP         *dsp;
-#if HAL_NUM_CAN_IFACES > 0
-    AP_HAL::CANIface* can[HAL_NUM_CAN_IFACES];
-#else
     AP_HAL::CANIface** can;
-#endif
 
     // access to serial ports using SERIALn_ numbering
     UARTDriver* serial(uint8_t sernum) const;

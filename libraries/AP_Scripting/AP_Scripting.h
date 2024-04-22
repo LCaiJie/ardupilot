@@ -23,7 +23,6 @@
 #include <AP_Mission/AP_Mission.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_HAL/I2CDevice.h>
-#include "AP_Scripting_CANSensor.h"
 #include <AP_Networking/AP_Networking_Config.h>
 
 #ifndef SCRIPTING_MAX_NUM_I2C_DEVICE
@@ -93,12 +92,6 @@ public:
     // the number of and storage for i2c devices
     uint8_t num_i2c_devices;
     AP_HAL::OwnPtr<AP_HAL::I2CDevice> *_i2c_dev[SCRIPTING_MAX_NUM_I2C_DEVICE];
-
-#if AP_SCRIPTING_CAN_SENSOR_ENABLED
-    // Scripting CAN sensor
-    ScriptingCANSensor *_CAN_dev;
-    ScriptingCANSensor *_CAN_dev2;
-#endif
 
 #if AP_MISSION_ENABLED
     // mission item buffer

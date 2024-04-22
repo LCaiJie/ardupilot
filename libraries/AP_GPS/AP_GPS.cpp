@@ -45,11 +45,6 @@
 #include "AP_GPS_SITL.h"
 #endif
 
-#if HAL_ENABLE_DRONECAN_DRIVERS
-#include <AP_CANManager/AP_CANManager.h>
-#include <AP_DroneCAN/AP_DroneCAN.h>
-#include "AP_GPS_DroneCAN.h"
-#endif
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Logger/AP_Logger.h>
@@ -402,37 +397,6 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     AP_GROUPINFO("_PRIMARY", 27, AP_GPS, _primary, 0),
 #endif
 
-#if HAL_ENABLE_DRONECAN_DRIVERS
-    // @Param: _CAN_NODEID1
-    // @DisplayName: GPS Node ID 1
-    // @Description: GPS Node id for first-discovered GPS.
-    // @ReadOnly: True
-    // @User: Advanced
-    AP_GROUPINFO("_CAN_NODEID1", 28, AP_GPS, _node_id[0], 0),
-
-#if GPS_MAX_RECEIVERS > 1
-    // @Param: _CAN_NODEID2
-    // @DisplayName: GPS Node ID 2
-    // @Description: GPS Node id for second-discovered GPS.
-    // @ReadOnly: True
-    // @User: Advanced
-    AP_GROUPINFO("_CAN_NODEID2", 29, AP_GPS, _node_id[1], 0),
-#endif // GPS_MAX_RECEIVERS > 1
-    // @Param: 1_CAN_OVRIDE
-    // @DisplayName: First DroneCAN GPS NODE ID
-    // @Description: GPS Node id for first GPS. If 0 the gps will be automatically selected on a first-come-first-GPS basis.
-    // @User: Advanced
-    AP_GROUPINFO("1_CAN_OVRIDE", 30, AP_GPS, _override_node_id[0], 0),
-
-#if GPS_MAX_RECEIVERS > 1
-    // @Param: 2_CAN_OVRIDE
-    // @DisplayName: Second DroneCAN GPS NODE ID
-    // @Description: GPS Node id for second GPS. If 0 the gps will be automatically selected on a second-come-second-GPS basis.
-    // @User: Advanced
-    AP_GROUPINFO("2_CAN_OVRIDE", 31, AP_GPS, _override_node_id[1], 0),
-#endif // GPS_MAX_RECEIVERS > 1
-#endif // HAL_ENABLE_DRONECAN_DRIVERS
-
     AP_GROUPEND
 };
 
@@ -742,10 +706,6 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     case GPS_TYPE_UAVCAN:
     case GPS_TYPE_UAVCAN_RTK_BASE:
     case GPS_TYPE_UAVCAN_RTK_ROVER:
-#if AP_GPS_DRONECAN_ENABLED
-        dstate->auto_detected_baud = false; // specified, not detected
-        return AP_GPS_DroneCAN::probe(*this, state[instance]);
-#endif
         return nullptr; // We don't do anything here if UAVCAN is not supported
 #if HAL_MSP_GPS_ENABLED
     case GPS_TYPE_MSP:
@@ -2279,15 +2239,6 @@ bool AP_GPS::prepare_for_arming(void) {
 
 bool AP_GPS::backends_healthy(char failure_msg[], uint16_t failure_msg_len) {
     for (uint8_t i = 0; i < GPS_MAX_RECEIVERS; i++) {
-#if AP_GPS_DRONECAN_ENABLED
-        if (_type[i] == GPS_TYPE_UAVCAN ||
-            _type[i] == GPS_TYPE_UAVCAN_RTK_BASE ||
-            _type[i] == GPS_TYPE_UAVCAN_RTK_ROVER) {
-            if (!AP_GPS_DroneCAN::backends_healthy(failure_msg, failure_msg_len)) {
-                return false;
-            }
-        }
-#endif
         if (_type[i] == GPS_TYPE_UBLOX_RTK_ROVER ||
             _type[i] == GPS_TYPE_UAVCAN_RTK_ROVER) {
             if (AP_HAL::millis() - state[i].gps_yaw_time_ms > 15000) {

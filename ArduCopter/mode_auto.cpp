@@ -749,12 +749,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 
-#if AP_WINCH_ENABLED
-    case MAV_CMD_DO_WINCH:                             // Mission command to control winch
-        do_winch(cmd);
-        break;
-#endif
-
     case MAV_CMD_DO_LAND_START:
         break;
 
@@ -1910,28 +1904,6 @@ void ModeAuto::do_roi(const AP_Mission::Mission_Command& cmd)
 void ModeAuto::do_mount_control(const AP_Mission::Mission_Command& cmd)
 {
 }
-
-#if AP_WINCH_ENABLED
-// control winch based on mission command
-void ModeAuto::do_winch(const AP_Mission::Mission_Command& cmd)
-{
-    // Note: we ignore the gripper num parameter because we only support one gripper
-    switch (cmd.content.winch.action) {
-        case WINCH_RELAXED:
-            g2.winch.relax();
-            break;
-        case WINCH_RELATIVE_LENGTH_CONTROL:
-            g2.winch.release_length(cmd.content.winch.release_length);
-            break;
-        case WINCH_RATE_CONTROL:
-            g2.winch.set_desired_rate(cmd.content.winch.release_rate);
-            break;
-        default:
-            // do nothing
-            break;
-    }
-}
-#endif
 
 #if AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED && AC_PAYLOAD_PLACE_ENABLED
 // do_payload_place - initiate placing procedure

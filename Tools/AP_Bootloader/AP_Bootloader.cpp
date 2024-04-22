@@ -36,7 +36,6 @@
 #if EXT_FLASH_SIZE_MB
 #include <AP_FlashIface/AP_FlashIface_JEDEC.h>
 #endif
-#include <AP_CheckFirmware/AP_CheckFirmware.h>
 #include "network.h"
 
 extern "C" {
@@ -115,42 +114,6 @@ int main(void)
         try_boot = true;
         timeout = 0;
     }
-#if HAL_USE_CAN == TRUE || HAL_NUM_CAN_IFACES
-    else if ((m & 0xFFFFFF00) == RTC_BOOT_CANBL) {
-        try_boot = false;
-        timeout = 10000;
-        can_set_node_id(m & 0xFF);
-    }
-    if (can_check_update()) {
-        // trying to update firmware, stay in bootloader
-        try_boot = false;
-        timeout = 0;
-    }
-#if AP_CHECK_FIRMWARE_ENABLED
-    const auto ok = check_good_firmware();
-    if (ok != check_fw_result_t::CHECK_FW_OK) {
-        // bad firmware CRC, don't try and boot
-        timeout = 0;
-        try_boot = false;
-        led_set(LED_BAD_FW);
-    }
-#endif  // AP_CHECK_FIRMWARE_ENABLED
-#ifndef BOOTLOADER_DEV_LIST
-    else if (timeout != 0) {
-        // fast boot for good firmware
-        try_boot = true;
-        timeout = 1000;
-    }
-#endif
-    if (was_watchdog && m != RTC_BOOT_FWOK) {
-        // we've had a watchdog within 30s of booting main CAN
-        // firmware. We will stay in bootloader to allow the user to
-        // load a fixed firmware
-        stm32_watchdog_clear_reason();
-        try_boot = false;
-        timeout = 0;
-    }
-#elif AP_CHECK_FIRMWARE_ENABLED
     const auto ok = check_good_firmware();
     if (ok != check_fw_result_t::CHECK_FW_OK) {
         // bad firmware, don't try and boot
@@ -158,7 +121,6 @@ int main(void)
         try_boot = false;
         led_set(LED_BAD_FW);
     }
-#endif
 
 #if defined(HAL_GPIO_PIN_VBUS) && defined(HAL_ENABLE_VBUS_CHECK)
 #if HAL_USE_SERIAL_USB == TRUE
@@ -196,9 +158,6 @@ int main(void)
 
 #if defined(BOOTLOADER_DEV_LIST)
     init_uarts();
-#endif
-#if HAL_USE_CAN == TRUE || HAL_NUM_CAN_IFACES
-    can_start();
 #endif
 
 #if AP_BOOTLOADER_NETWORK_ENABLED
