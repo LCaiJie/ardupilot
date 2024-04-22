@@ -772,9 +772,6 @@ private:
     // try changing compasses on compass failure or timeout
     void tryChangeCompass(void);
 
-    // check for new airspeed data and update stored measurements if available
-    void readAirSpdData();
-
     // determine when to perform fusion of GPS position and  velocity measurements
     void SelectVelPosFusion();
 

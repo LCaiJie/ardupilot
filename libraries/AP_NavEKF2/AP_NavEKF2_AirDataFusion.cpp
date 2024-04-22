@@ -192,9 +192,6 @@ void NavEKF2_core::SelectTasFusion()
         airSpdFusionDelayed = false;
     }
 
-    // get true airspeed measurement
-    readAirSpdData();
-
     // If we haven't received airspeed data for a while, then declare the airspeed data as being timed out
     if (imuSampleTime_ms - tasDataNew.time_ms > frontend->tasRetryTime_ms) {
         tasTimeout = true;

@@ -130,7 +130,6 @@ const struct MultiplierStructure log_Multipliers[] = {
 #include <AP_InertialSensor/LogStructure.h>
 #include <AP_AHRS/LogStructure.h>
 #include <AP_Baro/LogStructure.h>
-#include <AP_VisualOdom/LogStructure.h>
 #include <AC_PrecLand/LogStructure.h>
 #include <AP_Proximity/LogStructure.h>
 #include <AC_Avoidance/LogStructure.h>
@@ -1299,7 +1298,6 @@ LOG_STRUCTURE_FROM_FENCE \
       "RALY", "QBBLLhB", "TimeUS,Tot,Seq,Lat,Lng,Alt,Flags", "s--DUm-", "F--GGB-" },  \
     { LOG_MAV_MSG, sizeof(log_MAV),   \
       "MAV", "QBHHHBHH",   "TimeUS,chan,txp,rxp,rxdp,flags,ss,tf", "s#----s-", "F-000-C-" },   \
-LOG_STRUCTURE_FROM_VISUALODOM \
     { LOG_OPTFLOW_MSG, sizeof(log_Optflow), \
       "OF",   "QBffff",   "TimeUS,Qual,flowX,flowY,bodyX,bodyY", "s-EEnn", "F-0000" , true }, \
     { LOG_WHEELENCODER_MSG, sizeof(log_WheelEncoder), \

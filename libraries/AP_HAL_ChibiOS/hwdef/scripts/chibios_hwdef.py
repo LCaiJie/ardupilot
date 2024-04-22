@@ -1730,36 +1730,6 @@ INCLUDE common.ld
         if len(devlist) > 0:
             f.write('#define HAL_BARO_PROBE_LIST %s\n\n' % ';'.join(devlist))
 
-    def write_AIRSPEED_config(self, f):
-        '''write airspeed config defines'''
-        devlist = []
-        seen = set()
-        idx = 0
-        for dev in self.airspeed_list:
-            if self.seen_str(dev) in seen:
-                self.error("Duplicate AIRSPEED: %s" % self.seen_str(dev))
-            seen.add(self.seen_str(dev))
-            driver = dev[0]
-            wrapper = ''
-            a = driver.split(':')
-            driver = a[0]
-            for i in range(1, len(dev)):
-                if dev[i].startswith("SPI:"):
-                    dev[i] = self.parse_spi_device(dev[i])
-                elif dev[i].startswith("I2C:"):
-                    (wrapper, dev[i]) = self.parse_i2c_device(dev[i])
-                    if dev[i].startswith('hal.i2c_mgr'):
-                        dev[i] = 'std::move(%s)' % dev[i]
-            n = len(devlist)+1
-            devlist.append('HAL_AIRSPEED_PROBE%u' % n)
-            args = ['*this', str(idx)] + dev[1:]
-            f.write(
-                '#define HAL_AIRSPEED_PROBE%u %s ADD_BACKEND(AP_Airspeed_%s::probe(%s))\n'
-                % (n, wrapper, driver, ','.join(args)))
-            idx += 1
-        if len(devlist) > 0:
-            f.write('#define HAL_AIRSPEED_PROBE_LIST %s\n\n' % ';'.join(devlist))
-
     def write_board_validate_macro(self, f):
         '''write board validation macro'''
         validate_string = ''
@@ -2557,7 +2527,6 @@ Please run: Tools/scripts/build_bootloaders.py %s
         self.write_IMU_config(f)
         self.write_MAG_config(f)
         self.write_BARO_config(f)
-        self.write_AIRSPEED_config(f)
         self.write_board_validate_macro(f)
         self.write_peripheral_enable(f)
 

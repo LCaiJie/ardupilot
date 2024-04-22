@@ -98,10 +98,6 @@ void Copter::init_ardupilot()
     AP::compass().set_log_bit(MASK_LOG_COMPASS);
     AP::compass().init();
 
-#if AP_AIRSPEED_ENABLED
-    airspeed.set_log_bit(MASK_LOG_IMU);
-#endif
-
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
     g2.oa.init();
 #endif
@@ -244,11 +240,6 @@ bool Copter::ekf_has_relative_position() const
     bool enabled = false;
 #if AP_OPTICALFLOW_ENABLED
     if (optflow.enabled()) {
-        enabled = true;
-    }
-#endif
-#if HAL_VISUALODOM_ENABLED
-    if (visual_odom.enabled()) {
         enabled = true;
     }
 #endif

@@ -526,11 +526,6 @@ public:
     // ground effect compensation enable/disable
     AP_Int8 gndeffect_comp_enabled;
 
-#if AP_TEMPCALIBRATION_ENABLED
-    // temperature calibration handling
-    AP_TempCalibration temp_calibration;
-#endif
-
 #if HAL_PROXIMITY_ENABLED
     // proximity (aka object avoidance) library
     AP_Proximity proximity;

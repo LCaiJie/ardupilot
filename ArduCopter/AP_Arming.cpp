@@ -67,9 +67,6 @@ bool AP_Arming_Copter::run_pre_arm_checks(bool display_failure)
         & winch_checks(display_failure)
         & rc_throttle_failsafe_checks(display_failure)
         & alt_checks(display_failure)
-#if AP_AIRSPEED_ENABLED
-        & AP_Arming::airspeed_checks(display_failure)
-#endif
         & AP_Arming::pre_arm_checks(display_failure);
 }
 
@@ -722,11 +719,6 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
 #endif
 
     hal.util->set_soft_armed(true);
-
-#if HAL_SPRAYER_ENABLED
-    // turn off sprayer's test if on
-    copter.sprayer.test_pump(false);
-#endif
 
     // output lowest possible value to motors
     copter.motors->output_min();

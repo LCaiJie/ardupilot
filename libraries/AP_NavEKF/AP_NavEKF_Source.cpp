@@ -249,45 +249,7 @@ AP_NavEKF_Source::SourceZ AP_NavEKF_Source::getPosZSource() const
 // align position of inactive sources to ahrs
 void AP_NavEKF_Source::align_inactive_sources()
 {
-    // align visual odometry
-#if HAL_VISUALODOM_ENABLED
 
-    auto *visual_odom = AP::dal().visualodom();
-    if (!visual_odom || !visual_odom->enabled()) {
-        return;
-    }
-
-    // consider aligning XY position:
-    bool align_posxy = false;
-    if ((getPosXYSource() == SourceXY::GPS) ||
-        (getPosXYSource() == SourceXY::BEACON)) {
-        // only align position if active source is GPS or Beacon
-        for (uint8_t i=0; i<AP_NAKEKF_SOURCE_SET_MAX; i++) {
-            if (_source_set[i].posxy == SourceXY::EXTNAV) {
-                // ExtNav could potentially be used, so align it
-                align_posxy = true;
-                break;
-            }
-        }
-    }
-
-    // consider aligning Z position:
-    bool align_posz = false;
-    if ((getPosZSource() == SourceZ::BARO) ||
-        (getPosZSource() == SourceZ::RANGEFINDER) ||
-        (getPosZSource() == SourceZ::GPS) ||
-        (getPosZSource() == SourceZ::BEACON)) {
-        // ExtNav is not the active source; we do not want to align active source!
-        for (uint8_t i=0; i<AP_NAKEKF_SOURCE_SET_MAX; i++) {
-            if (_source_set[i].posz == SourceZ::EXTNAV) {
-                // ExtNav could potentially be used, so align it
-                align_posz = true;
-                break;
-            }
-        }
-    }
-    visual_odom->align_position_to_ahrs(align_posxy, align_posz);
-#endif
 }
 
 // sensor specific helper functions
@@ -482,10 +444,6 @@ bool AP_NavEKF_Source::pre_arm_check(bool requires_position, char *failure_msg, 
 
     if (visualodom_required) {
         bool visualodom_available = false;
-#if HAL_VISUALODOM_ENABLED
-        auto *vo = AP::dal().visualodom();
-        visualodom_available = vo && vo->enabled();
-#endif
         if (!visualodom_available) {
             hal.util->snprintf(failure_msg, failure_msg_len, ekf_requires_msg, "VisualOdom");
             return false;

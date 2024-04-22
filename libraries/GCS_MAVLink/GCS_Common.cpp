@@ -32,9 +32,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Gripper/AP_Gripper.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_Relay/AP_Relay.h>
 #include <AP_RTC/AP_RTC.h>
@@ -42,7 +40,6 @@
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_RCTelemetry/AP_Spektrum_Telem.h>
 #include <AP_Common/AP_FWVersion.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_Proximity/AP_Proximity.h>
@@ -53,7 +50,6 @@
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_Frsky_Telem/AP_Frsky_Telem.h>
 #include <RC_Channel/RC_Channel.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 #include <AP_Landing/AP_Landing_config.h>
 
@@ -1235,24 +1231,6 @@ void GCS_MAVLINK_InProgress::check_tasks()
         case Type::NONE:
             break;
         case Type::AIRSPEED_CAL: {
-#if AP_AIRSPEED_ENABLED
-            const AP_Airspeed *airspeed = AP_Airspeed::get_singleton();
-            switch (airspeed->get_calibration_state()) {
-            case AP_Airspeed::CalibrationState::NOT_STARTED:
-                // we shouldn't get here
-                task.conclude(MAV_RESULT_FAILED);
-                break;
-            case AP_Airspeed::CalibrationState::IN_PROGRESS:
-                task.send_in_progress();
-                break;
-            case AP_Airspeed::CalibrationState::FAILED:
-                task.conclude(MAV_RESULT_FAILED);
-                break;
-            case AP_Airspeed::CalibrationState::SUCCESS:
-                task.conclude(MAV_RESULT_ACCEPTED);
-                break;
-            }
-#endif
             }
             break;
         case Type::SD_FORMAT:
@@ -1977,22 +1955,6 @@ void GCS_MAVLINK::send_scaled_pressure_instance(uint8_t instance, void (*send_fn
     }
 
     float press_diff = 0; // pascal
-#if AP_AIRSPEED_ENABLED
-    AP_Airspeed *airspeed = AP_Airspeed::get_singleton();
-    if (airspeed != nullptr &&
-        airspeed->enabled(instance)) {
-        press_diff = airspeed->get_differential_pressure(instance) * 0.01f;
-        float temp;
-        if (airspeed->get_temperature(instance,temp)) {
-            temperature_press_diff = temp * 100;
-            if (temperature_press_diff == 0) {
-                // don't send zero as that is the value for 'no data'
-                temperature_press_diff = 1;
-            }
-        }
-        have_data = true;
-    }
-#endif
 
     if (!have_data) {
         return;
@@ -2954,13 +2916,6 @@ void GCS_MAVLINK::send_accelcal_vehicle_position(uint32_t position)
 
 float GCS_MAVLINK::vfr_hud_airspeed() const
 {
-#if AP_AIRSPEED_ENABLED
-    AP_Airspeed *airspeed = AP_Airspeed::get_singleton();
-    if (airspeed != nullptr && airspeed->healthy()) {
-        return airspeed->get_airspeed();
-    }
-#endif
-
 #if AP_GPS_ENABLED
     // because most vehicles don't have airspeed sensors, we return a
     // different sort of speed estimate in the relevant field for
@@ -3430,144 +3385,6 @@ void GCS_MAVLINK::handle_data_packet(const mavlink_message_t &msg)
 #endif
 }
 
-#if HAL_VISUALODOM_ENABLED
-void GCS_MAVLINK::handle_vision_position_delta(const mavlink_message_t &msg)
-{
-    AP_VisualOdom *visual_odom = AP::visualodom();
-    if (visual_odom == nullptr) {
-        return;
-    }
-    visual_odom->handle_vision_position_delta_msg(msg);
-}
-
-void GCS_MAVLINK::handle_vision_position_estimate(const mavlink_message_t &msg)
-{
-    mavlink_vision_position_estimate_t m;
-    mavlink_msg_vision_position_estimate_decode(&msg, &m);
-
-    handle_common_vision_position_estimate_data(m.usec, m.x, m.y, m.z, m.roll, m.pitch, m.yaw, m.covariance, m.reset_counter,
-                                                PAYLOAD_SIZE(chan, VISION_POSITION_ESTIMATE));
-}
-
-void GCS_MAVLINK::handle_global_vision_position_estimate(const mavlink_message_t &msg)
-{
-    mavlink_global_vision_position_estimate_t m;
-    mavlink_msg_global_vision_position_estimate_decode(&msg, &m);
-
-    handle_common_vision_position_estimate_data(m.usec, m.x, m.y, m.z, m.roll, m.pitch, m.yaw, m.covariance, m.reset_counter,
-                                                PAYLOAD_SIZE(chan, GLOBAL_VISION_POSITION_ESTIMATE));
-}
-
-void GCS_MAVLINK::handle_vicon_position_estimate(const mavlink_message_t &msg)
-{
-    mavlink_vicon_position_estimate_t m;
-    mavlink_msg_vicon_position_estimate_decode(&msg, &m);
-
-    // vicon position estimate does not include reset counter
-    handle_common_vision_position_estimate_data(m.usec, m.x, m.y, m.z, m.roll, m.pitch, m.yaw, m.covariance, 0,
-                                                PAYLOAD_SIZE(chan, VICON_POSITION_ESTIMATE));
-}
-
-/*
-  handle ODOMETRY message. This message combines position, velocity
-  and attitude data
- */
-void GCS_MAVLINK::handle_odometry(const mavlink_message_t &msg)
-{
-    AP_VisualOdom *visual_odom = AP::visualodom();
-    if (visual_odom == nullptr) {
-        return;
-    }
-
-    mavlink_odometry_t m;
-    mavlink_msg_odometry_decode(&msg, &m);
-
-    if (m.frame_id != MAV_FRAME_LOCAL_FRD ||
-        m.child_frame_id != MAV_FRAME_BODY_FRD) {
-        // only support local FRD frame data
-        return;
-    }
-
-    Quaternion q{m.q[0],m.q[1],m.q[2],m.q[3]};
-
-    float posErr = 0;
-    float angErr = 0;
-    if (!isnan(m.pose_covariance[0])) {
-        posErr = cbrtf(sq(m.pose_covariance[0])+sq(m.pose_covariance[6])+sq(m.pose_covariance[11]));
-        angErr = cbrtf(sq(m.pose_covariance[15])+sq(m.pose_covariance[18])+sq(m.pose_covariance[20]));
-    }
-
-    const uint32_t timestamp_ms = correct_offboard_timestamp_usec_to_ms(m.time_usec, PAYLOAD_SIZE(chan, ODOMETRY));
-    visual_odom->handle_pose_estimate(m.time_usec, timestamp_ms, m.x, m.y, m.z, q, posErr, angErr, m.reset_counter, m.quality);
-
-    // convert velocity vector from FRD to NED frame
-    Vector3f vel{m.vx, m.vy, m.vz};
-    vel = q * vel;
-    visual_odom->handle_vision_speed_estimate(m.time_usec, timestamp_ms, vel, m.reset_counter, m.quality);
-}
-
-// there are several messages which all have identical fields in them.
-// This function provides common handling for the data contained in
-// these packets
-void GCS_MAVLINK::handle_common_vision_position_estimate_data(const uint64_t usec,
-                                                              const float x,
-                                                              const float y,
-                                                              const float z,
-                                                              const float roll,
-                                                              const float pitch,
-                                                              const float yaw,
-                                                              const float covariance[21],
-                                                              const uint8_t reset_counter,
-                                                              const uint16_t payload_size)
-{
-    float posErr = 0;
-    float angErr = 0;
-    // correct offboard timestamp to be in local ms since boot
-    uint32_t timestamp_ms = correct_offboard_timestamp_usec_to_ms(usec, payload_size);
-
-    AP_VisualOdom *visual_odom = AP::visualodom();
-    if (visual_odom == nullptr) {
-        return;
-    }
-
-    if (!isnan(covariance[0])) {
-        posErr = cbrtf(sq(covariance[0])+sq(covariance[6])+sq(covariance[11]));
-        angErr = cbrtf(sq(covariance[15])+sq(covariance[18])+sq(covariance[20]));
-    }
-
-    visual_odom->handle_pose_estimate(usec, timestamp_ms, x, y, z, roll, pitch, yaw, posErr, angErr, reset_counter, 0);
-}
-
-void GCS_MAVLINK::handle_att_pos_mocap(const mavlink_message_t &msg)
-{
-    mavlink_att_pos_mocap_t m;
-    mavlink_msg_att_pos_mocap_decode(&msg, &m);
-
-    // correct offboard timestamp to be in local ms since boot
-    uint32_t timestamp_ms = correct_offboard_timestamp_usec_to_ms(m.time_usec, PAYLOAD_SIZE(chan, ATT_POS_MOCAP));
-   
-    AP_VisualOdom *visual_odom = AP::visualodom();
-    if (visual_odom == nullptr) {
-        return;
-    }
-    // note: att_pos_mocap does not include reset counter
-    visual_odom->handle_pose_estimate(m.time_usec, timestamp_ms, m.x, m.y, m.z, m.q, 0, 0, 0, 0);
-}
-
-void GCS_MAVLINK::handle_vision_speed_estimate(const mavlink_message_t &msg)
-{
-    AP_VisualOdom *visual_odom = AP::visualodom();
-    if (visual_odom == nullptr) {
-        return;
-    }
-    mavlink_vision_speed_estimate_t m;
-    mavlink_msg_vision_speed_estimate_decode(&msg, &m);
-    const Vector3f vel = {m.x, m.y, m.z};
-    uint32_t timestamp_ms = correct_offboard_timestamp_usec_to_ms(m.usec, PAYLOAD_SIZE(chan, VISION_SPEED_ESTIMATE));
-    visual_odom->handle_vision_speed_estimate(m.usec, timestamp_ms, vel, m.reset_counter, 0);
-}
-#endif  // HAL_VISUALODOM_ENABLED
-
 void GCS_MAVLINK::handle_command_ack(const mavlink_message_t &msg)
 {
 #if HAL_INS_ACCELCAL_ENABLED
@@ -3879,36 +3696,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
         handle_data_packet(msg);
         break;        
 
-#if HAL_VISUALODOM_ENABLED
-    case MAVLINK_MSG_ID_VISION_POSITION_DELTA:
-        handle_vision_position_delta(msg);
-        break;
-
-    case MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE:
-        handle_vision_position_estimate(msg);
-        break;
-
-    case MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE:
-        handle_global_vision_position_estimate(msg);
-        break;
-
-    case MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE:
-        handle_vicon_position_estimate(msg);
-        break;
-
-    case MAVLINK_MSG_ID_ODOMETRY:
-        handle_odometry(msg);
-        break;
-
-    case MAVLINK_MSG_ID_ATT_POS_MOCAP:
-        handle_att_pos_mocap(msg);
-        break;
-
-    case MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE:
-        handle_vision_speed_estimate(msg);
-        break;
-#endif  // HAL_VISUALODOM_ENABLED
-
 #if AP_RTC_ENABLED
     case MAVLINK_MSG_ID_SYSTEM_TIME:
         handle_system_time_message(msg);
@@ -4151,19 +3938,6 @@ MAV_RESULT GCS_MAVLINK::_handle_command_preflight_calibration_baro(const mavlink
     gcs().send_text(MAV_SEVERITY_INFO, "Updating barometer calibration");
     AP::baro().update_calibration();
     gcs().send_text(MAV_SEVERITY_INFO, "Barometer calibration complete");
-
-#if AP_AIRSPEED_ENABLED
-
-    AP_Airspeed *airspeed = AP_Airspeed::get_singleton();
-    if (airspeed != nullptr) {
-        GCS_MAVLINK_InProgress *task = GCS_MAVLINK_InProgress::get_task(MAV_CMD_PREFLIGHT_CALIBRATION, GCS_MAVLINK_InProgress::Type::AIRSPEED_CAL, msg.sysid, msg.compid, chan);
-        if (task == nullptr) {
-            return MAV_RESULT_TEMPORARILY_REJECTED;
-        }
-        airspeed->calibrate(false);
-        return MAV_RESULT_IN_PROGRESS;
-    }
-#endif
 
     return MAV_RESULT_ACCEPTED;
 }
@@ -4427,23 +4201,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_do_gripper(const mavlink_command_int_t &p
 }
 #endif  // AP_GRIPPER_ENABLED
 
-#if HAL_SPRAYER_ENABLED
-MAV_RESULT GCS_MAVLINK::handle_command_do_sprayer(const mavlink_command_int_t &packet)
-{
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return MAV_RESULT_FAILED;
-    }
-
-    if (is_equal(packet.param1, 1.0f)) {
-        sprayer->run(true);
-    } else if (is_zero(packet.param1)) {
-        sprayer->run(false);
-    }
-
-    return MAV_RESULT_ACCEPTED;
-}
-#endif
 
 #if AP_LANDINGGEAR_ENABLED
 /*
@@ -4849,11 +4606,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
 
     case MAV_CMD_DO_SET_MODE:
         return handle_command_do_set_mode(packet);
-
-#if HAL_SPRAYER_ENABLED
-    case MAV_CMD_DO_SPRAYER:
-        return handle_command_do_sprayer(packet);
-#endif
 
     case MAV_CMD_DO_SET_ROI_NONE: {
         const Location zero_loc = Location();
@@ -6296,15 +6048,6 @@ void GCS_MAVLINK::send_high_latency2() const
 
 int8_t GCS_MAVLINK::high_latency_air_temperature() const
 {
-#if AP_AIRSPEED_ENABLED
-    // return units are degC
-    AP_Airspeed *airspeed = AP_Airspeed::get_singleton();
-    float air_temperature;
-    if (airspeed != nullptr && airspeed->enabled() && airspeed->get_temperature(air_temperature)) {
-        return air_temperature;
-    }
-#endif
-
     return INT8_MIN;
 }
 

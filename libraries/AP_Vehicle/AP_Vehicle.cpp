@@ -38,12 +38,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(gyro_fft, "FFT_",  2, AP_Vehicle, AP_GyroFFT),
 #endif
 
-#if HAL_VISUALODOM_ENABLED
-    // @Group: VISO
-    // @Path: ../AP_VisualOdom/AP_VisualOdom.cpp
-    AP_SUBGROUPINFO(visual_odom, "VISO",  3, AP_Vehicle, AP_VisualOdom),
-#endif
-
 #if AP_VIDEOTX_ENABLED
     // @Group: VTX_
     // @Path: ../AP_VideoTX/AP_VideoTX.cpp
@@ -80,12 +74,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(efi, "EFI", 9, AP_Vehicle, AP_EFI),
 #endif
 
-#if AP_AIRSPEED_ENABLED
-    // @Group: ARSPD
-    // @Path: ../AP_Airspeed/AP_Airspeed.cpp
-    AP_SUBGROUPINFO(airspeed, "ARSPD", 10, AP_Vehicle, AP_Airspeed),
-#endif
-
     // @Group: CUST_ROT
     // @Path: ../AP_CustomRotations/AP_CustomRotations.cpp
     AP_SUBGROUPINFO(custom_rotations, "CUST_ROT", 11, AP_Vehicle, AP_CustomRotations),
@@ -100,12 +88,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     // @Group: FENCE_
     // @Path: ../AC_Fence/AC_Fence.cpp
     AP_SUBGROUPINFO(fence, "FENCE_", 14, AP_Vehicle, AC_Fence),
-#endif
-
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    // @Group: TEMP
-    // @Path: ../AP_TemperatureSensor/AP_TemperatureSensor.cpp
-    AP_SUBGROUPINFO(temperature_sensor, "TEMP", 16, AP_Vehicle, AP_TemperatureSensor),
 #endif
 
 #if HAL_NMEA_OUTPUT_ENABLED
@@ -319,18 +301,6 @@ void AP_Vehicle::setup()
     // init_ardupilot is where the vehicle does most of its initialisation.
     init_ardupilot();
 
-#if AP_AIRSPEED_ENABLED
-    airspeed.init();
-    if (airspeed.enabled()) {
-        airspeed.calibrate(true);
-    } 
-#if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
-    else {
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "No airspeed sensor");
-    }
-#endif
-#endif  // AP_AIRSPEED_ENABLED
-
 #if !APM_BUILD_TYPE(APM_BUILD_Replay)
     SRV_Channels::init();
 #endif
@@ -342,11 +312,6 @@ void AP_Vehicle::setup()
 #if HAL_HOTT_TELEM_ENABLED
     hott_telem.init();
 #endif
-#if HAL_VISUALODOM_ENABLED
-    // init library used for visual position estimation
-    visual_odom.init();
-#endif
-
 #if AP_VIDEOTX_ENABLED
     vtx.init();
 #endif
@@ -370,9 +335,6 @@ void AP_Vehicle::setup()
     efi.init();
 #endif
 
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    temperature_sensor.init();
-#endif
 
 #if HAL_NMEA_OUTPUT_ENABLED
     nmea.init();
@@ -467,9 +429,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #if HAL_GYROFFT_ENABLED
     FAST_TASK_CLASS(AP_GyroFFT,    &vehicle.gyro_fft,       sample_gyros),
 #endif
-#if AP_AIRSPEED_ENABLED
-    SCHED_TASK_CLASS(AP_Airspeed,  &vehicle.airspeed,       update,                   10, 100, 41),    // NOTE: the priority number here should be right before Plane's calc_airspeed_errors
-#endif
 #if COMPASS_CAL_ENABLED
     SCHED_TASK_CLASS(Compass,      &vehicle.compass,        cal_update,     100, 200, 75),
 #endif
@@ -500,9 +459,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #endif
 #if OSD_ENABLED
     SCHED_TASK(publish_osd_info, 1, 10, 240),
-#endif
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    SCHED_TASK_CLASS(AP_TemperatureSensor, &vehicle.temperature_sensor, update,        5, 50, 242),
 #endif
 #if HAL_INS_ACCELCAL_ENABLED
     SCHED_TASK(accel_cal_update,                                                      10, 100, 245),

@@ -556,12 +556,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
     GOBJECT(BoardConfig,            "BRD_",       AP_BoardConfig),
 
-#if HAL_SPRAYER_ENABLED
-    // @Group: SPRAY_
-    // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
-    GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
-#endif
-
 #if AP_SIM_ENABLED
     // @Group: SIM_
     // @Path: ../libraries/SITL/SITL.cpp
@@ -808,14 +802,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Group: RC
     // @Path: ../libraries/RC_Channel/RC_Channels_VarInfo.h
     AP_SUBGROUPINFO(rc_channels, "RC", 17, ParametersG2, RC_Channels_Copter),
-
-    // 18 was used by AP_VisualOdom
-
-#if AP_TEMPCALIBRATION_ENABLED
-    // @Group: TCAL
-    // @Path: ../libraries/AP_TempCalibration/AP_TempCalibration.cpp
-    AP_SUBGROUPINFO(temp_calibration, "TCAL", 19, ParametersG2, AP_TempCalibration),
-#endif
 
 #if TOY_MODE_ENABLED == ENABLED
     // @Group: TMODE
@@ -1192,9 +1178,6 @@ const AP_Param::GroupInfo ParametersG2::var_info2[] = {
  */
 ParametersG2::ParametersG2(void)
     : command_model_pilot(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
-#if AP_TEMPCALIBRATION_ENABLED
-    , temp_calibration()
-#endif
 #if HAL_PROXIMITY_ENABLED
     , proximity()
 #endif

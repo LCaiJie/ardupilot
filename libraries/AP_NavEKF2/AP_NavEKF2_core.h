@@ -578,9 +578,6 @@ private:
     // try changing compasses on compass failure or timeout
     void tryChangeCompass(void);
 
-    // check for new airspeed data and update stored measurements if available
-    void readAirSpdData();
-
     // check for new range beacon data and update stored measurements if available
     void readRngBcnData();
 

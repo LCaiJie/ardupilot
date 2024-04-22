@@ -4,8 +4,6 @@
 #include "AP_DAL_Baro.h"
 #include "AP_DAL_GPS.h"
 #include "AP_DAL_Compass.h"
-#include "AP_DAL_Airspeed.h"
-#include "AP_DAL_VisualOdom.h"
 
 #include "LogStructure.h"
 
@@ -129,15 +127,6 @@ public:
     AP_DAL_Baro &baro() { return _baro; }
     AP_DAL_GPS &gps() { return _gps; }
 
-    AP_DAL_Airspeed *airspeed() {
-        return _airspeed;
-    }
-#if HAL_VISUALODOM_ENABLED
-    AP_DAL_VisualOdom *visualodom() {
-        return _visualodom;
-    }
-#endif
-
     AP_DAL_Compass &compass() { return _compass; }
 
     // random methods that AP_NavEKF3 wants to call on AHRS:
@@ -231,16 +220,8 @@ public:
     }
 
     void handle_message(const log_RASH &msg) {
-        if (_airspeed == nullptr) {
-            _airspeed = new AP_DAL_Airspeed;
-        }
-        _airspeed->handle_message(msg);
     }
     void handle_message(const log_RASI &msg) {
-        if (_airspeed == nullptr) {
-            _airspeed = new AP_DAL_Airspeed;
-        }
-        _airspeed->handle_message(msg);
     }
 
     void handle_message(const log_RBRH &msg) {
@@ -277,12 +258,6 @@ public:
     void handle_message(const log_RBCI &msg) {
     }
     void handle_message(const log_RVOH &msg) {
-#if HAL_VISUALODOM_ENABLED
-        if (_visualodom == nullptr) {
-            _visualodom = new AP_DAL_VisualOdom;
-        }
-        _visualodom->handle_message(msg);
-#endif
     }
     void handle_message(const log_ROFH &msg, NavEKF2 &ekf2, NavEKF3 &ekf3);
     void handle_message(const log_REPH &msg, NavEKF2 &ekf2, NavEKF3 &ekf3);
@@ -329,10 +304,6 @@ private:
     AP_DAL_Baro _baro;
     AP_DAL_GPS _gps;
     AP_DAL_Compass _compass;
-    AP_DAL_Airspeed *_airspeed;
-#if HAL_VISUALODOM_ENABLED
-    AP_DAL_VisualOdom *_visualodom;
-#endif
 
     static bool logging_started;
     static bool force_write;

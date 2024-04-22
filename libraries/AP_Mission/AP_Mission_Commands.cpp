@@ -8,7 +8,6 @@
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_Parachute/AP_Parachute.h>
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <RC_Channel/RC_Channel.h>
 
 #if AP_RC_CHANNEL_ENABLED
@@ -139,22 +138,7 @@ bool AP_Mission::command_do_set_repeat_dist(const AP_Mission::Mission_Command& c
 
 bool AP_Mission::start_command_do_sprayer(const AP_Mission::Mission_Command& cmd)
 {
-#if HAL_SPRAYER_ENABLED
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return false;
-    }
-
-    if (cmd.p1 == 1) {
-        sprayer->run(true);
-    } else {
-        sprayer->run(false);
-    }
-
-    return true;
-#else
     return false;
-#endif // HAL_SPRAYER_ENABLED
 }
 
 bool AP_Mission::start_command_do_scripting(const AP_Mission::Mission_Command& cmd)

@@ -87,14 +87,6 @@ void AP_DAL::start_frame(AP_DAL::FrameType frametype)
     _baro.start_frame();
     _gps.start_frame();
     _compass.start_frame();
-    if (_airspeed) {
-        _airspeed->start_frame();
-    }
-#if HAL_VISUALODOM_ENABLED
-    if (_visualodom) {
-        _visualodom->start_frame();
-    }
-#endif
 
     // populate some derivative values:
     _micros = _RFRH.time_us;
@@ -126,19 +118,6 @@ void AP_DAL::init_sensors(void)
       at the time we startup the EKF
      */
 
-#if AP_AIRSPEED_ENABLED
-    auto *aspeed = AP::airspeed();
-    if (aspeed != nullptr && aspeed->get_num_sensors() > 0) {
-        alloc_failed |= (_airspeed = new AP_DAL_Airspeed) == nullptr;
-    }
-#endif
-
-#if HAL_VISUALODOM_ENABLED
-    auto *vodom = AP::visualodom();
-    if (vodom != nullptr && vodom->enabled()) {
-        alloc_failed |= (_visualodom = new AP_DAL_VisualOdom) == nullptr;
-    }
-#endif
 
     if (alloc_failed) {
         AP_BoardConfig::allocation_error("DAL backends");

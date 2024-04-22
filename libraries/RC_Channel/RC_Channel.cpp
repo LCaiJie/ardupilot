@@ -33,7 +33,6 @@ extern const AP_HAL::HAL& hal;
 #include <GCS_MAVLink/GCS.h>
 
 #include <AC_Avoidance/AC_Avoid.h>
-#include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Gripper/AP_Gripper.h>
@@ -50,7 +49,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_GPS/AP_GPS.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_VideoTX/AP_VideoTX.h>
@@ -970,20 +968,6 @@ void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
 }
 #endif
 
-#if HAL_SPRAYER_ENABLED
-void RC_Channel::do_aux_function_sprayer(const AuxSwitchPos ch_flag)
-{
-    AC_Sprayer *sprayer = AP::sprayer();
-    if (sprayer == nullptr) {
-        return;
-    }
-
-    sprayer->run(ch_flag == AuxSwitchPos::HIGH);
-    // if we are disarmed the pilot must want to test the pump
-    sprayer->test_pump((ch_flag == AuxSwitchPos::HIGH) && !hal.util->get_soft_armed());
-}
-#endif // HAL_SPRAYER_ENABLED
-
 #if AP_GRIPPER_ENABLED
 void RC_Channel::do_aux_function_gripper(const AuxSwitchPos ch_flag)
 {
@@ -1183,12 +1167,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         }
         break;
 
-#if HAL_SPRAYER_ENABLED
-    case AUX_FUNC::SPRAYER:
-        do_aux_function_sprayer(ch_flag);
-        break;
-#endif
-
     case AUX_FUNC::LOST_VEHICLE_SOUND:
         do_aux_function_lost_vehicle_sound(ch_flag);
         break;
@@ -1242,26 +1220,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         AP::gps().set_force_disable_yaw(ch_flag == AuxSwitchPos::HIGH);
         break;
 
-#if AP_AIRSPEED_ENABLED
-    case AUX_FUNC::DISABLE_AIRSPEED_USE: {
-        AP_Airspeed *airspeed = AP::airspeed();
-        if (airspeed == nullptr) {
-            break;
-        }
-        switch (ch_flag) {
-        case AuxSwitchPos::HIGH:
-            airspeed->force_disable_use(true);
-            break;
-        case AuxSwitchPos::MIDDLE:
-            break;
-        case AuxSwitchPos::LOW:
-            airspeed->force_disable_use(false);
-            break;
-        }
-        break;
-    }
-#endif
-
     case AUX_FUNC::MOTOR_ESTOP:
         switch (ch_flag) {
         case AuxSwitchPos::HIGH: {
@@ -1277,17 +1235,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         }
         }
         break;
-
-#if HAL_VISUALODOM_ENABLED
-    case AUX_FUNC::VISODOM_ALIGN:
-        if (ch_flag == AuxSwitchPos::HIGH) {
-            AP_VisualOdom *visual_odom = AP::visualodom();
-            if (visual_odom != nullptr) {
-                visual_odom->request_align_yaw_to_ahrs();
-            }
-        }
-        break;
-#endif
 
     case AUX_FUNC::EKF_POS_SOURCE:
         switch (ch_flag) {

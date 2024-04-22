@@ -3,7 +3,6 @@
 #include "AP_NavEKF3.h"
 #include "AP_NavEKF3_core.h"
 #include <GCS_MAVLink/GCS.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_DAL/AP_DAL.h>
 
@@ -76,14 +75,6 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
         maxTimeDelay_ms = MAX(maxTimeDelay_ms , frontend->tasDelay_ms);
     }
 
-#if HAL_VISUALODOM_ENABLED
-    // include delay from visual odometry if enabled
-    const auto *visual_odom = dal.visualodom();
-    if ((visual_odom != nullptr) && visual_odom->enabled()) {
-        maxTimeDelay_ms = MAX(maxTimeDelay_ms, MIN(visual_odom->get_delay_ms(), 250));
-    }
-#endif
-
     // calculate the IMU buffer length required to accommodate the maximum delay with some allowance for jitter
     imu_buffer_length = (maxTimeDelay_ms / (uint16_t)(EKF_TARGET_DT_MS)) + 1;
 
@@ -111,9 +102,6 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
         return false;
     }
     if(!storedBaro.init(obs_buffer_length)) {
-        return false;
-    }
-    if(dal.airspeed() && !storedTAS.init(obs_buffer_length)) {
         return false;
     }
     if(dal.opticalflow_enabled() && !storedOF.init(flow_buffer_length)) {

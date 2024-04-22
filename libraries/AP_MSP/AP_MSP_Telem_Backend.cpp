@@ -15,7 +15,6 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
@@ -560,12 +559,7 @@ void AP_MSP_Telem_Backend::msp_handle_baro(const MSP::msp_baro_data_message_t &p
 
 void AP_MSP_Telem_Backend::msp_handle_airspeed(const MSP::msp_airspeed_data_message_t &pkt)
 {
-#if AP_AIRSPEED_MSP_ENABLED && AP_AIRSPEED_ENABLED
-    auto *airspeed = AP::airspeed();
-    if (airspeed) {
-        airspeed->handle_msp(pkt);
-    }
-#endif
+
 }
 
 uint32_t AP_MSP_Telem_Backend::get_osd_flight_mode_bitmask(void)

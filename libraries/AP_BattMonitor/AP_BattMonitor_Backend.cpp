@@ -288,13 +288,6 @@ void AP_BattMonitor_Backend::update_esc_telem_outbound()
 // returns true if battery monitor provides temperature
 bool AP_BattMonitor_Backend::get_temperature(float &temperature) const
 {
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    if (_state.temperature_external_use) {
-        temperature = _state.temperature_external;
-        return true;
-    }
-#endif
-
     temperature = _state.temperature;
 
     return has_temperature();

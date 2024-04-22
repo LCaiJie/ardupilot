@@ -13,8 +13,6 @@ define HAL_HIGH_LATENCY2_ENABLED 0
 # Gripper isn't a vital feature for smaller boards
 define AP_GRIPPER_ENABLED 0
 
-# Sprayer isn't a vital feature for smaller boards
-define HAL_SPRAYER_ENABLED 0
 
 # disable use of onboard FFT library:
 define HAL_GYROFFT_ENABLED 0
@@ -101,13 +99,6 @@ define MODE_AUTOROTATE_ENABLED 0
 # don't send RELAY_STATUS messages:
 define AP_MAVLINK_MSG_RELAY_STATUS_ENABLED 0
 
-#fewer airspeed sensors
-define AP_AIRSPEED_BACKEND_DEFAULT_ENABLED 0
-define AP_AIRSPEED_MS4525_ENABLED 1
-define AP_AIRSPEED_ANALOG_ENABLED 1
-define AP_AIRSPEED_MS5525_ENABLED 1
-define AP_AIRSPEED_SDP3X_ENABLED 1
-define AP_AIRSPEED_NMEA_ENABLED 1  # additional checks for vehicle type in .cpp
 
 # don't need payload place mission items on these boards, it's very niche:
 define AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED 0

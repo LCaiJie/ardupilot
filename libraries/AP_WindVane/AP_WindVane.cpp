@@ -22,7 +22,6 @@
 #include "AP_WindVane_Home.h"
 #include "AP_WindVane_Analog.h"
 #include "AP_WindVane_ModernDevice.h"
-#include "AP_WindVane_Airspeed.h"
 #include "AP_WindVane_RPM.h"
 #include "AP_WindVane_SITL.h"
 #include "AP_WindVane_NMEA.h"
@@ -235,11 +234,6 @@ void AP_WindVane::init(const AP_SerialManager& serial_manager)
     switch (_speed_sensor_type) {
         case Speed_type::WINDSPEED_NONE:
             break;
-#if AP_WINDVANE_AIRSPEED_ENABLED
-        case Speed_type::WINDSPEED_AIRSPEED:
-            _speed_driver = new AP_WindVane_Airspeed(*this);
-            break;
-#endif
 #if AP_WINDVANE_MODERNDEVICE_ENABLED
         case Speed_type::WINDVANE_WIND_SENSOR_REV_P:
             _speed_driver = new AP_WindVane_ModernDevice(*this);

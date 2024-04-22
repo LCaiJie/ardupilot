@@ -42,7 +42,6 @@ class AP_WindVane
     friend class AP_WindVane_Analog;
     friend class AP_WindVane_SITL;
     friend class AP_WindVane_ModernDevice;
-    friend class AP_WindVane_Airspeed;
     friend class AP_WindVane_RPM;
     friend class AP_WindVane_NMEA;
 
@@ -184,9 +183,6 @@ private:
 
     enum Speed_type {
         WINDSPEED_NONE               = 0,
-#if AP_WINDVANE_AIRSPEED_ENABLED
-        WINDSPEED_AIRSPEED           = 1,
-#endif
         WINDVANE_WIND_SENSOR_REV_P   = 2,
 #if AP_WINDVANE_RPM_ENABLED
         WINDSPEED_RPM                = 3,

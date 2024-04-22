@@ -42,8 +42,6 @@ class ExtractFeatures(object):
         self.features = [
             ('AP_ADVANCEDFAILSAFE_ENABLED', r'AP_AdvancedFailsafe::heartbeat\b',),
             ('AP_BOOTLOADER_FLASHING_ENABLED', 'ChibiOS::Util::flash_bootloader',),
-            ('AP_AIRSPEED_ENABLED', 'AP_Airspeed::AP_Airspeed',),
-            ('AP_AIRSPEED_{type}_ENABLED', r'AP_Airspeed_(?P<type>.*)::init',),
 
             ('AC_PRECLAND_ENABLED', 'AC_PrecLand::AC_PrecLand',),
             ('AC_PRECLAND_ENABLED', 'AC_PrecLand::AC_PrecLand',),
@@ -60,9 +58,6 @@ class ExtractFeatures(object):
             ('HAL_EFI_ENABLED', 'AP_EFI::AP_EFI',),
             ('AP_EFI_{type}_ENABLED', 'AP_EFI_(?P<type>.*)::update',),
 
-            ('AP_TEMPERATURE_SENSOR_ENABLED', 'AP_TemperatureSensor::AP_TemperatureSensor',),
-            ('AP_TEMPERATURE_SENSOR_{type}_ENABLED', 'AP_TemperatureSensor_(?P<type>.*)::update',),
-
             ('HAL_TORQEEDO_ENABLED', 'AP_Torqeedo::AP_Torqeedo'),
 
             ('HAL_NAVEKF3_AVAILABLE', 'NavEKF3::NavEKF3',),
@@ -70,7 +65,6 @@ class ExtractFeatures(object):
             ('HAL_EXTERNAL_AHRS_ENABLED', r'AP_ExternalAHRS::init\b',),
             ('AP_EXTERNAL_AHRS_{type}_ENABLED', r'AP_ExternalAHRS_{type}::healthy\b',),
             ('HAL_INS_TEMPERATURE_CAL_ENABLE', 'AP_InertialSensor::TCal::Learn::save_calibration',),
-            ('HAL_VISUALODOM_ENABLED', 'AP_VisualOdom::init',),
 
             ('AP_GPS_{type}_ENABLED', r'AP_GPS_(?P<type>.*)::read\b',),
 
@@ -139,7 +133,6 @@ class ExtractFeatures(object):
             ('HAL_LANDING_DEEPSTALL_ENABLED', r'AP_Landing_Deepstall::terminate\b',),
 
             ('AP_GRIPPER_ENABLED', r'AP_Gripper::init\b',),
-            ('HAL_SPRAYER_ENABLED', 'AC_Sprayer::AC_Sprayer',),
             ('AP_LANDINGGEAR_ENABLED', r'AP_LandingGear::init\b',),
             ('AP_RELAY_ENABLED', 'AP_Relay::init',),
             ('AP_SERVORELAYEVENTS_ENABLED', 'AP_ServoRelayEvents::update_events',),
@@ -161,13 +154,12 @@ class ExtractFeatures(object):
             ('HAL_DISPLAY_ENABLED', r'Display::init\b',),
             ('HAL_NMEA_OUTPUT_ENABLED', r'AP_NMEA_Output::update\b',),
             ('HAL_BARO_WIND_COMP_ENABLED', r'AP_Baro::wind_pressure_correction\b',),
-            ('AP_TEMPCALIBRATION_ENABLED', r'AP_TempCalibration::apply_calibration',),
 
             ('EK3_FEATURE_EXTERNAL_NAV', r'NavEKF3::writeExtNavVelData'),
             ('EK3_FEATURE_DRAG_FUSION', r'NavEKF3_core::FuseDragForces'),
 
             ('AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED', r'RC_Channel::lookuptable',),
-            
+
             ('AP_NOTIFY_TONEALARM_ENABLED', r'AP_ToneAlarm::init'),
             ('AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED', r'AP_Notify::handle_play_tune'),
             ('AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED', r'AP_Notify::handle_led_control'),

@@ -726,52 +726,6 @@ void NavEKF3_core::correctEkfOriginHeight()
 }
 
 /********************************************************
-*                Air Speed Measurements                 *
-********************************************************/
-
-// check for new airspeed data and update stored measurements if available
-void NavEKF3_core::readAirSpdData()
-{
-    const float EAS2TAS = dal.get_EAS2TAS();
-    // if airspeed reading is valid and is set by the user to be used and has been updated then
-    // we take a new reading, convert from EAS to TAS and set the flag letting other functions
-    // know a new measurement is available
-
-    const auto *airspeed = dal.airspeed();
-    if (airspeed &&
-        (airspeed->last_update_ms(selected_airspeed) - timeTasReceived_ms) > frontend->sensorIntervalMin_ms) {
-        tasDataNew.tas = airspeed->get_airspeed(selected_airspeed) * EAS2TAS;
-        timeTasReceived_ms = airspeed->last_update_ms(selected_airspeed);
-        tasDataNew.time_ms = timeTasReceived_ms - frontend->tasDelay_ms;
-        tasDataNew.tasVariance = sq(MAX(frontend->_easNoise * EAS2TAS, 0.5f));
-        tasDataNew.allowFusion = airspeed->healthy(selected_airspeed) && airspeed->use(selected_airspeed);
-
-        // Correct for the average intersampling delay due to the filter update rate
-        tasDataNew.time_ms -= localFilterTimeStep_ms/2;
-
-        // Save data into the buffer to be fused when the fusion time horizon catches up with it
-        storedTAS.push(tasDataNew);
-    }
-
-    // Check the buffer for measurements that have been overtaken by the fusion time horizon and need to be fused
-    tasDataToFuse = storedTAS.recall(tasDataDelayed,imuDataDelayed.time_ms);
-
-    float easErrVar = sq(MAX(frontend->_easNoise, 0.5f));
-    // Allow use of a default value if enabled
-    if (!useAirspeed() &&
-        imuDataDelayed.time_ms - tasDataDelayed.time_ms > 200 &&
-        is_positive(defaultAirSpeed)) {
-        tasDataDelayed.tas = defaultAirSpeed * EAS2TAS;
-        tasDataDelayed.tasVariance = sq(MAX(defaultAirSpeedVariance, easErrVar));
-        tasDataDelayed.allowFusion = true;
-        tasDataDelayed.time_ms = 0;
-        usingDefaultAirspeed = true;
-    } else {
-        usingDefaultAirspeed = false;
-    }
-}
-
-/********************************************************
 *              Independant yaw sensor measurements      *
 ********************************************************/
 
@@ -961,22 +915,7 @@ void NavEKF3_core::update_baro_selection(void)
  */
 void NavEKF3_core::update_airspeed_selection(void)
 {
-    const auto *arsp = dal.airspeed();
-    if (arsp == nullptr) {
-        return;
-    }
-
-    // in normal operation use the primary airspeed sensor
-    selected_airspeed = arsp->get_primary();
-
-    if (frontend->_affinity & EKF_AFFINITY_ARSP) {
-        if (core_index < arsp->get_num_sensors() &&
-            arsp->healthy(core_index) &&
-            arsp->use(core_index)) {
-            // use core_index airspeed if it is healthy
-            selected_airspeed = core_index;
-        }
-    }
+    return;
 }
 
 /*

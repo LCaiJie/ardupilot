@@ -27,7 +27,6 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_AccelCal/AP_AccelCal.h>
-#include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>     // board configuration library
 #include <AP_Button/AP_Button.h>
@@ -46,14 +45,12 @@
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_Networking/AP_Networking.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_MSP/AP_MSP.h>
 #include <AP_Frsky_Telem/AP_Frsky_Parameters.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_VideoTX/AP_SmartAudio.h>
 #include <AP_VideoTX/AP_Tramp.h>
-#include <AP_TemperatureSensor/AP_TemperatureSensor.h>
 #include <SITL/SITL.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
 #include <AP_NMEA_Output/AP_NMEA_Output.h>
@@ -255,10 +252,6 @@ protected:
     AP_Hott_Telem hott_telem;
 #endif
 
-#if HAL_VISUALODOM_ENABLED
-    AP_VisualOdom visual_odom;
-#endif
-
 #if HAL_WITH_ESC_TELEM
     AP_ESC_Telem esc_telem;
 #endif
@@ -291,21 +284,12 @@ protected:
     // EFI Engine Monitor
     AP_EFI efi;
 #endif
-
-#if AP_AIRSPEED_ENABLED
-    AP_Airspeed airspeed;
-#endif
-
 #if HAL_NMEA_OUTPUT_ENABLED
     AP_NMEA_Output nmea;
 #endif
 
 #if AP_FENCE_ENABLED
     AC_Fence fence;
-#endif
-
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    AP_TemperatureSensor temperature_sensor;
 #endif
 
     static const struct AP_Param::GroupInfo var_info[];

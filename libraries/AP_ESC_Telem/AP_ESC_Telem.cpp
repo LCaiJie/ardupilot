@@ -21,7 +21,6 @@
 #if HAL_WITH_ESC_TELEM
 
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_TemperatureSensor/AP_TemperatureSensor_config.h>
 
 #include <AP_Math/AP_Math.h>
 
@@ -419,17 +418,8 @@ void AP_ESC_Telem::update_telem_data(const uint8_t esc_index, const AP_ESC_Telem
 
     _have_data = true;
 
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    // always allow external data. Block "internal" if external has ever its ever been set externally then ignore normal "internal" updates
-    const bool has_temperature = (data_mask & AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE_EXTERNAL) ||
-        ((data_mask & AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE) && !(_telem_data[esc_index].types & AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE_EXTERNAL));
-
-    const bool has_motor_temperature = (data_mask & AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE_EXTERNAL) ||
-        ((data_mask & AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE) && !(_telem_data[esc_index].types & AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE_EXTERNAL));
-#else
     const bool has_temperature = (data_mask & AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE);
     const bool has_motor_temperature = (data_mask & AP_ESC_Telem_Backend::TelemetryType::MOTOR_TEMPERATURE);
-#endif
 
     if (has_temperature) {
         _telem_data[esc_index].temperature_cdeg = new_data.temperature_cdeg;
