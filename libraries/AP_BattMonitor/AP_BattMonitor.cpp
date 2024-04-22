@@ -1,22 +1,5 @@
 #include "AP_BattMonitor.h"
 #include "AP_BattMonitor_Analog.h"
-#include "AP_BattMonitor_SMBus.h"
-#include "AP_BattMonitor_SMBus_Solo.h"
-#include "AP_BattMonitor_SMBus_Generic.h"
-#include "AP_BattMonitor_SMBus_Maxell.h"
-#include "AP_BattMonitor_SMBus_Rotoye.h"
-#include "AP_BattMonitor_Bebop.h"
-#include "AP_BattMonitor_SMBus_SUI.h"
-#include "AP_BattMonitor_SMBus_NeoDesign.h"
-#include "AP_BattMonitor_Sum.h"
-#include "AP_BattMonitor_FuelFlow.h"
-#include "AP_BattMonitor_FuelLevel_PWM.h"
-#include "AP_BattMonitor_INA2xx.h"
-#include "AP_BattMonitor_INA239.h"
-#include "AP_BattMonitor_LTC2946.h"
-#include "AP_BattMonitor_FuelLevel_Analog.h"
-#include "AP_BattMonitor_Synthetic_Current.h"
-#include "AP_BattMonitor_AD7091R5.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -441,90 +424,6 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_Analog(*this, state[instance], _params[instance]);
                 break;
 #endif
-#if AP_BATTERY_SMBUS_SOLO_ENABLED
-            case Type::SOLO:
-                drivers[instance] = new AP_BattMonitor_SMBus_Solo(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SMBUS_GENERIC_ENABLED
-            case Type::SMBus_Generic:
-                drivers[instance] = new AP_BattMonitor_SMBus_Generic(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SMBUS_SUI_ENABLED
-            case Type::SUI3:
-                drivers[instance] = new AP_BattMonitor_SMBus_SUI(*this, state[instance], _params[instance], 3);
-                break;
-            case Type::SUI6:
-                drivers[instance] = new AP_BattMonitor_SMBus_SUI(*this, state[instance], _params[instance], 6);
-                break;
-#endif
-#if AP_BATTERY_SMBUS_MAXELL_ENABLED
-            case Type::MAXELL:
-                drivers[instance] = new AP_BattMonitor_SMBus_Maxell(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SMBUS_ROTOYE_ENABLED
-            case Type::Rotoye:
-                drivers[instance] = new AP_BattMonitor_SMBus_Rotoye(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SMBUS_NEODESIGN_ENABLED
-            case Type::NeoDesign:
-                drivers[instance] = new AP_BattMonitor_SMBus_NeoDesign(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_BEBOP_ENABLED
-            case Type::BEBOP:
-                drivers[instance] = new AP_BattMonitor_Bebop(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SUM_ENABLED
-            case Type::Sum:
-                drivers[instance] = new AP_BattMonitor_Sum(*this, state[instance], _params[instance], instance);
-                break;
-#endif
-#if AP_BATTERY_FUELFLOW_ENABLED
-            case Type::FuelFlow:
-                drivers[instance] = new AP_BattMonitor_FuelFlow(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_FUELFLOW_ENABLED
-#if AP_BATTERY_FUELLEVEL_PWM_ENABLED
-            case Type::FuelLevel_PWM:
-                drivers[instance] = new AP_BattMonitor_FuelLevel_PWM(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_FUELLEVEL_PWM_ENABLED
-#if AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
-            case Type::FuelLevel_Analog:
-                drivers[instance] = new AP_BattMonitor_FuelLevel_Analog(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
-
-#if AP_BATTERY_INA2XX_ENABLED
-            case Type::INA2XX:
-                drivers[instance] = new AP_BattMonitor_INA2XX(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_LTC2946_ENABLED
-            case Type::LTC2946:
-                drivers[instance] = new AP_BattMonitor_LTC2946(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_SYNTHETIC_CURRENT_ENABLED
-            case Type::Analog_Volt_Synthetic_Current:
-                drivers[instance] = new AP_BattMonitor_Synthetic_Current(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_INA239_ENABLED
-            case Type::INA239_SPI:
-                drivers[instance] = new AP_BattMonitor_INA239(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if AP_BATTERY_AD7091R5_ENABLED
-            case Type::AD7091R5:
-                drivers[instance] = new AP_BattMonitor_AD7091R5(*this, state[instance], _params[instance]);
-                break;
-#endif// AP_BATTERY_AD7091R5_ENABLED
             case Type::NONE:
             default:
                 break;

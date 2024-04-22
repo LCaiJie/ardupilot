@@ -9,7 +9,7 @@
 
 // maximum number of battery monitors
 #ifndef AP_BATT_MONITOR_MAX_INSTANCES
-#define AP_BATT_MONITOR_MAX_INSTANCES       9
+#define AP_BATT_MONITOR_MAX_INSTANCES       1
 #endif
 
 // first monitor is always the primary monitor
@@ -31,44 +31,11 @@
 // declare backend class
 class AP_BattMonitor_Backend;
 class AP_BattMonitor_Analog;
-class AP_BattMonitor_SMBus;
-class AP_BattMonitor_SMBus_Solo;
-class AP_BattMonitor_SMBus_Generic;
-class AP_BattMonitor_SMBus_Maxell;
-class AP_BattMonitor_SMBus_Rotoye;
-class AP_BattMonitor_DroneCAN;
-class AP_BattMonitor_Generator;
-class AP_BattMonitor_INA2XX;
-class AP_BattMonitor_INA239;
-class AP_BattMonitor_LTC2946;
-class AP_BattMonitor_Torqeedo;
-class AP_BattMonitor_FuelLevel_Analog;
-class AP_BattMonitor_EFI;
-
 
 class AP_BattMonitor
 {
     friend class AP_BattMonitor_Backend;
     friend class AP_BattMonitor_Analog;
-    friend class AP_BattMonitor_SMBus;
-    friend class AP_BattMonitor_SMBus_Solo;
-    friend class AP_BattMonitor_SMBus_Generic;
-    friend class AP_BattMonitor_SMBus_Maxell;
-    friend class AP_BattMonitor_SMBus_Rotoye;
-    friend class AP_BattMonitor_DroneCAN;
-    friend class AP_BattMonitor_Sum;
-    friend class AP_BattMonitor_FuelFlow;
-    friend class AP_BattMonitor_FuelLevel_PWM;
-    friend class AP_BattMonitor_Generator;
-    friend class AP_BattMonitor_EFI;
-    friend class AP_BattMonitor_INA2XX;
-    friend class AP_BattMonitor_INA239;
-    friend class AP_BattMonitor_LTC2946;
-    friend class AP_BattMonitor_AD7091R5;
-
-    friend class AP_BattMonitor_Torqeedo;
-    friend class AP_BattMonitor_FuelLevel_Analog;
-    friend class AP_BattMonitor_Synthetic_Current;
 
 public:
 
@@ -84,31 +51,31 @@ public:
         NONE                           = 0,
         ANALOG_VOLTAGE_ONLY            = 3,
         ANALOG_VOLTAGE_AND_CURRENT     = 4,
-        SOLO                           = 5,
-        BEBOP                          = 6,
-        SMBus_Generic                  = 7,
-        UAVCAN_BatteryInfo             = 8,
-        BLHeliESC                      = 9,
-        Sum                            = 10,
-        FuelFlow                       = 11,
-        FuelLevel_PWM                  = 12,
-        SUI3                           = 13,
-        SUI6                           = 14,
-        NeoDesign                      = 15,
-        MAXELL                         = 16,
-        GENERATOR_ELEC                 = 17,
-        GENERATOR_FUEL                 = 18,
-        Rotoye                         = 19,
+        // SOLO                           = 5,
+        // BEBOP                          = 6,
+        // SMBus_Generic                  = 7,
+        // UAVCAN_BatteryInfo             = 8,
+        // BLHeliESC                      = 9,
+        // Sum                            = 10,
+        // FuelFlow                       = 11,
+        // FuelLevel_PWM                  = 12,
+        // SUI3                           = 13,
+        // SUI6                           = 14,
+        // NeoDesign                      = 15,
+        // MAXELL                         = 16,
+        // GENERATOR_ELEC                 = 17,
+        // GENERATOR_FUEL                 = 18,
+        // Rotoye                         = 19,
         // 20 was MPPT_PacketDigital
-        INA2XX                         = 21,
-        LTC2946                        = 22,
-        Torqeedo                       = 23,
-        FuelLevel_Analog               = 24,
-        Analog_Volt_Synthetic_Current  = 25,
-        INA239_SPI                     = 26,
-        EFI                            = 27,
-        AD7091R5                       = 28,
-        Scripting                      = 29,
+        // INA2XX                         = 21,
+        // LTC2946                        = 22,
+        // Torqeedo                       = 23,
+        // FuelLevel_Analog               = 24,
+        // Analog_Volt_Synthetic_Current  = 25,
+        // INA239_SPI                     = 26,
+        // EFI                            = 27,
+        // AD7091R5                       = 28,
+        // Scripting                      = 29,
     };
 
     FUNCTOR_TYPEDEF(battery_failsafe_handler_fn_t, void, const char *, const int8_t);
