@@ -17,7 +17,6 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Common/Bitmask.h>
-#include <AP_RobotisServo/AP_RobotisServo.h>
 #include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_FETtecOneWire/AP_FETtecOneWire.h>
 
@@ -597,12 +596,6 @@ private:
     // this static arrangement is to avoid having static objects in AP_Param tables
     static SRV_Channel *channels;
     static SRV_Channels *_singleton;
-
-#if AP_ROBOTISSERVO_ENABLED
-    // support for Robotis servo protocol
-    AP_RobotisServo robotis;
-    static AP_RobotisServo *robotis_ptr;
-#endif
 
 #if HAL_SUPPORT_RCOUT_SERIAL
     // support for BLHeli protocol

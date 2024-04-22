@@ -35,9 +35,6 @@ extern const AP_HAL::HAL& hal;
 SRV_Channel *SRV_Channels::channels;
 SRV_Channels *SRV_Channels::_singleton;
 
-#if AP_ROBOTISSERVO_ENABLED
-AP_RobotisServo *SRV_Channels::robotis_ptr;
-#endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
 AP_FETtecOneWire *SRV_Channels::fetteconwire_ptr;
@@ -179,12 +176,6 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @Group: _BLH_
     // @Path: ../AP_BLHeli/AP_BLHeli.cpp
     AP_SUBGROUPINFO(blheli, "_BLH_",  21, SRV_Channels, AP_BLHeli),
-#endif
-
-#if AP_ROBOTISSERVO_ENABLED
-    // @Group: _ROB_
-    // @Path: ../AP_RobotisServo/AP_RobotisServo.cpp
-    AP_SUBGROUPINFO(robotis, "_ROB_",  22, SRV_Channels, AP_RobotisServo),
 #endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
@@ -358,9 +349,6 @@ SRV_Channels::SRV_Channels(void)
     fetteconwire_ptr = &fetteconwire;
 #endif
 
-#if AP_ROBOTISSERVO_ENABLED
-    robotis_ptr = &robotis;
-#endif // AP_ROBOTISSERVO_ENABLED
 
 #if HAL_SUPPORT_RCOUT_SERIAL
     blheli_ptr = &blheli;
@@ -480,11 +468,6 @@ void SRV_Channels::cork()
 void SRV_Channels::push()
 {
     hal.rcout->push();
-
-#if AP_ROBOTISSERVO_ENABLED
-    // give robotis library a chance to update
-    robotis_ptr->update();
-#endif
 
 #if HAL_SUPPORT_RCOUT_SERIAL
     // give blheli telemetry a chance to update

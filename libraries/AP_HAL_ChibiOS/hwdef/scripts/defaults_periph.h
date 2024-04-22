@@ -41,10 +41,6 @@
 #define HAL_RALLY_ENABLED 0
 #endif
 
-#ifndef HAL_NMEA_OUTPUT_ENABLED
-#define HAL_NMEA_OUTPUT_ENABLED 0
-#endif
-
 #ifndef HAL_CAN_DEFAULT_NODE_ID
 #define HAL_CAN_DEFAULT_NODE_ID 0
 #endif
@@ -85,9 +81,6 @@
 #define AP_STATS_ENABLED 0
 #endif
 
-#ifndef AP_ROBOTISSERVO_ENABLED
-#define AP_ROBOTISSERVO_ENABLED 0
-#endif
 
 // by default an AP_Periph defines as many servo output channels as
 // there are PWM outputs:

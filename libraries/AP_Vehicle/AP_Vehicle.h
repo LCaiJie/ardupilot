@@ -36,7 +36,6 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
-#include <AP_Hott_Telem/AP_Hott_Telem.h>
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_Networking/AP_Networking.h>
@@ -48,7 +47,6 @@
 #include <AP_VideoTX/AP_Tramp.h>
 #include <SITL/SITL.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
-#include <AP_NMEA_Output/AP_NMEA_Output.h>
 #include <AC_Fence/AC_Fence.h>
 #include <Filter/LowPassFilter.h>
 #include <Filter/AP_Filter.h>
@@ -232,10 +230,6 @@ protected:
     // Inertial Navigation EKF
     AP_AHRS ahrs;
 
-#if HAL_HOTT_TELEM_ENABLED
-    AP_Hott_Telem hott_telem;
-#endif
-
 #if HAL_WITH_ESC_TELEM
     AP_ESC_Telem esc_telem;
 #endif
@@ -258,9 +252,6 @@ protected:
 
 #if AP_NETWORKING_ENABLED
     AP_Networking networking;
-#endif
-#if HAL_NMEA_OUTPUT_ENABLED
-    AP_NMEA_Output nmea;
 #endif
 
 #if AP_FENCE_ENABLED

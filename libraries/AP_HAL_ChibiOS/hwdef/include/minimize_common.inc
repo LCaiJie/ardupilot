@@ -16,8 +16,6 @@ define HAL_GYROFFT_ENABLED 0
 # several notify backends are rare and not supported by default on smaller boards:
 define AP_NOTIFY_NCP5623_ENABLED 0
 
-# HOTT telemetry is quite rare, so we don't include it on smaller boards
-define HAL_HOTT_TELEM_ENABLED 0
 
 # smaller boards lose some GPS support
 define AP_GPS_BACKEND_DEFAULT_ENABLED 0
@@ -58,9 +56,6 @@ define AP_BARO_PROBE_EXTERNAL_I2C_BUSES 0
 # no wind compensation code:
 define HAL_BARO_WIND_COMP_ENABLED 0
 
-
-# no NMEA output:
-define HAL_NMEA_OUTPUT_ENABLED 0
 
 # no Notify Display support:
 define HAL_DISPLAY_ENABLED 0

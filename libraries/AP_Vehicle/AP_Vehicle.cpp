@@ -77,12 +77,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(fence, "FENCE_", 14, AP_Vehicle, AC_Fence),
 #endif
 
-#if HAL_NMEA_OUTPUT_ENABLED
-    // @Group: NMEA_
-    // @Path: ../AP_NMEA_Output/AP_NMEA_Output.cpp
-    AP_SUBGROUPINFO(nmea, "NMEA_", 17, AP_Vehicle, AP_NMEA_Output),
-#endif
-
 #if AP_DDS_ENABLED
     // @Group: DDS
     // @Path: ../AP_DDS/AP_DDS_Client.cpp
@@ -292,9 +286,6 @@ void AP_Vehicle::setup()
 #if HAL_GYROFFT_ENABLED
     gyro_fft.init(AP::scheduler().get_loop_rate_hz());
 #endif
-#if HAL_HOTT_TELEM_ENABLED
-    hott_telem.init();
-#endif
 #if AP_VIDEOTX_ENABLED
     vtx.init();
 #endif
@@ -313,10 +304,6 @@ void AP_Vehicle::setup()
 
     send_watchdog_reset_statustext();
 
-
-#if HAL_NMEA_OUTPUT_ENABLED
-    nmea.init();
-#endif
 
 #if AP_FENCE_ENABLED
     fence.init();
@@ -411,9 +398,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
     SCHED_TASK_CLASS(Compass,      &vehicle.compass,        cal_update,     100, 200, 75),
 #endif
     SCHED_TASK_CLASS(AP_Notify,    &vehicle.notify,         update,                   50, 300, 78),
-#if HAL_NMEA_OUTPUT_ENABLED
-    SCHED_TASK_CLASS(AP_NMEA_Output, &vehicle.nmea,         update,                   50, 50, 180),
-#endif
 #if HAL_GYROFFT_ENABLED
     SCHED_TASK_CLASS(AP_GyroFFT,   &vehicle.gyro_fft,       update,                  400, 50, 205),
     SCHED_TASK_CLASS(AP_GyroFFT,   &vehicle.gyro_fft,       update_parameters,         1, 50, 210),

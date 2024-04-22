@@ -100,7 +100,7 @@ class ExtractFeatures(object):
             ('AC_PAYLOAD_PLACE_ENABLED', 'PayloadPlace::start_descent'),
             ('AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED', ExtractFeatures.FindString('PayloadPlace')),
             ('AP_EFI_SERIAL_HIRTH_ENABLED', r'AP_EFI_Serial_Hirth::update\b',),
-            
+
             ('OSD_ENABLED', 'AP_OSD::update_osd',),
             ('OSD_PARAM_ENABLED', 'AP_OSD_ParamScreen::AP_OSD_ParamScreen',),
             ('HAL_OSD_SIDEBAR_ENABLE', 'AP_OSD_Screen::draw_sidebars',),
@@ -121,7 +121,6 @@ class ExtractFeatures(object):
             ('AP_RCPROTOCOL_{type}_ENABLED', r'AP_RCProtocol_(?P<type>.*)::_process_byte\b',),
             ('AP_RCPROTOCOL_{type}_ENABLED', r'AP_RCProtocol_(?P<type>.*)::_process_pulse\b',),
 
-            ('AP_ROBOTISSERVO_ENABLED', r'AP_RobotisServo::init\b',),
             ('AP_FETTEC_ONEWIRE_ENABLED', r'AP_FETtecOneWire::init\b',),
 
             ('GPS_MOVING_BASELINE', r'AP_GPS_Backend::calculate_moving_base_yaw\b',),
@@ -129,7 +128,6 @@ class ExtractFeatures(object):
             ('HAL_WITH_DSP', r'AP_HAL::DSP::find_peaks\b',),
             ('HAL_GYROFFT_ENABLED', r'AP_GyroFFT::AP_GyroFFT\b',),
             ('HAL_DISPLAY_ENABLED', r'Display::init\b',),
-            ('HAL_NMEA_OUTPUT_ENABLED', r'AP_NMEA_Output::update\b',),
             ('HAL_BARO_WIND_COMP_ENABLED', r'AP_Baro::wind_pressure_correction\b',),
 
             ('EK3_FEATURE_EXTERNAL_NAV', r'NavEKF3::writeExtNavVelData'),
