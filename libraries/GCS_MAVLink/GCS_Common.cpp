@@ -30,19 +30,15 @@
 #include <AP_InternalError/AP_InternalError.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#include <AP_RCTelemetry/AP_Spektrum_Telem.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_Proximity/AP_Proximity.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_OSD/AP_OSD.h>
-#include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <AP_Filesystem/AP_Filesystem.h>
-#include <AP_Frsky_Telem/AP_Frsky_Telem.h>
 #include <RC_Channel/RC_Channel.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 #include <AP_Landing/AP_Landing_config.h>
@@ -893,9 +889,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #endif
         { MAVLINK_MSG_ID_EXTENDED_SYS_STATE,    MSG_EXTENDED_SYS_STATE},
         { MAVLINK_MSG_ID_AUTOPILOT_VERSION,     MSG_AUTOPILOT_VERSION},
-#if HAL_WITH_ESC_TELEM
-        { MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4,  MSG_ESC_TELEMETRY},
-#endif
 #if HAL_HIGH_LATENCY2_ENABLED
         { MAVLINK_MSG_ID_HIGH_LATENCY2,         MSG_HIGH_LATENCY2},
 #endif
@@ -2054,24 +2047,6 @@ void GCS::send_textv(MAV_SEVERITY severity, const char *fmt, va_list arg_list, u
     }
 #endif
 
-#if AP_FRSKY_TELEM_ENABLED
-    frsky = AP::frsky_telem();
-    if (frsky != nullptr) {
-        frsky->queue_message(severity, first_piece_of_text);
-    }
-#endif
-#if HAL_SPEKTRUM_TELEM_ENABLED
-    AP_Spektrum_Telem* spektrum = AP::spektrum_telem();
-    if (spektrum != nullptr) {
-        spektrum->queue_message(severity, first_piece_of_text);
-    }
-#endif
-#if HAL_CRSF_TELEM_ENABLED
-    AP_CRSF_Telem* crsf = AP::crsf_telem();
-    if (crsf != nullptr) {
-        crsf->queue_message(severity, first_piece_of_text);
-    }
-#endif
     AP_Notify *notify = AP_Notify::get_singleton();
     if (notify) {
         notify->send_text(first_piece_of_text);
@@ -2311,16 +2286,6 @@ void GCS::setup_uarts()
         }
         create_gcs_mavlink_backend(chan_parameters[i], *uart);
     }
-
-#if AP_FRSKY_TELEM_ENABLED
-    if (frsky == nullptr) {
-        frsky = new AP_Frsky_Telem();
-        if (frsky == nullptr || !frsky->init()) {
-            delete frsky;
-            frsky = nullptr;
-        }
-    }
-#endif
 
 #if AP_LTM_TELEM_ENABLED
     ltm_telemetry.init();
@@ -5121,12 +5086,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         CHECK_PAYLOAD_SIZE(AUTOPILOT_VERSION);
         send_autopilot_version();
         break;
-
-#if HAL_WITH_ESC_TELEM
-    case MSG_ESC_TELEMETRY:
-        AP::esc_telem().send_esc_telemetry_mavlink(uint8_t(chan));
-        break;
-#endif
 
 #if HAL_HIGH_LATENCY2_ENABLED
     case MSG_HIGH_LATENCY2:

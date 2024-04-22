@@ -22,10 +22,8 @@
 #include <AP_HAL/Semaphores.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <RC_Channel/RC_Channel.h>
 #include <GCS_MAVLink/GCS_config.h>
-#include <AP_MSP/msp.h>
 #include <AP_Baro/AP_Baro.h>
 #if HAL_GCS_ENABLED
 #include <GCS_MAVLink/GCS_MAVLink.h>
@@ -33,7 +31,6 @@
 #include <AC_Fence/AC_Fence_config.h>
 
 class AP_OSD_Backend;
-class AP_MSP;
 
 #define AP_OSD_NUM_DISPLAY_SCREENS 4
 #if OSD_PARAM_ENABLED
@@ -87,14 +84,6 @@ public:
 
 protected:
     bool check_option(uint32_t option);
-#if HAL_WITH_MSP_DISPLAYPORT
-    virtual uint8_t get_txt_resolution() const {
-        return 0;
-    }
-    virtual uint8_t get_font_index() const {
-        return 0;
-    }
-#endif
     enum unit_type {
         ALTITUDE=0,
         SPEED=1,
@@ -126,26 +115,14 @@ public:
 
     // skip the drawing if we are not using a font based backend. This saves a lot of flash space when
     // using the MSP OSD system on boards that don't have a MAX7456
-#if HAL_WITH_OSD_BITMAP || HAL_WITH_MSP_DISPLAYPORT
+#if HAL_WITH_OSD_BITMAP
     void draw(void) override;
 #endif
 
     // User settable parameters
     static const struct AP_Param::GroupInfo var_info[];
     static const struct AP_Param::GroupInfo var_info2[];
-
-#if HAL_WITH_MSP_DISPLAYPORT
-    uint8_t get_txt_resolution() const override {
-        return txt_resolution;
-    }
-    uint8_t get_font_index() const override {
-        return font_index;
-    }
-#endif
 private:
-    friend class AP_MSP;
-    friend class AP_MSP_Telem_Backend;
-    friend class AP_MSP_Telem_DJI;
 
     static const uint8_t message_visible_width = 26;
     static const uint8_t message_scroll_time_ms = 200;
@@ -185,11 +162,6 @@ private:
     AP_OSD_Setting aspd1;
     AP_OSD_Setting aspd2;
     AP_OSD_Setting vspeed{true, 24, 9};
-#if HAL_WITH_ESC_TELEM
-    AP_OSD_Setting esc_temp {false, 24, 13};
-    AP_OSD_Setting esc_rpm{false, 22, 12};
-    AP_OSD_Setting esc_amps{false, 24, 14};
-#endif
     AP_OSD_Setting gps_latitude{true, 9, 13};
     AP_OSD_Setting gps_longitude{true, 9, 14};
     AP_OSD_Setting roll_angle;
@@ -227,12 +199,6 @@ private:
     AP_OSD_Setting batt_bar{true, 1, 1};
     AP_OSD_Setting arming{true, 1, 1};
 
-#if HAL_WITH_MSP_DISPLAYPORT
-    // Per screen HD resolution options (currently supported only by DisplayPort)
-    AP_Int8 txt_resolution;
-    AP_Int8 font_index;
-#endif
-
     void draw_altitude(uint8_t x, uint8_t y);
     void draw_bat_volt(uint8_t instance,VoltageType  type,uint8_t x, uint8_t y);
     void draw_bat_volt(uint8_t x, uint8_t y);
@@ -264,11 +230,6 @@ private:
     void draw_speed(uint8_t x, uint8_t y, float angle_rad, float magnitude);
     void draw_distance(uint8_t x, uint8_t y, float distance);
     char get_arrow_font_index (int32_t angle_cd);
-#if HAL_WITH_ESC_TELEM
-    void draw_esc_temp(uint8_t x, uint8_t y);
-    void draw_esc_rpm(uint8_t x, uint8_t y);
-    void draw_esc_amps(uint8_t x, uint8_t y);
-#endif
     void draw_gps_latitude(uint8_t x, uint8_t y);
     void draw_gps_longitude(uint8_t x, uint8_t y);
     void draw_roll_angle(uint8_t x, uint8_t y);
@@ -411,7 +372,7 @@ public:
     static const uint8_t NUM_PARAMS = 9;
     static const uint8_t SAVE_PARAM = NUM_PARAMS + 1;
 
-#if OSD_ENABLED && (HAL_WITH_OSD_BITMAP || HAL_WITH_MSP_DISPLAYPORT)
+#if OSD_ENABLED && (HAL_WITH_OSD_BITMAP)
     void draw(void) override;
 #endif
 #if HAL_GCS_ENABLED
@@ -462,8 +423,6 @@ class AP_OSD
 {
 public:
     friend class AP_OSD_Screen;
-    friend class AP_MSP;
-    friend class AP_MSP_Telem_Backend;
     friend class AP_OSD_ParamScreen;
     //constructor
     AP_OSD();

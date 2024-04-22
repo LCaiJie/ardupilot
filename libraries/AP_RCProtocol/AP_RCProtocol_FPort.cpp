@@ -22,7 +22,6 @@
 #if AP_RCPROTOCOL_FPORT_ENABLED
 
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <AP_Frsky_Telem/AP_Frsky_Telem.h>
 #include <RC_Channel/RC_Channel.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
@@ -103,106 +102,7 @@ void AP_RCProtocol_FPort::decode_control(const FPort_Frame &frame)
 */
 void AP_RCProtocol_FPort::decode_downlink(const FPort_Frame &frame)
 {
-#if !APM_BUILD_TYPE(APM_BUILD_iofirmware) && AP_FRSKY_SPORT_TELEM_ENABLED
-    switch (frame.downlink.prim) {
-        case FPORT_PRIM_DATA:
-            // we've seen at least one 0x10 frame
-            rx_driven_frame_rate = true;
-            break;
-        case FPORT_PRIM_NULL:
-            if (rx_driven_frame_rate) {
-                return;
-            }
-            // with 0x00 and no rx control we have a constraint
-            // on max consecutive frames
-            if (consecutive_telemetry_frame_count >= MAX_FPORT_CONSECUTIVE_FRAMES) {
-                consecutive_telemetry_frame_count = 0;
-                return;
-            } else {
-                consecutive_telemetry_frame_count++;
-            }
-            break;
-        case FPORT_PRIM_READ:
-        case FPORT_PRIM_WRITE:
-#if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL        
-            AP_Frsky_Telem::set_telem_data(frame.downlink.prim, frame.downlink.appid, le32toh_ptr(frame.downlink.data));
-#endif //HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL            
-            // do not respond to 0x30 and 0x31
-            return;
-    }
 
-    /*
-      if we are getting FPORT over a UART then we can ask the FrSky
-      telem library for some passthrough data to send back, enabling
-      telemetry on the receiver via the same uart pin as we use for
-      incoming RC frames
-     */
-
-    AP_HAL::UARTDriver *uart = get_UART();
-    if (!uart) {
-        return;
-    }
-
-    /*
-      get SPort data from FRSky_Telem or send a null frame.
-      We save the data to a variable so in case we're late we'll
-      send it in the next call, this prevents corruption of
-      status text messages
-     */
-    if (!telem_data.available) {
-        uint8_t packet_count;
-        if (!AP_Frsky_Telem::get_telem_data(&telem_data.packet, packet_count, 1)) {
-            // nothing to send, send a null frame
-            telem_data.packet.frame = 0x00;
-            telem_data.packet.appid = 0x00;
-            telem_data.packet.data = 0x00;
-        }
-        telem_data.available = true;
-    }
-    /*
-      check that we haven't been too slow in responding to the new
-      UART data. If we respond too late then we will corrupt the next
-      incoming control frame
-     */
-    uint64_t tend = uart->receive_time_constraint_us(1);
-    uint64_t now = AP_HAL::micros64();
-    uint64_t tdelay = now - tend;
-    if (tdelay > 2500) {
-        // we've been too slow in responding
-        return;
-    }
-    uint8_t buf[10];
-
-    buf[0] = 0x08;
-    buf[1] = 0x81;
-    buf[2] = telem_data.packet.frame;
-    buf[3] = telem_data.packet.appid & 0xFF;
-    buf[4] = telem_data.packet.appid >> 8;
-    memcpy(&buf[5], &telem_data.packet.data, 4);
-    buf[9] = crc_sum8_with_carry(&buf[0], 9);
-
-    // perform byte stuffing per FPort spec
-    uint8_t len = 0;
-    uint8_t buf2[sizeof(buf)*2+1];
-
-    if (rc().option_is_enabled(RC_Channels::Option::FPORT_PAD)) {
-        // this padding helps on some uarts that have hw pullups
-        buf2[len++] = 0xff;
-    }
-
-    for (uint8_t i=0; i<sizeof(buf); i++) {
-        uint8_t c = buf[i];
-        if (c == FRAME_DLE || buf[i] == FRAME_HEAD) {
-            buf2[len++] = FRAME_DLE;
-            buf2[len++] = c ^ FRAME_XOR;
-        } else {
-            buf2[len++] = c;
-        }
-    }
-    uart->write(buf2, len);
-    // get fresh telem_data in the next call
-    telem_data.available = false;
-#endif
 }
 
 /*

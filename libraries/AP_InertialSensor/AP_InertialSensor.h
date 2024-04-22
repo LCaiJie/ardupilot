@@ -16,7 +16,6 @@
 #include <AP_AccelCal/AP_AccelCal.h>
 #include <AP_HAL/utility/RingBuffer.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <Filter/LowPassFilter.h>
 #include <Filter/HarmonicNotchFilter.h>
 #include <AP_SerialManager/AP_SerialManager_config.h>
@@ -413,10 +412,6 @@ public:
     BatchSampler batchsampler{*this};
 #endif
 
-#if HAL_EXTERNAL_AHRS_ENABLED
-    // handle external AHRS data
-    void handle_external(const AP_ExternalAHRS::ins_data_message_t &pkt);
-#endif
 
 #if HAL_INS_TEMPERATURE_CAL_ENABLE
     /*

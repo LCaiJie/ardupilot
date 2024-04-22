@@ -753,9 +753,6 @@ bool RCOutput::bdshot_decode_telemetry_from_erpm(uint16_t encodederpm, uint8_t c
     // eRPM = m << e (see https://github.com/bird-sanctuary/extended-dshot-telemetry)
     uint8_t expo = ((encodederpm & 0xfffffe00U) >> 9U) & 0xffU; // 3bits
     uint16_t value = (encodederpm & 0x000001ffU);               // 9bits
-#if HAL_WITH_ESC_TELEM
-    uint8_t normalized_chan = chan;
-#endif
 #if HAL_WITH_IO_MCU
     if (iomcu_enabled) {
         normalized_chan = chan + chan_offset;
@@ -765,32 +762,14 @@ bool RCOutput::bdshot_decode_telemetry_from_erpm(uint16_t encodederpm, uint8_t c
     if (!(value & 0x100U) && (_dshot_esc_type == DSHOT_ESC_BLHELI_EDT || _dshot_esc_type == DSHOT_ESC_BLHELI_EDT_S)) {
         switch (expo) {
         case 0b001: { // Temperature C
-    #if HAL_WITH_ESC_TELEM
-            TelemetryData t {
-                .temperature_cdeg = int16_t(value * 100)
-            };
-            update_telem_data(normalized_chan, t, AP_ESC_Telem_Backend::TelemetryType::TEMPERATURE);
-    #endif
             return false;
             }
             break;
         case 0b010: { // Voltage 0.25v
-    #if HAL_WITH_ESC_TELEM
-            TelemetryData t {
-                .voltage = 0.25f * value
-            };
-            update_telem_data(normalized_chan, t, AP_ESC_Telem_Backend::TelemetryType::VOLTAGE);
-    #endif
             return false;
             }
             break;
         case 0b011: { // Current A
-    #if HAL_WITH_ESC_TELEM
-            TelemetryData t {
-                .current = float(value)
-            };
-            update_telem_data(normalized_chan, t, AP_ESC_Telem_Backend::TelemetryType::CURRENT);
-    #endif
             return false;
             }
             break;
@@ -821,9 +800,6 @@ bool RCOutput::bdshot_decode_telemetry_from_erpm(uint16_t encodederpm, uint8_t c
     if (erpm < INVALID_ERPM) {
         _bdshot.erpm[chan] = erpm;
         _bdshot.update_mask |= 1U<<chan;
-#if HAL_WITH_ESC_TELEM
-        update_rpm(normalized_chan, erpm * 200U / _bdshot.motor_poles, get_erpm_error_rate(chan));
-#endif
     }
     return erpm < INVALID_ERPM;
 }

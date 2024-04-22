@@ -6,7 +6,6 @@
 #include "AP_BattMonitor_SMBus_Maxell.h"
 #include "AP_BattMonitor_SMBus_Rotoye.h"
 #include "AP_BattMonitor_Bebop.h"
-#include "AP_BattMonitor_ESC.h"
 #include "AP_BattMonitor_SMBus_SUI.h"
 #include "AP_BattMonitor_SMBus_NeoDesign.h"
 #include "AP_BattMonitor_Sum.h"
@@ -15,7 +14,6 @@
 #include "AP_BattMonitor_INA2xx.h"
 #include "AP_BattMonitor_INA239.h"
 #include "AP_BattMonitor_LTC2946.h"
-#include "AP_BattMonitor_Torqeedo.h"
 #include "AP_BattMonitor_FuelLevel_Analog.h"
 #include "AP_BattMonitor_Synthetic_Current.h"
 #include "AP_BattMonitor_AD7091R5.h"
@@ -481,11 +479,6 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_Bebop(*this, state[instance], _params[instance]);
                 break;
 #endif
-#if AP_BATTERY_ESC_ENABLED
-            case Type::BLHeliESC:
-                drivers[instance] = new AP_BattMonitor_ESC(*this, state[instance], _params[instance]);
-                break;
-#endif
 #if AP_BATTERY_SUM_ENABLED
             case Type::Sum:
                 drivers[instance] = new AP_BattMonitor_Sum(*this, state[instance], _params[instance], instance);
@@ -515,11 +508,6 @@ AP_BattMonitor::init()
 #if AP_BATTERY_LTC2946_ENABLED
             case Type::LTC2946:
                 drivers[instance] = new AP_BattMonitor_LTC2946(*this, state[instance], _params[instance]);
-                break;
-#endif
-#if HAL_TORQEEDO_ENABLED
-            case Type::Torqeedo:
-                drivers[instance] = new AP_BattMonitor_Torqeedo(*this, state[instance], _params[instance]);
                 break;
 #endif
 #if AP_BATTERY_SYNTHETIC_CURRENT_ENABLED
@@ -637,9 +625,6 @@ void AP_BattMonitor::read()
             drivers[i]->read();
             drivers[i]->update_resistance_estimate();
 
-#if AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED
-            drivers[i]->update_esc_telem_outbound();
-#endif
 
 #if HAL_LOGGING_ENABLED
             if (logger != nullptr && logger->should_log(_log_battery_bit)) {

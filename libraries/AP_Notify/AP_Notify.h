@@ -68,9 +68,6 @@ public:
         Notify_LED_NCP5623_I2C_External     = (1 << 6), // External NCP5623
         Notify_LED_NCP5623_I2C_Internal     = (1 << 7), // Internal NCP5623
 #endif
-#if AP_NOTIFY_DSHOT_LED_ENABLED
-        Notify_LED_DShot                    = (1 << 11),// Use dshot commands to set ESC LEDs
-#endif
 #if AP_NOTIFY_PROFILED_SPI_ENABLED
         Notify_LED_ProfiLED_SPI             = (1 << 12), // ProfiLED (SPI)
 #endif

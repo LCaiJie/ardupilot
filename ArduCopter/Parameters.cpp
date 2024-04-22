@@ -1032,15 +1032,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("TKOFF_SLEW_TIME", 57, ParametersG2, takeoff_throttle_slew_time, 2.0),
 
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
-    // @Param: TKOFF_RPM_MIN
-    // @DisplayName: Takeoff Check RPM minimum
-    // @Description: Takeoff is not permitted until motors report at least this RPM.  Set to zero to disable check
-    // @Range: 0 10000
-    // @User: Standard
-    AP_GROUPINFO("TKOFF_RPM_MIN", 58, ParametersG2, takeoff_rpm_min, 0),
-#endif
-
 #if WEATHERVANE_ENABLED == ENABLED
     // @Group: WVANE_
     // @Path: ../libraries/AC_AttitudeControl/AC_WeatherVane.cpp
@@ -1108,15 +1099,6 @@ const AP_Param::GroupInfo ParametersG2::var_info2[] = {
     // @Range: 0.0 0.9
     // @User: Advanced
     AP_GROUPINFO("TKOFF_THR_MAX", 6, ParametersG2, takeoff_throttle_max, 0.9),
-
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
-    // @Param: TKOFF_RPM_MAX
-    // @DisplayName: Takeoff Check RPM maximum
-    // @Description: Takeoff is not permitted until motors report no more than this RPM.  Set to zero to disable check
-    // @Range: 0 10000
-    // @User: Standard
-    AP_GROUPINFO("TKOFF_RPM_MAX", 7, ParametersG2, takeoff_rpm_max, 0),
-#endif
 
     // @Param: FS_EKF_FILT
     // @DisplayName: EKF Failsafe filter cutoff

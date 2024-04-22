@@ -2,7 +2,6 @@
 
 #include <AP_HAL/AP_HAL_Boards.h>
 #include <AP_InertialSensor/AP_InertialSensor_config.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS_config.h>
 
 #ifndef AP_AHRS_ENABLED
 #define AP_AHRS_ENABLED 1
@@ -16,9 +15,6 @@
 #define AP_AHRS_DCM_ENABLED AP_AHRS_BACKEND_DEFAULT_ENABLED && AP_INERTIALSENSOR_ENABLED
 #endif
 
-#ifndef AP_AHRS_EXTERNAL_ENABLED
-#define AP_AHRS_EXTERNAL_ENABLED AP_AHRS_BACKEND_DEFAULT_ENABLED && HAL_EXTERNAL_AHRS_ENABLED
-#endif
 
 #ifndef HAL_NAVEKF2_AVAILABLE
 // EKF2 slated compiled out by default in 4.5, slated to be removed.

@@ -4,10 +4,8 @@
 
 #include "AP_Vehicle.h"
 
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_Arming/AP_Arming.h>
-#include <AP_Frsky_Telem/AP_Frsky_Parameters.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AP_OSD/AP_OSD.h>
@@ -43,33 +41,10 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(vtx, "VTX_",  4, AP_Vehicle, AP_VideoTX),
 #endif
 
-#if HAL_MSP_ENABLED
-    // @Group: MSP
-    // @Path: ../AP_MSP/AP_MSP.cpp
-    AP_SUBGROUPINFO(msp, "MSP",  5, AP_Vehicle, AP_MSP),
-#endif
-
-#if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    // @Group: FRSKY_
-    // @Path: ../AP_Frsky_Telem/AP_Frsky_Parameters.cpp
-    AP_SUBGROUPINFO(frsky_parameters, "FRSKY_", 6, AP_Vehicle, AP_Frsky_Parameters),
-#endif
-
-#if HAL_EXTERNAL_AHRS_ENABLED
-    // @Group: EAHRS
-    // @Path: ../AP_ExternalAHRS/AP_ExternalAHRS.cpp
-    AP_SUBGROUPINFO(externalAHRS, "EAHRS", 8, AP_Vehicle, AP_ExternalAHRS),
-#endif
 
     // @Group: CUST_ROT
     // @Path: ../AP_CustomRotations/AP_CustomRotations.cpp
     AP_SUBGROUPINFO(custom_rotations, "CUST_ROT", 11, AP_Vehicle, AP_CustomRotations),
-
-#if HAL_WITH_ESC_TELEM
-    // @Group: ESC_TLM
-    // @Path: ../AP_ESC_Telem/AP_ESC_Telem.cpp
-    AP_SUBGROUPINFO(esc_telem, "ESC_TLM", 12, AP_Vehicle, AP_ESC_Telem),
-#endif
 
 #if AP_FENCE_ENABLED
     // @Group: FENCE_
@@ -265,16 +240,6 @@ void AP_Vehicle::setup()
     // more than 5ms remaining in your call to hal.scheduler->delay
     hal.scheduler->register_delay_callback(scheduler_delay_callback, 5);
 
-#if HAL_MSP_ENABLED
-    // call MSP init before init_ardupilot to allow for MSP sensors
-    msp.init();
-#endif
-
-#if HAL_EXTERNAL_AHRS_ENABLED
-    // call externalAHRS init before init_ardupilot to allow for external sensors
-    externalAHRS.init();
-#endif
-
     // init_ardupilot is where the vehicle does most of its initialisation.
     init_ardupilot();
 
@@ -314,13 +279,6 @@ void AP_Vehicle::setup()
 #if AP_FILTER_ENABLED
     filters.init();
 #endif
-
-#if HAL_WITH_ESC_TELEM && HAL_GYROFFT_ENABLED
-    for (uint8_t i = 0; i<ESC_TELEM_MAX_ESCS; i++) {
-        esc_noise[i].set_cutoff_frequency(2);
-    }
-#endif
-
     // invalidate count in case an enable parameter changed during
     // initialisation
     AP_Param::invalidate_count();
@@ -410,9 +368,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_Tramp,     &vehicle.tramp,          update,                   50,  50, 225),
 #endif
     SCHED_TASK(send_watchdog_reset_statustext,         0.1,     20, 225),
-#if HAL_WITH_ESC_TELEM
-    SCHED_TASK_CLASS(AP_ESC_Telem, &vehicle.esc_telem,      update,                  100,  50, 230),
-#endif
 #if AP_NETWORKING_ENABLED
     SCHED_TASK_CLASS(AP_Networking, &vehicle.networking,    update,                   10,  50, 238),
 #endif
@@ -426,9 +381,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AC_Fence,     &vehicle.fence,          update,                   10, 100, 248),
 #endif
     SCHED_TASK(one_Hz_update,                                                         1, 100, 252),
-#if HAL_WITH_ESC_TELEM && HAL_GYROFFT_ENABLED
-    SCHED_TASK(check_motor_noise,      5,     50, 252),
-#endif
 #if AP_FILTER_ENABLED
     SCHED_TASK_CLASS(AP_Filters,   &vehicle.filters,        update,                   1, 100, 252),
 #endif
@@ -577,28 +529,6 @@ void AP_Vehicle::update_dynamic_notch(AP_InertialSensor::HarmonicNotch &notch)
             // set the harmonic notch filter frequency approximately scaled on motor rpm implied by throttle
             update_throttle_notch(notch);
             break;
-#if HAL_WITH_ESC_TELEM
-        case HarmonicNotchDynamicMode::UpdateBLHeli: // BLHeli based tracking
-            // set the harmonic notch filter frequency scaled on measured frequency
-            if (notch.params.hasOption(HarmonicNotchFilterParams::Options::DynamicHarmonic)) {
-                float notches[INS_MAX_NOTCHES];
-                // ESC telemetry will return 0 for missing data, but only after 1s
-                const uint8_t num_notches = AP::esc_telem().get_motor_frequencies_hz(INS_MAX_NOTCHES, notches);
-                for (uint8_t i = 0; i < num_notches; i++) {
-                    if (!is_zero(notches[i])) {
-                        notches[i] =  MAX(ref_freq, notches[i]);
-                    }
-                }
-                if (num_notches > 0) {
-                    notch.update_frequencies_hz(num_notches, notches);
-                } else {    // throttle fallback
-                    update_throttle_notch(notch);
-                }
-            } else {
-                notch.update_freq_hz(MAX(ref_freq, AP::esc_telem().get_average_motor_frequency_hz() * ref));
-            }
-            break;
-#endif
 #if HAL_GYROFFT_ENABLED
         case HarmonicNotchDynamicMode::UpdateGyroFFT: // FFT based tracking
             // set the harmonic notch filter frequency scaled on measured frequency
@@ -800,31 +730,7 @@ void AP_Vehicle::one_Hz_update(void)
 
 void AP_Vehicle::check_motor_noise()
 {
-#if HAL_GYROFFT_ENABLED && HAL_WITH_ESC_TELEM
-    if (!hal.util->get_soft_armed() || !gyro_fft.check_esc_noise() || !gyro_fft.using_post_filter_samples() || ins.has_fft_notch()) {
-        return;
-    }
 
-    float esc_data[ESC_TELEM_MAX_ESCS];
-    const uint8_t numf = AP::esc_telem().get_motor_frequencies_hz(ESC_TELEM_MAX_ESCS, esc_data);
-    bool output_error = false;
-
-    for (uint8_t i = 0; i<numf; i++) {
-        if (is_zero(esc_data[i])) {
-            continue;
-        }
-        float energy = gyro_fft.has_noise_at_frequency_hz(esc_data[i]);
-        energy = esc_noise[i].apply(energy, 0.2f);
-        if (energy > 40.0f && AP_HAL::millis() - last_motor_noise_ms > 5000) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Noise %.fdB on motor %u at %.fHz", energy, i+1, esc_data[i]);
-            output_error = true;
-        }
-    }
-
-    if (output_error) {
-        last_motor_noise_ms = AP_HAL::millis();
-    }
-#endif
 }
 
 #if AP_DDS_ENABLED

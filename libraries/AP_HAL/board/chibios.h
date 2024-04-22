@@ -102,10 +102,6 @@
 #define CONFIG_HAL_BOARD_SUBTYPE HAL_BOARD_SUBTYPE_CHIBIOS_GENERIC
 #endif
 
-// we support RC serial for BLHeli pass-thru
-#ifndef HAL_SUPPORT_RCOUT_SERIAL
-#define HAL_SUPPORT_RCOUT_SERIAL 1
-#endif
 
 // by default assume first I2C bus is internal
 #ifndef HAL_I2C_INTERNAL_MASK

@@ -26,7 +26,6 @@
 #include "AP_OSD_SITL.h"
 #endif
 #include "AP_OSD_MSP.h"
-#include "AP_OSD_MSP_DisplayPort.h"
 #include <AP_HAL/AP_HAL.h>
 #include <AP_HAL/Util.h>
 #include <RC_Channel/RC_Channel.h>
@@ -334,16 +333,6 @@ bool AP_OSD::init_backend(const AP_OSD::osd_types type, const uint8_t instance)
         DEV_PRINTF("Started MSP OSD\n");
         break;
     }
-#if HAL_WITH_MSP_DISPLAYPORT
-    case OSD_MSP_DISPLAYPORT: {
-        _backends[instance] = AP_OSD_MSP_DisplayPort::probe(*this);
-        if (_backends[instance] == nullptr) {
-            break;
-        }
-        DEV_PRINTF("Started MSP DisplayPort OSD\n");
-        break;
-    }
-#endif
     }
 #if OSD_ENABLED
     if (_backends[instance] != nullptr) {
@@ -460,13 +449,6 @@ void AP_OSD::update_stats()
     if (have_airspeed_estimate) {
         _stats.max_airspeed_mps = fmaxf(_stats.max_airspeed_mps, aspd_mps);
     }
-#if HAL_WITH_ESC_TELEM
-    // max esc temp
-    AP_ESC_Telem& telem = AP::esc_telem();
-    int16_t highest_temperature = 0;
-    telem.get_highest_motor_temperature(highest_temperature);
-    _stats.max_esc_temp = MAX(_stats.max_esc_temp, highest_temperature);
-#endif
 }
 
 //Thanks to minimosd authors for the multiple osd screen idea

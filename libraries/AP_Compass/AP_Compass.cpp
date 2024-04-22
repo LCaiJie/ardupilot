@@ -6,7 +6,6 @@
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
 #include <GCS_MAVLink/GCS.h>
 
@@ -29,12 +28,6 @@
 #include "AP_Compass_MMC5xx3.h"
 #include "AP_Compass_MAG3110.h"
 #include "AP_Compass_RM3100.h"
-#if AP_COMPASS_MSP_ENABLED
-#include "AP_Compass_MSP.h"
-#endif
-#if AP_COMPASS_EXTERNALAHRS_ENABLED
-#include "AP_Compass_ExternalAHRS.h"
-#endif
 #include "AP_Compass.h"
 #include "Compass_learn.h"
 #include <stdio.h>
@@ -1313,13 +1306,6 @@ void Compass::_probe_external_i2c_compasses(void)
  */
 void Compass::_detect_backends(void)
 {
-#if AP_COMPASS_EXTERNALAHRS_ENABLED
-    const int8_t serial_port = AP::externalAHRS().get_port(AP_ExternalAHRS::AvailableSensor::COMPASS);
-    if (serial_port >= 0) {
-        ADD_BACKEND(DRIVER_EXTERNALAHRS, new AP_Compass_ExternalAHRS(serial_port));
-    }
-#endif
-    
 #if AP_FEATURE_BOARD_DETECT
     if (AP_BoardConfig::get_board_type() == AP_BoardConfig::PX4_BOARD_PIXHAWK2) {
         // default to disabling LIS3MDL on pixhawk2 due to hardware issue
@@ -1337,14 +1323,6 @@ void Compass::_detect_backends(void)
     // allow boards to ask for external probing of all i2c compass types in hwdef.dat
     _probe_external_i2c_compasses();
     CHECK_UNREG_LIMIT_RETURN;
-#endif
-
-#if AP_COMPASS_MSP_ENABLED
-    for (uint8_t i=0; i<8; i++) {
-        if (msp_instance_mask & (1U<<i)) {
-            ADD_BACKEND(DRIVER_MSP, new AP_Compass_MSP(i));
-        }
-    }
 #endif
 
     // finally look for i2c and spi compasses not found yet
@@ -2068,35 +2046,6 @@ bool Compass::have_scale_factor(uint8_t i) const
     return true;
 }
 
-#if AP_COMPASS_MSP_ENABLED
-void Compass::handle_msp(const MSP::msp_compass_data_message_t &pkt)
-{
-    if (!_driver_enabled(DRIVER_MSP)) {
-        return;
-    }
-    if (!init_done) {
-        if (pkt.instance < 8) {
-            msp_instance_mask |= 1U<<pkt.instance;
-        }
-    } else {
-        for (uint8_t i=0; i<_backend_count; i++) {
-            _backends[i]->handle_msp(pkt);
-        }
-    }
-}
-#endif // AP_COMPASS_MSP_ENABLED
-
-#if AP_COMPASS_EXTERNALAHRS_ENABLED
-void Compass::handle_external(const AP_ExternalAHRS::mag_data_message_t &pkt)
-{
-    if (!_driver_enabled(DRIVER_EXTERNALAHRS)) {
-        return;
-    }
-    for (uint8_t i=0; i<_backend_count; i++) {
-        _backends[i]->handle_external(pkt);
-    }
-}
-#endif // AP_COMPASS_EXTERNALAHRS_ENABLED
 
 // force save of current calibration as valid
 void Compass::force_save_calibration(void)

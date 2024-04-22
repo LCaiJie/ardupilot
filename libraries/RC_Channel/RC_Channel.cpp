@@ -46,7 +46,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_VideoTX/AP_VideoTX.h>
-#include <AP_Torqeedo/AP_Torqeedo.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #define SWITCH_DEBOUNCE_TIME_MS  200
 
@@ -1089,9 +1088,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 
     case AUX_FUNC::GPS_DISABLE:
         AP::gps().force_disable(ch_flag == AuxSwitchPos::HIGH);
-#if HAL_EXTERNAL_AHRS_ENABLED
-        AP::externalAHRS().set_gnss_disable(ch_flag == AuxSwitchPos::HIGH);
-#endif
         break;
 
     case AUX_FUNC::GPS_DISABLE_YAW:
@@ -1220,25 +1216,9 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         break;
 
     case AUX_FUNC::AHRS_TYPE: {
-#if HAL_NAVEKF3_AVAILABLE && HAL_EXTERNAL_AHRS_ENABLED
-        AP::ahrs().set_ekf_type(ch_flag==AuxSwitchPos::HIGH? AP_AHRS::EKFType::EXTERNAL : AP_AHRS::EKFType::THREE);
-#endif
         break;
     }
         
-
-#if HAL_TORQEEDO_ENABLED
-    // clear torqeedo error
-    case AUX_FUNC::TORQEEDO_CLEAR_ERR: {
-        if (ch_flag == AuxSwitchPos::HIGH) {
-            AP_Torqeedo *torqeedo = AP_Torqeedo::get_singleton();
-            if (torqeedo != nullptr) {
-                torqeedo->clear_motor_error();
-            }
-        }
-        break;
-    }
-#endif
 
     // do nothing for these functions
     case AUX_FUNC::MOUNT1_ROLL:

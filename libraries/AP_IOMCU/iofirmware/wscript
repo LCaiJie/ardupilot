@@ -12,7 +12,6 @@ def build(bld):
         'AP_Math',
         'AP_RCProtocol',
         'AP_BoardConfig',
-        'AP_ESC_Telem',
         ],
         exclude_src=[
             'libraries/AP_HAL_ChibiOS/Storage.cpp'

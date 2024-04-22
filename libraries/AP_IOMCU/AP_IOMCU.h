@@ -13,15 +13,11 @@
 #include "iofirmware/ioprotocol.h"
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_HAL/RCOutput.h>
-#include <AP_ESC_Telem/AP_ESC_Telem_Backend.h>
 
 typedef uint32_t eventmask_t;
 typedef struct ch_thread thread_t;
 
 class AP_IOMCU
-#ifdef HAL_WITH_ESC_TELEM
-  : public AP_ESC_Telem_Backend
-#endif
 {
 public:
     AP_IOMCU(AP_HAL::UARTDriver &uart);

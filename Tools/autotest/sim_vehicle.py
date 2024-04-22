@@ -815,9 +815,7 @@ def start_vehicle(binary, opts, stuff, spawns=None):
 
             progress("Adding parameters from (%s)" % (str(file),))
     if opts.OSDMSP:
-        path += "," + os.path.join(root_dir, "libraries/AP_MSP/Tools/osdtest.parm")
         path += "," + os.path.join(autotest_dir, "default_params/msposd.parm")
-        subprocess.Popen([os.path.join(root_dir, "libraries/AP_MSP/Tools/msposd.py")])
 
     if path is not None and len(path) > 0:
         cmd.extend(["--defaults", path])

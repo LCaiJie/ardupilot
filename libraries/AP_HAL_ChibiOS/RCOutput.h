@@ -19,7 +19,6 @@
 #include <hal.h>
 #include "AP_HAL_ChibiOS.h"
 #include <AP_HAL/Semaphores.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 
 #include "shared_dma.h"
 
@@ -41,9 +40,6 @@ typedef int32_t dmar_int_t;
 #define RCOU_DSHOT_TIMING_DEBUG 0
 
 class ChibiOS::RCOutput : public AP_HAL::RCOutput
-#ifdef HAL_WITH_BIDIR_DSHOT
-  , AP_ESC_Telem_Backend
-#endif
 {
 public:
     // disabled channel marker

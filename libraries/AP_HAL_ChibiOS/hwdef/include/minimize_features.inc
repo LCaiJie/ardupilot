@@ -9,8 +9,6 @@ define OSD_ENABLED 0
 define HAL_OSD_SIDEBAR_ENABLE 0
 define OSD_PARAM_ENABLED 0
 
-# Crossfire telemetry must be explicitly enabled on minimized boards:
-define HAL_CRSF_TELEM_ENABLED 0
 
 # Soaring is off by defauult on of smaller boards.
 define HAL_SOARING_ENABLED 0
@@ -21,11 +19,7 @@ define HAL_RUNCAM_ENABLED 0
 # minimized boards don't get configuration via SmartAudio by default:
 define AP_SMARTAUDIO_ENABLED 0
 
-# no Spektrum telemetry:
-define HAL_SPEKTRUM_TELEM_ENABLED 0
 
-# no MSP:
-define HAL_MSP_ENABLED 0
 
 # Copter-specific defines; these defines are only used in the Copter
 #  directory, but are seen across the entire codebase:

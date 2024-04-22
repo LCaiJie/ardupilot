@@ -133,7 +133,6 @@ const struct MultiplierStructure log_Multipliers[] = {
 #include <AC_PrecLand/LogStructure.h>
 #include <AP_Proximity/LogStructure.h>
 #include <AC_Avoidance/LogStructure.h>
-#include <AP_ESC_Telem/LogStructure.h>
 #include <AP_HAL_ChibiOS/LogStructure.h>
 #include <AC_Fence/LogStructure.h>
 #include <AP_Landing/LogStructure.h>
@@ -1264,7 +1263,6 @@ LOG_STRUCTURE_FROM_AVOIDANCE \
       "SIM","QccCfLLffff","TimeUS,Roll,Pitch,Yaw,Alt,Lat,Lng,Q1,Q2,Q3,Q4", "sddhmDU----", "FBBB0GG0000", true }, \
     { LOG_TERRAIN_MSG, sizeof(log_TERRAIN), \
       "TERR","QBLLHffHHf","TimeUS,Status,Lat,Lng,Spacing,TerrH,CHeight,Pending,Loaded,ROfs", "s-DU-mm--m", "F-GG-00--0", true }, \
-LOG_STRUCTURE_FROM_ESC_TELEM \
     { LOG_CSRV_MSG, sizeof(log_CSRV), \
       "CSRV","QBfffBfffffB","TimeUS,Id,Pos,Force,Speed,Pow,PosCmd,V,A,MotT,PCBT,Err", "s#---%dvAOO-", "F-000000000-", true }, \
     { LOG_PIDR_MSG, sizeof(log_PID), \

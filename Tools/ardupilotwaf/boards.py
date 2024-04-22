@@ -405,7 +405,7 @@ class Board:
             env.CXXFLAGS += ['-DHAL_WITH_POSTYPE_DOUBLE=0']
             
         if cfg.options.osd or cfg.options.osd_fonts:
-            env.CXXFLAGS += ['-DOSD_ENABLED=1', '-DHAL_MSP_ENABLED=1']
+            env.CXXFLAGS += ['-DOSD_ENABLED=1']
 
         if cfg.options.osd_fonts:
             for f in os.listdir('libraries/AP_OSD/fonts'):
@@ -765,7 +765,6 @@ class sitl_periph(sitl):
             AP_AHRS_ENABLED = 1,
             AP_AHRS_BACKEND_DEFAULT_ENABLED = 0,
             AP_AHRS_DCM_ENABLED = 1,  # need a default backend
-            HAL_EXTERNAL_AHRS_ENABLED = 0,
 
             HAL_MAVLINK_BINDINGS_ENABLED = 1,
 
@@ -785,7 +784,6 @@ class sitl_periph(sitl):
             HAL_LOGGING_MAVLINK_ENABLED = 0,
             HAL_PROXIMITY_ENABLED = 0,
             HAL_RALLY_ENABLED = 0,
-            HAL_SUPPORT_RCOUT_SERIAL = 0,
             AP_TERRAIN_AVAILABLE = 0,
         )
 
@@ -813,9 +811,7 @@ class sitl_periph_universal(sitl_periph):
             HAL_PERIPH_ENABLE_RC_OUT = 1,
             HAL_PERIPH_ENABLE_ADSB = 1,
             HAL_PERIPH_ENABLE_SERIAL_OPTIONS = 1,
-            AP_BATTERY_ESC_ENABLED = 1,
             HAL_PWM_COUNT = 32,
-            HAL_WITH_ESC_TELEM = 1,
             AP_TERRAIN_AVAILABLE = 1,
         )
 

@@ -4,7 +4,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_RCProtocol/AP_RCProtocol.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 
 #include "hal.h"
 #include "ch.h"
@@ -143,9 +142,6 @@ public:
     uint32_t last_erpm_us;
     struct page_dshot_telem dshot_telem[IOMCU_MAX_TELEM_CHANNELS/4];
     uint32_t last_telem_ms;
-#if HAL_WITH_ESC_TELEM
-    AP_ESC_Telem esc_telem;
-#endif
 #endif
 
     // true when override channel active

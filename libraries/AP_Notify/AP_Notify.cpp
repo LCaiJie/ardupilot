@@ -344,11 +344,6 @@ void AP_Notify::add_backends(void)
                 }
                 break;
 #endif
-#if AP_NOTIFY_DSHOT_LED_ENABLED
-            case Notify_LED_DShot:
-                ADD_BACKEND(new DShotLED());
-                break;
-#endif
 #if AP_NOTIFY_LP5562_ENABLED
             case Notify_LED_LP5562_I2C_External:
                 FOREACH_I2C_EXTERNAL(b) {

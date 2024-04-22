@@ -38,8 +38,6 @@
 #include "AP_GPS_SIRF.h"
 #include "AP_GPS_UBLOX.h"
 #include "AP_GPS_MAV.h"
-#include "AP_GPS_MSP.h"
-#include "AP_GPS_ExternalAHRS.h"
 #include "GPS_Backend.h"
 #if HAL_SIM_GPS_ENABLED
 #include "AP_GPS_SITL.h"
@@ -707,16 +705,6 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     case GPS_TYPE_UAVCAN_RTK_BASE:
     case GPS_TYPE_UAVCAN_RTK_ROVER:
         return nullptr; // We don't do anything here if UAVCAN is not supported
-#if HAL_MSP_GPS_ENABLED
-    case GPS_TYPE_MSP:
-        dstate->auto_detected_baud = false; // specified, not detected
-        return new AP_GPS_MSP(*this, state[instance], nullptr);
-#endif
-#if HAL_EXTERNAL_AHRS_ENABLED
-    case GPS_TYPE_EXTERNAL_AHRS:
-        dstate->auto_detected_baud = false; // specified, not detected
-        return new AP_GPS_ExternalAHRS(*this, state[instance], nullptr);
-#endif
 #if AP_GPS_GSOF_ENABLED
     case GPS_TYPE_GSOF:
         dstate->auto_detected_baud = false; // specified, not detected
@@ -1324,37 +1312,7 @@ void AP_GPS::handle_msg(mavlink_channel_t chan, const mavlink_message_t &msg)
 }
 #endif
 
-#if HAL_MSP_GPS_ENABLED
-void AP_GPS::handle_msp(const MSP::msp_gps_data_message_t &pkt)
-{
-    for (uint8_t i=0; i<num_instances; i++) {
-        if (drivers[i] != nullptr && _type[i] == GPS_TYPE_MSP) {
-            drivers[i]->handle_msp(pkt);
-        }
-    }
-}
-#endif // HAL_MSP_GPS_ENABLED
 
-#if HAL_EXTERNAL_AHRS_ENABLED
-
-bool AP_GPS::get_first_external_instance(uint8_t& instance) const
-{
-    for (uint8_t i=0; i<num_instances; i++) {
-        if (drivers[i] != nullptr && _type[i] == GPS_TYPE_EXTERNAL_AHRS) {
-            instance = i;
-            return true;
-        }
-    }
-    return false;
-}
-
-void AP_GPS::handle_external(const AP_ExternalAHRS::gps_data_message_t &pkt, const uint8_t instance)
-{
-    if (_type[instance] == GPS_TYPE_EXTERNAL_AHRS && drivers[instance] != nullptr) {
-        drivers[instance]->handle_external(pkt);
-    }
-}
-#endif // HAL_EXTERNAL_AHRS_ENABLED
 
 /**
    Lock a GPS port, preventing the GPS driver from using it. This can

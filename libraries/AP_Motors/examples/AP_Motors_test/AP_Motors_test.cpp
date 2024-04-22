@@ -14,7 +14,6 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Motors/AP_Motors.h>
 #include <SRV_Channel/SRV_Channel.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <stdio.h>
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
@@ -28,9 +27,6 @@ void update_motors();
 void print_all_motor_matrix();
 
 // Instantiate a few classes that will be needed so that the singletons can be called from the motors lib
-#if HAL_WITH_ESC_TELEM
-AP_ESC_Telem esc_telem;
-#endif
 
 #define VERSION "AP_Motors library test ver 1.1"
 

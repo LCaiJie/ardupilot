@@ -27,7 +27,6 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 
 #define CRSF_SUBSET_RC_STARTING_CHANNEL_BITS        5
@@ -176,12 +175,6 @@ AP_RCProtocol_CRSF::AP_RCProtocol_CRSF(AP_RCProtocol &_frontend) : AP_RCProtocol
 #else
     if (_singleton == nullptr) {
         _singleton = this;
-    }
-#endif
-#if HAL_CRSF_TELEM_ENABLED && !APM_BUILD_TYPE(APM_BUILD_iofirmware) && !APM_BUILD_TYPE(APM_BUILD_UNKNOWN)
-    _uart = AP::serialmanager().find_serial(AP_SerialManager::SerialProtocol_CRSF, 0);
-    if (_uart) {
-        start_uart();
     }
 #endif
 }
@@ -455,27 +448,6 @@ bool AP_RCProtocol_CRSF::decode_crsf_packet()
         default:
             break;
     }
-#if HAL_CRSF_TELEM_ENABLED
-    if (AP_CRSF_Telem::process_frame(FrameType(_frame.type), (uint8_t*)&_frame.payload)) {
-        process_telemetry();
-    }
-    // process any pending baudrate changes before reading another frame
-    if (_new_baud_rate > 0) {
-        AP_HAL::UARTDriver *uart = get_current_UART();
-
-        if (uart) {
-            // wait for all the pending data to be sent
-            while (uart->tx_pending()) {
-                hal.scheduler->delay_microseconds(10);
-            }
-            // now wait for 4ms to account for RX transmission and processing
-            hal.scheduler->delay(4);
-            // change the baud rate
-            uart->begin(_new_baud_rate);
-        }
-        _new_baud_rate = 0;
-    }
-#endif
 
     return rc_active;
 }
@@ -556,15 +528,7 @@ bool AP_RCProtocol_CRSF::process_telemetry(bool check_constraint)
     }
 
     if (!telem_available) {
-#if HAL_CRSF_TELEM_ENABLED && !APM_BUILD_TYPE(APM_BUILD_iofirmware)
-        if (AP_CRSF_Telem::get_telem_data(&_telemetry_frame, is_tx_active())) {
-            telem_available = true;
-        } else {
-            return false;
-        }
-#else
         return false;
-#endif
     }
     write_frame(&_telemetry_frame);
     // get fresh telem_data in the next call

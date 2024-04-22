@@ -50,12 +50,8 @@ class ExtractFeatures(object):
             ('AP_COMPASS_{type}_ENABLED', r'AP_Compass_(?P<type>.*)::read\b',),
             ('AP_COMPASS_ICM20948_ENABLED', r'AP_Compass_AK09916::probe_ICM20948',),
 
-            ('HAL_TORQEEDO_ENABLED', 'AP_Torqeedo::AP_Torqeedo'),
-
             ('HAL_NAVEKF3_AVAILABLE', 'NavEKF3::NavEKF3',),
             ('HAL_NAVEKF2_AVAILABLE', 'NavEKF2::NavEKF2',),
-            ('HAL_EXTERNAL_AHRS_ENABLED', r'AP_ExternalAHRS::init\b',),
-            ('AP_EXTERNAL_AHRS_{type}_ENABLED', r'AP_ExternalAHRS_{type}::healthy\b',),
             ('HAL_INS_TEMPERATURE_CAL_ENABLE', 'AP_InertialSensor::TCal::Learn::save_calibration',),
 
             ('AP_GPS_{type}_ENABLED', r'AP_GPS_(?P<type>.*)::read\b',),
@@ -64,14 +60,7 @@ class ExtractFeatures(object):
 
             ('AP_MOTORS_FRAME_{type}_ENABLED', r'AP_MotorsMatrix::setup_(?P<type>.*)_matrix\b',),
 
-            ('HAL_MSP_ENABLED', r'AP_MSP::init\b',),
-            ('HAL_MSP_{type}_ENABLED', r'AP_(?P<type>.*)_MSP::update\b',),
-            ('HAL_MSP_{type}_ENABLED', r'AP_(?P<type>.*)_MSP::read\b',),
-            ('HAL_WITH_MSP_DISPLAYPORT', r'AP_OSD_MSP_DisplayPort::init\b',),
-
-
             ('AP_BATTERY_{type}_ENABLED', r'AP_BattMonitor_(?P<type>.*)::init\b',),
-            ('AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED', r'AP_BattMonitor_Backend::update_esc_telem_outbound\b',),
             ('AP_BATTERY_WATT_MAX_ENABLED', 'AP_BattMonitor_Params::_watt_max',),
 
             ('HAL_{type}_TELEM_ENABLED', r'AP_(?P<type>.*)_Telem::init',),
@@ -79,11 +68,6 @@ class ExtractFeatures(object):
             ('HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED', 'AP_CRSF_Telem::calc_text_selection',),
             ('AP_LTM_TELEM_ENABLED', 'AP_LTM_Telem::init',),
             ('HAL_HIGH_LATENCY2_ENABLED', 'GCS_MAVLINK::handle_control_high_latency',),
-
-            ('AP_FRSKY_TELEM_ENABLED', 'AP::frsky_telem',),
-            ('AP_FRSKY_D_TELEM_ENABLED', 'AP_Frsky_D::send',),
-            ('AP_FRSKY_SPORT_TELEM_ENABLED', 'AP_Frsky_SPort::send_sport_frame',),
-            ('AP_FRSKY_SPORT_PASSTHROUGH_ENABLED', 'AP::frsky_passthrough_telem',),
 
             ('MODE_{type}_ENABLED', r'Mode(?P<type>.+)::init',),
             ('MODE_GUIDED_NOGPS_ENABLED', r'ModeGuidedNoGPS::init',),

@@ -36,13 +36,9 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_Networking/AP_Networking.h>
 #include <AP_VideoTX/AP_VideoTX.h>
-#include <AP_MSP/AP_MSP.h>
-#include <AP_Frsky_Telem/AP_Frsky_Parameters.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_VideoTX/AP_SmartAudio.h>
 #include <AP_VideoTX/AP_Tramp.h>
 #include <SITL/SITL.h>
@@ -174,10 +170,6 @@ public:
      */
     virtual bool get_wp_crosstrack_error_m(float &xtrack_error) const { return false; }
 
-#if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    AP_Frsky_Parameters frsky_parameters;
-#endif
-
     /*
       Returns the pan and tilt for use by onvif camera in scripting
      */
@@ -230,17 +222,6 @@ protected:
     // Inertial Navigation EKF
     AP_AHRS ahrs;
 
-#if HAL_WITH_ESC_TELEM
-    AP_ESC_Telem esc_telem;
-#endif
-
-#if HAL_MSP_ENABLED
-    AP_MSP msp;
-#endif
-
-#if HAL_EXTERNAL_AHRS_ENABLED
-    AP_ExternalAHRS externalAHRS;
-#endif
 
 #if AP_SMARTAUDIO_ENABLED
     AP_SmartAudio smartaudio;
@@ -319,10 +300,6 @@ private:
 
     static AP_Vehicle *_singleton;
 
-#if HAL_GYROFFT_ENABLED && HAL_WITH_ESC_TELEM
-    LowPassFilterFloat esc_noise[ESC_TELEM_MAX_ESCS];
-    uint32_t last_motor_noise_ms;
-#endif
 
     bool done_safety_init;
 

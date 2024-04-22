@@ -11,7 +11,6 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/div1000.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include "EKF_Maths.h"
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
@@ -46,9 +45,6 @@ static uint32_t sysclk = 0;
 static EKF_Maths ekf;
 
 HAL_Semaphore sem;
-#if HAL_WITH_ESC_TELEM
-AP_ESC_Telem telem;
-#endif
 
 void setup() {
 #ifdef DISABLE_CACHES

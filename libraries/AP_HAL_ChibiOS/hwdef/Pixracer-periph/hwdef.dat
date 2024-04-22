@@ -26,10 +26,6 @@ APJ_BOARD_ID 1402
 env AP_PERIPH 1
 
 
-
-define HAL_SUPPORT_RCOUT_SERIAL 0
-
-
 # disable dual GPS and GPS blending to save flash space
 define GPS_MAX_RECEIVERS 1
 define GPS_MAX_INSTANCES 1
@@ -215,5 +211,3 @@ PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
 PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
 PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
 
-# setup for MSP
-define HAL_MSP_ENABLED 1

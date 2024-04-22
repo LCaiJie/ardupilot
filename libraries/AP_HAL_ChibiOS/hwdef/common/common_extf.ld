@@ -173,7 +173,6 @@ SECTIONS
         lib/lib*.a:AP_RCProtocol_Backend.*(.text* .rodata*)
         lib/lib*.a:AP_RCProtocol.*(.text* .rodata*)
         lib/lib*.a:AP_RCProtocol_CRSF.*(.text* .rodata*)
-        lib/lib*.a:AP_RCTelemetry.*(.text* .rodata*)
         lib/lib*.a:AP_CRSF_Telem.*(.text* .rodata*)
         lib/lib*.a:vector2.*(.text* .rodata*)
         lib/lib*.a:quaternion.*(.text* .rodata*)

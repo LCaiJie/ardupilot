@@ -29,7 +29,6 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
-#include <AP_RCTelemetry/AP_GHST_Telem.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 
 /*
@@ -343,12 +342,6 @@ bool AP_RCProtocol_GHST::decode_ghost_packet()
             break;
     }
 
-#if AP_GHST_TELEM_ENABLED
-    if (AP_GHST_Telem::process_frame(FrameType(_frame.type), (uint8_t*)&_frame.payload)) {
-        process_telemetry();
-    }
-#endif
-
     return true;
 }
 
@@ -362,15 +355,7 @@ bool AP_RCProtocol_GHST::process_telemetry(bool check_constraint)
     }
 
     if (!telem_available) {
-#if AP_GHST_TELEM_ENABLED
-        if (AP_GHST_Telem::get_telem_data(&_telemetry_frame, is_tx_active())) {
-            telem_available = true;
-        } else {
-            return false;
-        }
-#else
         return false;
-#endif
     }
     if (!write_frame(&_telemetry_frame)) {
         return false;

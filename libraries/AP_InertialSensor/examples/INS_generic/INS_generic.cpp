@@ -5,16 +5,12 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_Logger/AP_Logger.h>
 #include <GCS_MAVLink/GCS_Dummy.h>
 
 const AP_HAL::HAL &hal = AP_HAL::get_HAL();
 
 static AP_InertialSensor ins;
-#if HAL_EXTERNAL_AHRS_ENABLED
- static AP_ExternalAHRS eAHRS;
-#endif // HAL_EXTERNAL_AHRS_ENABLED
 
 static void display_offsets_and_scaling();
 static void run_test();

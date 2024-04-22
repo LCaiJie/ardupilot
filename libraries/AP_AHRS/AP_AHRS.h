@@ -32,7 +32,6 @@
 
 #include "AP_AHRS_DCM.h"
 #include "AP_AHRS_SIM.h"
-#include "AP_AHRS_External.h"
 
 // forward declare view class
 class AP_AHRS_View;
@@ -444,9 +443,6 @@ public:
 #if AP_AHRS_SIM_ENABLED
         SIM = 10,
 #endif
-#if AP_AHRS_EXTERNAL_ENABLED
-        EXTERNAL = 11,
-#endif
     };
 
     // set the selected ekf type, for RC aux control
@@ -799,11 +795,7 @@ private:
 
 #if AP_AHRS_SIM_ENABLED
     void update_SITL(void);
-#endif
-
-#if AP_AHRS_EXTERNAL_ENABLED
-    void update_external(void);
-#endif    
+#endif 
 
     /*
      * trim-related state and private methods:
@@ -1001,11 +993,6 @@ private:
     AP_AHRS_SIM sim;
 #endif
     struct AP_AHRS_Backend::Estimates sim_estimates;
-#endif
-
-#if AP_AHRS_EXTERNAL_ENABLED
-    AP_AHRS_External external;
-    struct AP_AHRS_Backend::Estimates external_estimates;
 #endif
 
     enum class Options : uint16_t {

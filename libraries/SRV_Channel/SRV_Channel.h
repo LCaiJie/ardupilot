@@ -17,7 +17,6 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Common/Bitmask.h>
-#include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_FETtecOneWire/AP_FETtecOneWire.h>
 
 #include "SRV_Channel_config.h"
@@ -597,11 +596,6 @@ private:
     static SRV_Channel *channels;
     static SRV_Channels *_singleton;
 
-#if HAL_SUPPORT_RCOUT_SERIAL
-    // support for BLHeli protocol
-    AP_BLHeli blheli;
-    static AP_BLHeli *blheli_ptr;
-#endif
 
 #if AP_FETTEC_ONEWIRE_ENABLED
     AP_FETtecOneWire fetteconwire;

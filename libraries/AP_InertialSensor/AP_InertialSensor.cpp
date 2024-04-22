@@ -14,7 +14,6 @@
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_AHRS/AP_AHRS_View.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #if !APM_BUILD_TYPE(APM_BUILD_Rover)
@@ -35,7 +34,6 @@
 #include "AP_InertialSensor_BMI088.h"
 #include "AP_InertialSensor_Invensensev2.h"
 #include "AP_InertialSensor_ADIS1647x.h"
-#include "AP_InertialSensor_ExternalAHRS.h"
 #include "AP_InertialSensor_Invensensev3.h"
 #include "AP_InertialSensor_NONE.h"
 #include "AP_InertialSensor_SCHA63T.h"
@@ -1147,14 +1145,6 @@ AP_InertialSensor::detect_backends(void)
 
 // macro for use by HAL_INS_PROBE_LIST
 #define GET_I2C_DEVICE(bus, address) hal.i2c_mgr->get_device(bus, address)
-
-#if HAL_EXTERNAL_AHRS_ENABLED
-    // if enabled, make the first IMU the external AHRS
-    const int8_t serial_port = AP::externalAHRS().get_port(AP_ExternalAHRS::AvailableSensor::IMU);
-    if (serial_port >= 0) {
-        ADD_BACKEND(new AP_InertialSensor_ExternalAHRS(*this, serial_port));
-    }
-#endif
 
 #if AP_SIM_INS_ENABLED
     for (uint8_t i=0; i<AP::sitl()->imu_count; i++) {
@@ -2676,15 +2666,6 @@ void AP_InertialSensor::send_uart_data(void)
     uart.imu_out_uart->write((const uint8_t *)&data, sizeof(data));
 }
 #endif // AP_SERIALMANAGER_IMUOUT_ENABLED
-
-#if HAL_EXTERNAL_AHRS_ENABLED
-void AP_InertialSensor::handle_external(const AP_ExternalAHRS::ins_data_message_t &pkt)
-{
-    for (uint8_t i = 0; i < _backend_count; i++) {
-        _backends[i]->handle_external(pkt);
-    }
-}
-#endif // HAL_EXTERNAL_AHRS_ENABLED
 
 // force save of current calibration as valid
 void AP_InertialSensor::force_save_calibration(void)

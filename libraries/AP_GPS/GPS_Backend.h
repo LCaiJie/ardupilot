@@ -76,13 +76,6 @@ public:
 #endif
 
     virtual void broadcast_configuration_failure_reason(void) const { return ; }
-
-#if HAL_MSP_GPS_ENABLED
-    virtual void handle_msp(const MSP::msp_gps_data_message_t &pkt) { return; }
-#endif
-#if HAL_EXTERNAL_AHRS_ENABLED
-    virtual void handle_external(const AP_ExternalAHRS::gps_data_message_t &pkt) { return; }
-#endif
     
     // driver specific lag, returns true if the driver is confident in the provided lag
     virtual bool get_lag(float &lag) const { lag = 0.2f; return true; }

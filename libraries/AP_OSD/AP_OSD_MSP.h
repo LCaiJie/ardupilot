@@ -1,5 +1,4 @@
 #include <AP_OSD/AP_OSD_Backend.h>
-#include <AP_MSP/AP_MSP.h>
 
 class AP_OSD_MSP : public AP_OSD_Backend
 {

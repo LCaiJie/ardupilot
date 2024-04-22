@@ -42,8 +42,6 @@
 #include "AP_Baro_DPS280.h"
 #include "AP_Baro_BMP388.h"
 #include "AP_Baro_Dummy.h"
-#include "AP_Baro_MSP.h"
-#include "AP_Baro_ExternalAHRS.h"
 #include "AP_Baro_ICP101XX.h"
 #include "AP_Baro_ICP201XX.h"
 
@@ -166,7 +164,7 @@ const AP_Param::GroupInfo AP_Baro::var_info[] = {
     // @Increment: 1
     AP_GROUPINFO("_FLTR_RNG", 13, AP_Baro, _filter_range, HAL_BARO_FILTER_DEFAULT),
 
-#if AP_BARO_PROBE_EXTERNAL_I2C_BUSES || AP_BARO_MSP_ENABLED
+#if AP_BARO_PROBE_EXTERNAL_I2C_BUSES
     // @Param: _PROBE_EXT
     // @DisplayName: External barometers to probe
     // @Description: This sets which types of external i2c barometer to look for. It is a bitmask of barometer types. The I2C buses to probe is based on BARO_EXT_BUS. If BARO_EXT_BUS is -1 then it will probe all external buses, otherwise it will probe just the bus number given in BARO_EXT_BUS.
@@ -593,13 +591,6 @@ void AP_Baro::init(void)
 #endif
 #endif
 
-#if AP_BARO_EXTERNALAHRS_ENABLED
-    const int8_t serial_port = AP::externalAHRS().get_port(AP_ExternalAHRS::AvailableSensor::BARO);
-    if (serial_port >= 0) {
-        ADD_BACKEND(new AP_Baro_ExternalAHRS(*this, serial_port));
-    }
-#endif
-
 // macro for use by HAL_INS_PROBE_LIST
 #define GET_I2C_DEVICE(bus, address) _have_i2c_driver(bus, address)?nullptr:hal.i2c_mgr->get_device(bus, address)
 
@@ -743,18 +734,6 @@ void AP_Baro::init(void)
 
 #if AP_BARO_PROBE_EXTERNAL_I2C_BUSES
     _probe_i2c_barometers();
-#endif
-
-#if AP_BARO_MSP_ENABLED
-    if ((_baro_probe_ext.get() & PROBE_MSP) && msp_instance_mask == 0) {
-        // allow for late addition of MSP sensor
-        msp_instance_mask |= 1;
-    }
-    for (uint8_t i=0; i<8; i++) {
-        if (msp_instance_mask & (1U<<i)) {
-            ADD_BACKEND(new AP_Baro_MSP(*this, i));
-        }
-    }
 #endif
 
 #if !defined(HAL_BARO_ALLOW_INIT_NO_BARO) // most boards requires external baro
@@ -1062,37 +1041,6 @@ void AP_Baro::set_pressure_correction(uint8_t instance, float p_correction)
         sensors[instance].p_correction = p_correction;
     }
 }
-
-#if AP_BARO_MSP_ENABLED
-/*
-  handle MSP barometer data
- */
-void AP_Baro::handle_msp(const MSP::msp_baro_data_message_t &pkt)
-{
-    if (pkt.instance > 7) {
-        return;
-    }
-    if (!init_done) {
-        msp_instance_mask |= 1U<<pkt.instance;
-    } else if (msp_instance_mask != 0) {
-        for (uint8_t i=0; i<_num_drivers; i++) {
-            drivers[i]->handle_msp(pkt);
-        }
-    }
-}
-#endif
-
-#if AP_BARO_EXTERNALAHRS_ENABLED
-/*
-  handle ExternalAHRS barometer data
- */
-void AP_Baro::handle_external(const AP_ExternalAHRS::baro_data_message_t &pkt)
-{
-    for (uint8_t i=0; i<_num_drivers; i++) {
-        drivers[i]->handle_external(pkt);
-    }
-}
-#endif  // AP_BARO_EXTERNALAHRS_ENABLED
 
 // returns false if we fail arming checks, in which case the buffer will be populated with a failure message
 bool AP_Baro::arming_checks(size_t buflen, char *buffer) const

@@ -529,9 +529,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #endif
     MSG_EKF_STATUS_REPORT,
     MSG_VIBRATION,
-#if HAL_WITH_ESC_TELEM
-    MSG_ESC_TELEMETRY,
-#endif
 };
 static const ap_message STREAM_PARAMS_msgs[] = {
     MSG_NEXT_PARAM

@@ -175,7 +175,6 @@ SECTIONS
         lib/lib*.a:AP_RCProtocol_Backend.*(.text* .rodata*)
         lib/lib*.a:AP_RCProtocol.*(.text* .rodata*)
         lib/lib*.a:AP_RCProtocol_CRSF.*(.text* .rodata*)
-        lib/lib*.a:AP_RCTelemetry.*(.text* .rodata*)
         lib/lib*.a:AP_CRSF_Telem.*(.text* .rodata*)
         lib/lib*.a:AP_MotorsMatrix.*(.text* .rodata*)
         lib/lib*.a:RC_Channel.*(.text* .rodata*)

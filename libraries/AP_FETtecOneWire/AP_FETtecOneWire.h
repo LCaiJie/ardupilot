@@ -54,13 +54,12 @@
 #define fet_debug(fmt, args ...)
 #endif
 
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_Param/AP_Param.h>
 
 #include <AP_Math/AP_Math.h>
 #include <AP_Math/crc.h>
 
-class AP_FETtecOneWire : public AP_ESC_Telem_Backend
+class AP_FETtecOneWire
 {
 
 public:
@@ -106,9 +105,6 @@ private:
 
     AP_Int32 _motor_mask_parameter;
     AP_Int32 _reverse_mask_parameter;
-#if HAL_WITH_ESC_TELEM
-    AP_Int8 _pole_count_parameter;
-#endif
 
     static constexpr uint8_t FRAME_OVERHEAD = 6;          ///< OneWire message frame overhead (header+tail bytes)
     static constexpr uint8_t MAX_RECEIVE_LENGTH = 12;     ///< OneWire max receive message payload length in bytes
@@ -152,11 +148,6 @@ private:
         WAITING_SN = 51,
 #endif
 
-#if HAL_WITH_ESC_TELEM
-        WANT_SEND_SET_TLM_TYPE = 60,
-        WAITING_SET_TLM_TYPE_OK = 61,
-#endif
-
         WANT_SEND_SET_FAST_COM_LENGTH = 70,
         WAITING_SET_FAST_COM_LENGTH_OK = 71,
 
@@ -165,14 +156,6 @@ private:
 
     class ESC {
     public:
-
-#if HAL_WITH_ESC_TELEM
-        uint32_t last_telem_us;              ///< last time we got telemetry from this ESC
-        uint16_t unexpected_telem;
-        uint16_t error_count_at_throttle_count_overflow;            ///< overflow counter for error counter from the ESCs.
-        bool telem_expected;                 ///< this ESC is fully configured and is now expected to send us telemetry
-        bool telem_requested;                ///< this ESC is fully configured and at some point was requested to send us telemetry
-#endif
 
         uint8_t id;         ///< FETtec ESC ID
         uint8_t servo_ofs;  ///< offset into ArduPilot servo array
@@ -338,43 +321,6 @@ private:
 /*
  * Messages, methods and states for dealing with ESC telemetry
  */
-#if HAL_WITH_ESC_TELEM
-    void handle_message_telem(ESC &esc);
-
-    uint16_t _fast_throttle_cmd_count;     ///< number of fast-throttle commands sent by the flight controller
-
-    /// the ESC at this offset into _escs should be the next to send a
-    /// telemetry request for:
-    uint8_t _esc_ofs_to_request_telem_from;
-
-    class PACKED SET_TLM_TYPE {
-    public:
-        SET_TLM_TYPE(uint8_t _tlm_type) :
-            tlm_type{_tlm_type}
-        { }
-        uint8_t msgid { (uint8_t)MsgType::SET_TLM_TYPE };
-        uint8_t tlm_type;
-    };
-
-    class PACKED TLM {
-    public:
-        TLM(int8_t _temp, uint16_t _voltage, uint16_t _current, int16_t _rpm, uint16_t _consumption_mah, uint16_t _tx_err_count) :
-            temp{_temp},
-            voltage{_voltage},
-            current{_current},
-            rpm{_rpm},
-            consumption_mah{_consumption_mah},
-            tx_err_count{_tx_err_count}
-        { }
-        int8_t temp;              // centi-degrees
-        uint16_t voltage;         // centi-Volt
-        uint16_t current;         // centi-Ampere  (signed?)
-        int16_t rpm;              // centi-rpm
-        uint16_t consumption_mah; // milli-Ampere.hour
-        uint16_t tx_err_count;    // CRC error count, as perceived from the ESC receiving side
-    };
-
-#endif  // HAL_WITH_ESC_TELEM
 
 #if HAL_AP_FETTEC_ESC_BEEP
     class PACKED Beep {
@@ -468,9 +414,6 @@ private:
         PackedMessage<SW_VER> packed_sw_ver;
         PackedMessage<SN> packed_sn;
 #endif
-#if HAL_WITH_ESC_TELEM
-        PackedMessage<TLM> packed_tlm;
-#endif
         uint8_t receive_buf[FRAME_OVERHEAD + MAX_RECEIVE_LENGTH];
     } u;
 
@@ -479,9 +422,6 @@ private:
     static_assert(sizeof(u.packed_esc_type) <= sizeof(u.receive_buf),"packed_esc_type does not fit in receive_buf. MAX_RECEIVE_LENGTH too small?");
     static_assert(sizeof(u.packed_sw_ver) <= sizeof(u.receive_buf),"packed_sw_ver does not fit in receive_buf. MAX_RECEIVE_LENGTH too small?");
     static_assert(sizeof(u.packed_sn) <= sizeof(u.receive_buf),"packed_sn does not fit in receive_buf. MAX_RECEIVE_LENGTH too small?");
-#endif
-#if HAL_WITH_ESC_TELEM
-    static_assert(sizeof(u.packed_tlm) <= sizeof(u.receive_buf),"packed_tlm does not fit in receive_buf. MAX_RECEIVE_LENGTH too small?");
 #endif
 
     uint16_t _unknown_esc_message;

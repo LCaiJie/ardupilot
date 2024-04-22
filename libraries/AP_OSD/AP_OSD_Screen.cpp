@@ -36,7 +36,6 @@
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_RTC/AP_RTC.h>
-#include <AP_MSP/msp.h>
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_Vehicle/AP_Vehicle.h>
@@ -342,55 +341,6 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
     // @Range: 0 21
     AP_SUBGROUPINFO(vspeed, "VSPEED", 20, AP_OSD_Screen, AP_OSD_Setting),
 
-#if HAL_WITH_ESC_TELEM
-    // @Param: ESCTEMP_EN
-    // @DisplayName: ESCTEMP_EN
-    // @Description: Displays first esc's temp
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: ESCTEMP_X
-    // @DisplayName: ESCTEMP_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: ESCTEMP_Y
-    // @DisplayName: ESCTEMP_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(esc_temp, "ESCTEMP", 21, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: ESCRPM_EN
-    // @DisplayName: ESCRPM_EN
-    // @Description: Displays first esc's rpm
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: ESCRPM_X
-    // @DisplayName: ESCRPM_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: ESCRPM_Y
-    // @DisplayName: ESCRPM_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(esc_rpm, "ESCRPM", 22, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: ESCAMPS_EN
-    // @DisplayName: ESCAMPS_EN
-    // @Description: Displays first esc's current
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: ESCAMPS_X
-    // @DisplayName: ESCAMPS_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: ESCAMPS_Y
-    // @DisplayName: ESCAMPS_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(esc_amps, "ESCAMPS", 23, AP_OSD_Screen, AP_OSD_Setting),
-#endif
     // @Param: GPSLAT_EN
     // @DisplayName: GPSLAT_EN
     // @Description: Displays GPS latitude
@@ -714,7 +664,7 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
     // @Range: 0 21
     AP_SUBGROUPINFO(clk, "CLK", 43, AP_OSD_Screen, AP_OSD_Setting),
 
-#if HAL_OSD_SIDEBAR_ENABLE || HAL_MSP_ENABLED
+#if HAL_OSD_SIDEBAR_ENABLE
     // @Param: SIDEBARS_EN
     // @DisplayName: SIDEBARS_EN
     // @Description: Displays artificial horizon side bars
@@ -731,120 +681,6 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
     // @Range: 0 21
     AP_SUBGROUPINFO(sidebars, "SIDEBARS", 44, AP_OSD_Screen, AP_OSD_Setting),
 #endif
-
-#if HAL_MSP_ENABLED
-    // @Param: CRSSHAIR_EN
-    // @DisplayName: CRSSHAIR_EN
-    // @Description: Displays artificial horizon crosshair (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: CRSSHAIR_X
-    // @DisplayName: CRSSHAIR_X
-    // @Description: Horizontal position on screen (MSP OSD only)
-    // @Range: 0 59
-
-    // @Param: CRSSHAIR_Y
-    // @DisplayName: CRSSHAIR_Y
-    // @Description: Vertical position on screen (MSP OSD only)
-    // @Range: 0 21
-    AP_SUBGROUPINFO(crosshair, "CRSSHAIR", 45, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: HOMEDIST_EN
-    // @DisplayName: HOMEDIST_EN
-    // @Description: Displays distance from HOME (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: HOMEDIST_X
-    // @DisplayName: HOMEDIST_X
-    // @Description: Horizontal position on screen (MSP OSD only)
-    // @Range: 0 59
-
-    // @Param: HOMEDIST_Y
-    // @DisplayName: HOMEDIST_Y
-    // @Description: Vertical position on screen (MSP OSD only)
-    // @Range: 0 21
-    AP_SUBGROUPINFO(home_dist, "HOMEDIST", 46, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: HOMEDIR_EN
-    // @DisplayName: HOMEDIR_EN
-    // @Description: Displays relative direction to HOME (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: HOMEDIR_X
-    // @DisplayName: HOMEDIR_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: HOMEDIR_Y
-    // @DisplayName: HOMEDIR_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(home_dir, "HOMEDIR", 47, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: POWER_EN
-    // @DisplayName: POWER_EN
-    // @Description: Displays power (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: POWER_X
-    // @DisplayName: POWER_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: POWER_Y
-    // @DisplayName: POWER_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(power, "POWER", 48, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: CELLVOLT_EN
-    // @DisplayName: CELL_VOLT_EN
-    // @Description: Displays average cell voltage (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: CELLVOLT_X
-    // @DisplayName: CELL_VOLT_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: CELLVOLT_Y
-    // @DisplayName: CELL_VOLT_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(cell_volt, "CELLVOLT", 49, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: BATTBAR_EN
-    // @DisplayName: BATT_BAR_EN
-    // @Description: Displays battery usage bar (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: BATTBAR_X
-    // @DisplayName: BATT_BAR_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: BATTBAR_Y
-    // @DisplayName: BATT_BAR_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(batt_bar, "BATTBAR", 50, AP_OSD_Screen, AP_OSD_Setting),
-
-    // @Param: ARMING_EN
-    // @DisplayName: ARMING_EN
-    // @Description: Displays arming status (MSP OSD only)
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: ARMING_X
-    // @DisplayName: ARMING_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: ARMING_Y
-    // @DisplayName: ARMING_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(arming, "ARMING", 51, AP_OSD_Screen, AP_OSD_Setting),
-#endif //HAL_MSP_ENABLED
 
 
 #if AP_OSD_CALLSIGN_FROM_SD_ENABLED
@@ -1019,22 +855,6 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info2[] = {
     // @Description: Vertical position on screen
     // @Range: 0 21
     AP_SUBGROUPINFO(link_quality, "LINK_Q", 1, AP_OSD_Screen, AP_OSD_Setting),
-
-#if HAL_WITH_MSP_DISPLAYPORT
-    // @Param: TXT_RES
-    // @DisplayName: Sets the overlay text resolution (MSP DisplayPort only)
-    // @Description: Sets the overlay text resolution for this screen to either LD 30x16 or HD 50x18 (MSP DisplayPort only)
-    // @Values: 0:30x16,1:50x18
-    // @User: Standard
-    AP_GROUPINFO("TXT_RES", 3, AP_OSD_Screen, txt_resolution, 0),
-
-    // @Param: FONT
-    // @DisplayName: Sets the font index for this screen (MSP DisplayPort only)
-    // @Description: Sets the font index for this screen (MSP DisplayPort only)
-    // @Range: 0 21
-    // @User: Standard
-    AP_GROUPINFO("FONT", 4, AP_OSD_Screen, font_index, 0),
-#endif
     AP_GROUPEND
 };
 
@@ -1789,40 +1609,6 @@ void AP_OSD_Screen::draw_vspeed(uint8_t x, uint8_t y)
     }
 }
 
-#if HAL_WITH_ESC_TELEM
-void AP_OSD_Screen::draw_esc_temp(uint8_t x, uint8_t y)
-{
-    int16_t etemp;
-    // first parameter is index into array of ESC's.  Hardwire to zero (first) for now.
-    if (!AP::esc_telem().get_temperature(0, etemp)) {
-        return;
-    }
-
-    backend->write(x, y, false, "%3d%c", (int)u_scale(TEMPERATURE, etemp / 100), u_icon(TEMPERATURE));
-}
-
-void AP_OSD_Screen::draw_esc_rpm(uint8_t x, uint8_t y)
-{
-    float rpm;
-    // first parameter is index into array of ESC's.  Hardwire to zero (first) for now.
-    if (!AP::esc_telem().get_rpm(0, rpm)) {
-        return;
-    }
-    float krpm = rpm * 0.001f;
-    const char *format = krpm < 9.995 ? "%.2f%c%c" : (krpm < 99.95 ? "%.1f%c%c" : "%.0f%c%c");
-    backend->write(x, y, false, format, krpm, SYMBOL(SYM_KILO), SYMBOL(SYM_RPM));
-}
-
-void AP_OSD_Screen::draw_esc_amps(uint8_t x, uint8_t y)
-{
-    float amps;
-    // first parameter is index into array of ESC's.  Hardwire to zero (first) for now.
-    if (!AP::esc_telem().get_current(0, amps)) {
-        return;
-    }
-    backend->write(x, y, false, "%4.1f%c", amps, SYMBOL(SYM_AMP));
-}
-#endif
 
 void AP_OSD_Screen::draw_gps_latitude(uint8_t x, uint8_t y)
 {
@@ -2119,7 +1905,7 @@ void AP_OSD_Screen::draw_rngf(uint8_t x, uint8_t y)
 
 #define DRAW_SETTING(n) if (n.enabled) draw_ ## n(n.xpos, n.ypos)
 
-#if HAL_WITH_OSD_BITMAP || HAL_WITH_MSP_DISPLAYPORT
+#if HAL_WITH_OSD_BITMAP
 void AP_OSD_Screen::draw(void)
 {
     if (!enabled || !backend) {
@@ -2181,13 +1967,6 @@ void AP_OSD_Screen::draw(void)
 #if AP_VIDEOTX_ENABLED
     DRAW_SETTING(vtx_power);
 #endif
-
-#if HAL_WITH_ESC_TELEM
-    DRAW_SETTING(esc_temp);
-    DRAW_SETTING(esc_rpm);
-    DRAW_SETTING(esc_amps);
-#endif
-
     DRAW_SETTING(gps_latitude);
     DRAW_SETTING(gps_longitude);
     DRAW_SETTING(dist);

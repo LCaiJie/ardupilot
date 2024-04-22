@@ -570,7 +570,7 @@ void AP_OSD_ParamScreen::update_state_machine()
     }
 }
 
-#if HAL_WITH_OSD_BITMAP || HAL_WITH_MSP_DISPLAYPORT
+#if HAL_WITH_OSD_BITMAP
 void AP_OSD_ParamScreen::draw(void)
 {
     if (!enabled || !backend) {

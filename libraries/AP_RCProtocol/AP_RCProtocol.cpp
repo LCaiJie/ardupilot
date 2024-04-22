@@ -31,7 +31,6 @@
 #include "AP_RCProtocol_CRSF.h"
 #include "AP_RCProtocol_ST24.h"
 #include "AP_RCProtocol_FPort.h"
-#include "AP_RCProtocol_FPort2.h"
 #include "AP_RCProtocol_GHST.h"
 #include <AP_Math/AP_Math.h>
 #include <RC_Channel/RC_Channel.h>
@@ -69,9 +68,6 @@ void AP_RCProtocol::init()
 #endif
 #if AP_RCPROTOCOL_CRSF_ENABLED
     backend[AP_RCProtocol::CRSF] = new AP_RCProtocol_CRSF(*this);
-#endif
-#if AP_RCPROTOCOL_FPORT2_ENABLED
-    backend[AP_RCProtocol::FPORT2] = new AP_RCProtocol_FPort2(*this, true);
 #endif
 #if AP_RCPROTOCOL_ST24_ENABLED
     backend[AP_RCProtocol::ST24] = new AP_RCProtocol_ST24(*this);
@@ -480,10 +476,6 @@ const char *AP_RCProtocol::protocol_name_from_protocol(rcprotocol_t protocol)
 #if AP_RCPROTOCOL_FPORT_ENABLED
     case FPORT:
         return "FPORT";
-#endif
-#if AP_RCPROTOCOL_FPORT2_ENABLED
-    case FPORT2:
-        return "FPORT2";
 #endif
 #if AP_RCPROTOCOL_GHST_ENABLED
     case GHST:

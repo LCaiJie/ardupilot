@@ -53,14 +53,6 @@ const AP_Param::GroupInfo AP_FETtecOneWire::var_info[] {
     // @User: Standard
     AP_GROUPINFO("RVMASK",  2, AP_FETtecOneWire, _reverse_mask_parameter, 0),
 
-#if HAL_WITH_ESC_TELEM
-    // @Param: POLES
-    // @DisplayName: Nr. electrical poles
-    // @Description: Number of motor electrical poles
-    // @Range: 2 50
-    // @User: Standard
-    AP_GROUPINFO("POLES", 3, AP_FETtecOneWire, _pole_count_parameter, 14),
-#endif
 
     AP_GROUPEND
 };
@@ -120,15 +112,8 @@ void AP_FETtecOneWire::init()
 
     _motor_mask = uint32_t(_motor_mask_parameter); // take a copy that will not change after we leave this function
     _esc_count = __builtin_popcount(_motor_mask);
-#if HAL_WITH_ESC_TELEM
-    // OneWire supports telemetry in at most 15 ESCs, because of the 4 bit limitation
-    // on the fast-throttle command.  But we are still limited to the
-    // number of ESCs the telem library will collect data for.
-    if (_esc_count == 0 || _motor_mask >= (1U << MIN(15, ESC_TELEM_MAX_ESCS))) {
-#else
     // OneWire supports at most 24 ESCs without telemetry
     if (_esc_count == 0 || _motor_mask >= (1U << MIN(24, NUM_SERVO_CHANNELS))) {
-#endif
         _invalid_mask = true;
         return;
     }
@@ -165,11 +150,6 @@ void AP_FETtecOneWire::init()
     // 7  dummy for rounding up the division by 8
     const uint16_t fast_throttle_byte_count = (net_bit_count + 7)/8;
     uint16_t telemetry_byte_count { 0U };
-#if HAL_WITH_ESC_TELEM
-    // Telemetry is fetched from each loop in turn.
-    telemetry_byte_count = sizeof(u.packed_tlm) + 1; // assume 9 pause bits between TX and RX
-    _fast_throttle_byte_count = fast_throttle_byte_count;
-#endif
     uint32_t uart_baud { FULL_DUPLEX_BAUDRATE };
 #if HAL_AP_FETTEC_HALF_DUPLEX
     if (_use_hdplex == true) { //Half-Duplex is enabled
@@ -305,11 +285,7 @@ void AP_FETtecOneWire::handle_message(ESC &esc, const uint8_t length)
 #if HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
             esc.set_state(ESCState::WANT_SEND_REQ_TYPE);
 #else
-#if HAL_WITH_ESC_TELEM
-            esc.set_state(ESCState::WANT_SEND_SET_TLM_TYPE);
-#else
             esc.set_state(ESCState::WANT_SEND_SET_FAST_COM_LENGTH);
-#endif
 #endif  // HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
             esc.is_awake = true;
             break;
@@ -323,11 +299,7 @@ void AP_FETtecOneWire::handle_message(ESC &esc, const uint8_t length)
 #if HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
             esc.set_state(ESCState::WANT_SEND_REQ_TYPE);
 #else
-#if HAL_WITH_ESC_TELEM
-            esc.set_state(ESCState::WANT_SEND_SET_TLM_TYPE);
-#else
             esc.set_state(ESCState::WANT_SEND_SET_FAST_COM_LENGTH);
-#endif
 #endif  // HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
         }
         break;
@@ -365,24 +337,9 @@ void AP_FETtecOneWire::handle_message(ESC &esc, const uint8_t length)
         }
         static_assert(ARRAY_SIZE(u.packed_sn.msg.sn) == ARRAY_SIZE(esc.serial_number), "Serial number array length missmatch");
         memcpy(esc.serial_number, u.packed_sn.msg.sn, ARRAY_SIZE(u.packed_sn.msg.sn));
-#if HAL_WITH_ESC_TELEM
-        esc.set_state(ESCState::WANT_SEND_SET_TLM_TYPE);
-#else
         esc.set_state(ESCState::WANT_SEND_SET_FAST_COM_LENGTH);
-#endif
         break;
 #endif  // HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
-
-#if HAL_WITH_ESC_TELEM
-    case ESCState::WANT_SEND_SET_TLM_TYPE:
-        return;
-    case ESCState::WAITING_SET_TLM_TYPE_OK:
-        if (buffer_contains_ok(length)) {
-            esc.set_state(ESCState::WANT_SEND_SET_FAST_COM_LENGTH);
-        }
-        break;
-#endif
-
     case ESCState::WANT_SEND_SET_FAST_COM_LENGTH:
         return;
     case ESCState::WAITING_SET_FAST_COM_LENGTH_OK:
@@ -392,59 +349,9 @@ void AP_FETtecOneWire::handle_message(ESC &esc, const uint8_t length)
         break;
     case ESCState::RUNNING:
         // we only expect telemetry messages in this state
-#if HAL_WITH_ESC_TELEM
-        if (!esc.telem_expected) {
-            esc.unexpected_telem++;
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-            AP_HAL::panic("unexpected telemetry");
-#endif
-            return;
-        }
-        esc.telem_expected = false;
-        return handle_message_telem(esc);
-#else
         return;
-#endif  // HAL_WITH_ESC_TELEM
-
     }
 }
-
-#if HAL_WITH_ESC_TELEM
-void AP_FETtecOneWire::handle_message_telem(ESC &esc)
-{
-    // the following two methods are coming from AP_ESC_Telem:
-    const TLM &tlm = u.packed_tlm.msg;
-
-    // update rpm and error rate
-    float error_rate_pct = 0;
-    if (_fast_throttle_cmd_count > _esc_count) {
-        error_rate_pct = (tlm.tx_err_count-esc.error_count_at_throttle_count_overflow)*(float)100/(float)_fast_throttle_cmd_count;
-    } else {
-        // the telemetry is requested in a round-robin, sequential fashion
-        // so the in the first _esc_count times all ESCs get to initialize this
-        esc.error_count_at_throttle_count_overflow = tlm.tx_err_count;
-    }
-    update_rpm(esc.servo_ofs,
-               tlm.rpm*(100*2/_pole_count_parameter),
-               error_rate_pct);
-
-    // update power and temperature telem data
-    TelemetryData t {};
-    t.temperature_cdeg = tlm.temp * 100;
-    t.voltage = tlm.voltage * 0.01f;
-    t.current = tlm.current * 0.01f;
-    t.consumption_mah = tlm.consumption_mah;
-    update_telem_data(
-        esc.servo_ofs,
-        t,
-        TelemetryType::TEMPERATURE|
-          TelemetryType::VOLTAGE|
-          TelemetryType::CURRENT|
-          TelemetryType::CONSUMPTION);
-
-    esc.last_telem_us = AP_HAL::micros();
-}
-#endif  // HAL_WITH_ESC_TELEM
 
 // reads data from the UART, calling handle_message on any message found
 void AP_FETtecOneWire::read_data_from_uart()
@@ -585,13 +492,6 @@ void AP_FETtecOneWire::pack_fast_throttle_command(const uint16_t *motor_values, 
 void AP_FETtecOneWire::escs_set_values(const uint16_t* motor_values)
 {
     uint8_t esc_id_to_request_telem_from = 0;
-#if HAL_WITH_ESC_TELEM
-    ESC &esc_to_req_telem_from = _escs[_esc_ofs_to_request_telem_from++];
-    if (_esc_ofs_to_request_telem_from >= _esc_count) {
-        _esc_ofs_to_request_telem_from = 0;
-    }
-    esc_id_to_request_telem_from = esc_to_req_telem_from.id;
-#endif
 
     uint8_t fast_throttle_command[_fast_throttle_byte_count];
     pack_fast_throttle_command(motor_values, fast_throttle_command, sizeof(fast_throttle_command), esc_id_to_request_telem_from);
@@ -609,11 +509,6 @@ void AP_FETtecOneWire::escs_set_values(const uint16_t* motor_values)
 
     // send throttle commands to all configured ESCs in a single packet transfer
     if (transmit(fast_throttle_command, sizeof(fast_throttle_command))) {
-#if HAL_WITH_ESC_TELEM
-        esc_to_req_telem_from.telem_expected = true;    // used to make sure that the returned telemetry comes from this ESC and not another
-        esc_to_req_telem_from.telem_requested = true;   // used to check if this ESC is periodically sending telemetry
-        _fast_throttle_cmd_count++;
-#endif
     }
 }
 
@@ -631,15 +526,6 @@ bool AP_FETtecOneWire::pre_arm_check(char *failure_msg, const uint8_t failure_ms
         hal.util->snprintf(failure_msg, failure_msg_len, "Invalid motor mask");
         return false;
     }
-#if HAL_WITH_ESC_TELEM
-    if (_pole_count_parameter < 2) {
-        hal.util->snprintf(failure_msg, failure_msg_len, "Invalid pole count %u", uint8_t(_pole_count_parameter));
-        return false;
-    }
-    uint8_t no_telem = 0;
-    const uint32_t now = AP_HAL::micros();
-#endif
-
     uint8_t not_running = 0;
     for (uint8_t i=0; i<_esc_count; i++) {
         auto &esc = _escs[i];
@@ -647,11 +533,6 @@ bool AP_FETtecOneWire::pre_arm_check(char *failure_msg, const uint8_t failure_ms
             not_running++;
             continue;
         }
-#if HAL_WITH_ESC_TELEM
-        if (now - esc.last_telem_us > max_telem_interval_us) {
-            no_telem++;
-        }
-#endif
     }
     if (not_running != 0) {
         hal.util->snprintf(failure_msg, failure_msg_len, "%u of %u ESCs are not running", not_running, _esc_count);
@@ -661,12 +542,6 @@ bool AP_FETtecOneWire::pre_arm_check(char *failure_msg, const uint8_t failure_ms
         hal.util->snprintf(failure_msg, failure_msg_len, "Not initialised");
         return false;
     }
-#if HAL_WITH_ESC_TELEM
-    if (no_telem != 0) {
-        hal.util->snprintf(failure_msg, failure_msg_len, "%u of %u ESCs are not sending telemetry", no_telem, _esc_count);
-        return false;
-    }
-#endif
 
     return true;
 }
@@ -728,15 +603,6 @@ void AP_FETtecOneWire::configure_escs()
         case ESCState::WAITING_SN:
             return;
 #endif  // HAL_AP_FETTEC_ONEWIRE_GET_STATIC_INFO
-#if HAL_WITH_ESC_TELEM
-        case ESCState::WANT_SEND_SET_TLM_TYPE:
-            if (transmit_config_request(PackedMessage<SET_TLM_TYPE>{esc.id, SET_TLM_TYPE{1}})) {
-                esc.set_state(ESCState::WAITING_SET_TLM_TYPE_OK);
-            }
-            return;
-        case ESCState::WAITING_SET_TLM_TYPE_OK:
-            return;
-#endif
         case ESCState::WANT_SEND_SET_FAST_COM_LENGTH:
             if (transmit_config_request(PackedMessage<SET_FAST_COM_LENGTH>{esc.id,
                             SET_FAST_COM_LENGTH{
@@ -768,28 +634,6 @@ void AP_FETtecOneWire::update()
     read_data_from_uart();
 
     const uint32_t now = AP_HAL::micros();
-
-#if HAL_WITH_ESC_TELEM
-    if (!hal.util->get_soft_armed()) {
-
-        _reverse_mask = _reverse_mask_parameter; // update this only when disarmed
-
-        // if we haven't seen an ESC in a while, the user might
-        // have power-cycled them.  Try re-initialising.
-        for (uint8_t i=0; i<_esc_count; i++) {
-            auto &esc = _escs[i];
-            if (!esc.telem_requested || now - esc.last_telem_us < 1000000U ) {
-                // telem OK
-                continue;
-            }
-            _running_mask &= ~(1U << esc.servo_ofs);
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "No telem from esc id=%u. Resetting it.", esc.id);
-            //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "unknown %u, invalid %u, too short %u, unexpected: %u, crc_err %u", _unknown_esc_message, _message_invalid_in_state_count, _period_too_short, esc.unexpected_telem, crc_rec_err_cnt);
-            esc.set_state(ESCState::WANT_SEND_OK_TO_GET_RUNNING_SW_TYPE);
-            esc.telem_requested = false;
-        }
-    }
-#endif  // HAL_WITH_ESC_TELEM
 
     if (now - _last_transmit_us < 700U) {
         // in case the SRV_Channels::push() is running at very high rates, limit the period

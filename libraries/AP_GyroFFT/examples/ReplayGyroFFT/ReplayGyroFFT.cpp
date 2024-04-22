@@ -8,7 +8,6 @@
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_Arming/AP_Arming.h>
 #include <SITL/SITL.h>
@@ -30,9 +29,6 @@ static AP_InertialSensor ins;
 static AP_Baro baro;
 AP_Int32 logger_bitmask;
 static AP_Logger logger{logger_bitmask};
-#if HAL_EXTERNAL_AHRS_ENABLED
-static AP_ExternalAHRS external_ahrs;
-#endif
 static SITL::SIM sitl;
 static AP_Scheduler scheduler;
 

@@ -1,5 +1,4 @@
 #include "Copter.h"
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
 
 /*****************************************************************************
 *   The init_ardupilot function processes everything we need for an in - air restart

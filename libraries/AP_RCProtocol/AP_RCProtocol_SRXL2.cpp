@@ -24,7 +24,6 @@
 #include "AP_RCProtocol.h"
 #include "AP_RCProtocol_SRXL2.h"
 #include <AP_Math/AP_Math.h>
-#include <AP_RCTelemetry/AP_Spektrum_Telem.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_HAL/utility/sparse-endian.h>
 #include <AP_VideoTX/AP_VideoTX.h>
@@ -354,9 +353,6 @@ void srxlSendOnUart(uint8_t uart, uint8_t* pBuffer, uint8_t length)
 // could be used if you would prefer to just populate that with the next outgoing telemetry packet.
 void srxlFillTelemetry(SrxlTelemetryData* pTelemetryData)
 {
-#if HAL_SPEKTRUM_TELEM_ENABLED && !APM_BUILD_TYPE(APM_BUILD_iofirmware)
-    AP_Spektrum_Telem::get_telem_data(pTelemetryData->raw);
-#endif
 }
 
 // User-provided callback routine that is called whenever a control data packet is received:
