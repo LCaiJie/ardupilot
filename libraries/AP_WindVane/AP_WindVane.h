@@ -184,9 +184,6 @@ private:
     enum Speed_type {
         WINDSPEED_NONE               = 0,
         WINDVANE_WIND_SENSOR_REV_P   = 2,
-#if AP_WINDVANE_RPM_ENABLED
-        WINDSPEED_RPM                = 3,
-#endif
 #if AP_WINDVANE_NMEA_ENABLED
         WINDSPEED_NMEA               = 4,
 #endif

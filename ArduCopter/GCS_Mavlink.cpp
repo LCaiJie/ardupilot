@@ -1,7 +1,6 @@
 #include "Copter.h"
 
 #include "GCS_Mavlink.h"
-#include <AP_RPM/AP_RPM_config.h>
 #include <AP_EFI/AP_EFI_config.h>
 
 MAV_TYPE GCS_Copter::frame_type() const

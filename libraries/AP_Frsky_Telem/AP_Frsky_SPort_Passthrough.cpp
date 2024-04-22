@@ -8,7 +8,6 @@
 #include <AP_HAL/utility/RingBuffer.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_Notify/AP_Notify.h>
-#include <AP_RPM/AP_RPM.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_Vehicle/AP_Vehicle.h>
@@ -223,13 +222,6 @@ bool AP_Frsky_SPort_Passthrough::is_packet_ready(uint8_t idx, bool queue_empty)
     case RPM:
         {
             packet_ready = false;
-#if AP_RPM_ENABLED
-            const AP_RPM *rpm = AP::rpm();
-            if (rpm == nullptr) {
-                break;
-            }
-            packet_ready = rpm->num_sensors() > 0;
-#endif
         }
         break;
     case TERRAIN:
@@ -697,26 +689,7 @@ uint32_t AP_Frsky_SPort_Passthrough::calc_attiandrng(void)
  */
 uint32_t AP_Frsky_SPort_Passthrough::calc_rpm(void)
 {
-#if AP_RPM_ENABLED
-    const AP_RPM *ap_rpm = AP::rpm();
-    if (ap_rpm == nullptr) {
-        return 0;
-    }
-    uint32_t value = 0;
-    // we send: rpm_value*0.1 as 16 bits signed
-    float rpm;
-    // bits 0-15 for rpm 0
-    if (ap_rpm->get_rpm(0,rpm)) {
-        value |= (int16_t)roundf(rpm * 0.1);
-    }
-    // bits 16-31 for rpm 1
-    if (ap_rpm->get_rpm(1,rpm)) {
-        value |= (int16_t)roundf(rpm * 0.1) << 16;
-    }
-    return value;
-#else
     return 0;
-#endif
 }
 
 /*

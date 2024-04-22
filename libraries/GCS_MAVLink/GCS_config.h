@@ -1,7 +1,6 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL_Boards.h>
-#include <AP_Relay/AP_Relay_config.h>
 #include <AP_Mission/AP_Mission_config.h>
 
 #ifndef HAL_GCS_ENABLED
@@ -44,10 +43,6 @@
 
 #ifndef HAL_MAVLINK_INTERVALS_FROM_FILES_ENABLED
 #define HAL_MAVLINK_INTERVALS_FROM_FILES_ENABLED ((AP_FILESYSTEM_FATFS_ENABLED || AP_FILESYSTEM_POSIX_ENABLED) && BOARD_FLASH_SIZE > 1024)
-#endif
-
-#ifndef AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
-#define AP_MAVLINK_MSG_RELAY_STATUS_ENABLED HAL_GCS_ENABLED && AP_RELAY_ENABLED
 #endif
 
 // allow removal of developer-centric mavlink commands

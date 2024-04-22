@@ -41,7 +41,6 @@
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_RPM/AP_RPM.h>
 #if APM_BUILD_TYPE(APM_BUILD_Rover)
 #include <AP_WindVane/AP_WindVane.h>
 #endif
@@ -1019,24 +1018,6 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
     // @Range: 0 21
     AP_SUBGROUPINFO(avgcellrestvolt, "ACRVOLT", 61, AP_OSD_Screen, AP_OSD_Setting),
 
-#if AP_RPM_ENABLED
-	// @Param: RPM_EN
-	// @DisplayName: RPM_EN
-	// @Description: Displays main rotor revs/min
-	// @Values: 0:Disabled,1:Enabled
-
-	// @Param: RPM_X
-	// @DisplayName: RPM_X
-	// @Description: Horizontal position on screen
-	// @Range: 0 29
-
-	// @Param: RPM_Y
-	// @DisplayName: RPM_Y
-	// @Description: Vertical position on screen
-	// @Range: 0 15
-	AP_SUBGROUPINFO(rrpm, "RPM", 62, AP_OSD_Screen, AP_OSD_Setting),
-#endif
-
     AP_GROUPEND
 };
 
@@ -1660,25 +1641,6 @@ void AP_OSD_Screen::draw_heading(uint8_t x, uint8_t y)
     backend->write(x, y, false, "%3d%c", yaw, SYMBOL(SYM_DEGR));
 }
 
-#if AP_RPM_ENABLED
-void AP_OSD_Screen::draw_rrpm(uint8_t x, uint8_t y)
-{
-    float _rrpm;
-    const AP_RPM *rpm = AP_RPM::get_singleton();
-    if (rpm != nullptr) {
-            if (!rpm->get_rpm(0, _rrpm)) {
-                // No valid RPM data
-                _rrpm = -1;
-            }
-        } else {
-            // No RPM because pointer is null
-            _rrpm = -1;
-        }
-    int r_rpm = static_cast<int>(_rrpm);
-    backend->write(x, y, false, "%4d%c", (int)r_rpm, SYMBOL(SYM_RPM));
-}
-#endif
-
 void AP_OSD_Screen::draw_throttle(uint8_t x, uint8_t y)
 {
     backend->write(x, y, false, "%3d%c", gcs().get_hud_throttle(), SYMBOL(SYM_PCNT));
@@ -2244,9 +2206,6 @@ void AP_OSD_Screen::draw(void)
     DRAW_SETTING(heading);
     DRAW_SETTING(wind);
     DRAW_SETTING(home);
-#if AP_RPM_ENABLED
-    DRAW_SETTING(rrpm);
-#endif
 #if AP_FENCE_ENABLED
     DRAW_SETTING(fence);
 #endif

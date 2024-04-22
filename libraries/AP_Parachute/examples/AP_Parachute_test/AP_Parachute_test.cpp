@@ -8,7 +8,6 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_HAL/AP_HAL.h>
 #include <RC_Channel/RC_Channel.h>
-#include <AP_Relay/AP_Relay.h>
 #include <AP_Parachute/AP_Parachute.h>
 #include <AP_Notify/AP_Notify.h>
 #include <StorageManager/StorageManager.h>
@@ -18,8 +17,6 @@ void loop();
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 
-// Relay
-static AP_Relay relay;
 
 #if HAL_PARACHUTE_ENABLED
 // Parachute

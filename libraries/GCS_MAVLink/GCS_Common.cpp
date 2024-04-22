@@ -34,7 +34,6 @@
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_BLHeli/AP_BLHeli.h>
-#include <AP_Relay/AP_Relay.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>
@@ -46,7 +45,6 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_OSD/AP_OSD.h>
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
-#include <AP_RPM/AP_RPM.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_Frsky_Telem/AP_Frsky_Telem.h>
 #include <RC_Channel/RC_Channel.h>
@@ -889,9 +887,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_LOCAL_POSITION_NED,    MSG_LOCAL_POSITION},
         { MAVLINK_MSG_ID_PID_TUNING,            MSG_PID_TUNING},
         { MAVLINK_MSG_ID_VIBRATION,             MSG_VIBRATION},
-#if AP_RPM_ENABLED
-        { MAVLINK_MSG_ID_RPM,                   MSG_RPM},
-#endif
         { MAVLINK_MSG_ID_MISSION_ITEM_REACHED,  MSG_MISSION_ITEM_REACHED},
         { MAVLINK_MSG_ID_ATTITUDE_TARGET,       MSG_ATTITUDE_TARGET},
         { MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT,  MSG_POSITION_TARGET_GLOBAL_INT},
@@ -922,9 +917,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #endif
 #if AP_MAVLINK_MSG_UAVIONIX_ADSB_OUT_STATUS_ENABLED
         { MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS, MSG_UAVIONIX_ADSB_OUT_STATUS},
-#endif
-#if AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
-        { MAVLINK_MSG_ID_RELAY_STATUS, MSG_RELAY_STATUS},
 #endif
             };
 
@@ -4779,30 +4771,6 @@ void GCS_MAVLINK::send_hwstatus()
         0);
 }
 
-#if AP_RPM_ENABLED
-void GCS_MAVLINK::send_rpm() const
-{
-    AP_RPM *rpm = AP::rpm();
-    if (rpm == nullptr) {
-        return;
-    }
-
-    if (!rpm->enabled(0) && !rpm->enabled(1)) {
-        return;
-    }
-
-    float rpm1 = -1, rpm2 = -1;
-
-    rpm->get_rpm(0, rpm1);
-    rpm->get_rpm(1, rpm2);
-
-    mavlink_msg_rpm_send(
-        chan,
-        rpm1,
-        rpm2);
-}
-#endif  // AP_RPM_ENABLED
-
 void GCS_MAVLINK::send_sys_status()
 {
     // send extended status only once vehicle has been initialised
@@ -4992,18 +4960,6 @@ void GCS_MAVLINK::send_uavionix_adsb_out_status() const
 }
 #endif
 
-#if AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
-bool GCS_MAVLINK::send_relay_status() const
-{
-    AP_Relay *relay = AP::relay();
-    if (relay == nullptr) {
-        // must only return false if out of space:
-        return true;
-    }
-
-    return relay->send_relay_status(*this);
-}
-#endif  // AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
 
 void GCS_MAVLINK::send_autopilot_state_for_gimbal_device() const
 {
@@ -5120,13 +5076,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         send_gps_global_origin();
         break;
 #endif  // AP_AHRS_ENABLED
-
-#if AP_RPM_ENABLED
-    case MSG_RPM:
-        CHECK_PAYLOAD_SIZE(RPM);
-        send_rpm();
-        break;
-#endif
 
     case MSG_CURRENT_WAYPOINT:
     case MSG_MISSION_ITEM_REACHED:
@@ -5388,12 +5337,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_UAVIONIX_ADSB_OUT_STATUS:
         CHECK_PAYLOAD_SIZE(UAVIONIX_ADSB_OUT_STATUS);
         send_uavionix_adsb_out_status();
-        break;
-#endif
-
-#if AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
-    case MSG_RELAY_STATUS:
-        ret = send_relay_status();
         break;
 #endif
 

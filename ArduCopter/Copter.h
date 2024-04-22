@@ -131,7 +131,6 @@
 #if TOY_MODE_ENABLED == ENABLED
  # include "toy_mode.h"
 #endif
-#include <AP_RPM/AP_RPM.h>
 
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED

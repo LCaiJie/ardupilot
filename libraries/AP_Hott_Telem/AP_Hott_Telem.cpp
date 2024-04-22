@@ -27,7 +27,6 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_RPM/AP_RPM.h>
 #include <AP_Stats/AP_Stats.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_RTC/AP_RTC.h>
@@ -147,13 +146,6 @@ void AP_Hott_Telem::send_EAM(void)
     msg.climbrate = uint16_t(30000.5 + vel.z * -100);
     msg.climbrate3s = 120 + vel.z * -3;
 
-#if AP_RPM_ENABLED
-    const AP_RPM *rpm = AP::rpm();
-    float rpm_value;
-    if (rpm && rpm->get_rpm(0, rpm_value)) {
-        msg.rpm = rpm_value * 0.1;
-    }
-#endif
 
     AP_Stats *stats = AP::stats();
     if (stats) {

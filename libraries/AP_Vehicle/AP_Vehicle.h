@@ -37,7 +37,6 @@
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Notify/AP_Notify.h>                    // Notify library
 #include <AP_Param/AP_Param.h>
-#include <AP_Relay/AP_Relay.h>                      // APM relay
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
 #include <AP_Hott_Telem/AP_Hott_Telem.h>
@@ -231,10 +230,6 @@ protected:
     AP_VideoTX vtx;
 #endif
     AP_SerialManager serial_manager;
-
-#if AP_RELAY_ENABLED
-    AP_Relay relay;
-#endif
 
     // notification object for LEDs, buzzers etc (parameter set to
     // false disables external leds)

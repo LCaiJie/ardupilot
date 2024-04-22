@@ -770,7 +770,6 @@ class sitl_periph(sitl):
             HAL_MAVLINK_BINDINGS_ENABLED = 1,
 
             AP_AIRSPEED_AUTOCAL_ENABLE = 0,
-            AP_ICENGINE_ENABLED = 0,
             AP_MISSION_ENABLED = 0,
             AP_RCPROTOCOL_ENABLED = 0,
             AP_RTC_ENABLED = 0,

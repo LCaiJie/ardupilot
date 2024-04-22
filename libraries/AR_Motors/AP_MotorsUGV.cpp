@@ -16,7 +16,6 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <GCS_MAVLink/GCS.h>
 #include "AP_MotorsUGV.h"
-#include <AP_Relay/AP_Relay.h>
 
 #define SERVO_MAX 4500  // This value represents 45 degrees and is just an arbitrary representation of servo max travel.
 
@@ -526,33 +525,7 @@ bool AP_MotorsUGV::pre_arm_check(bool report) const
         }
     }
 
-    // Check relays are configured for brushed with relay outputs
-#if AP_RELAY_ENABLED
-    AP_Relay*relay = AP::relay();
-    if ((_pwm_type == PWM_TYPE_BRUSHED_WITH_RELAY) && (relay != nullptr)) {
-        // If a output is configured its relay must be enabled
-        struct RelayTable {
-            bool output_assigned;
-            AP_Relay_Params::FUNCTION fun;
-        };
 
-        const RelayTable relay_table[] = {
-            { have_throttle || have_throttle_left || (SRV_Channels::function_assigned(SRV_Channel::k_motor1) && (_motors_num >= 1)), AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_1 },
-            { have_throttle_right || (SRV_Channels::function_assigned(SRV_Channel::k_motor2) && (_motors_num >= 2)),                 AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_2 },
-            { SRV_Channels::function_assigned(SRV_Channel::k_motor3) && (_motors_num >= 3),                                          AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_3 },
-            { SRV_Channels::function_assigned(SRV_Channel::k_motor4) && (_motors_num >= 4),                                          AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_4 },
-        };
-
-        for (uint8_t i=0; i<ARRAY_SIZE(relay_table); i++) {
-            if (relay_table[i].output_assigned && !relay->enabled(relay_table[i].fun)) {
-                if (report) {
-                    gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: relay function %u unassigned", uint8_t(relay_table[i].fun));
-                }
-                return false;
-            }
-        }
-    }
-#endif
 
     return true;
 }
@@ -977,45 +950,6 @@ void AP_MotorsUGV::output_throttle(SRV_Channel::Aux_servo_function_t function, f
 
     // apply rate control
     throttle = get_rate_controlled_throttle(function, throttle, dt);
-
-    // set relay if necessary
-#if AP_RELAY_ENABLED
-    AP_Relay*relay = AP::relay();
-    if ((_pwm_type == PWM_TYPE_BRUSHED_WITH_RELAY) && (relay != nullptr)) {
-
-        // find the output channel, if not found return
-        const SRV_Channel *out_chan = SRV_Channels::get_channel_for(function);
-        if (out_chan == nullptr) {
-            return;
-        }
-        const int8_t reverse_multiplier = out_chan->get_reversed() ? -1 : 1;
-        bool relay_high = is_negative(reverse_multiplier * throttle);
-
-        AP_Relay_Params::FUNCTION relay_function;
-        switch (function) {
-            case SRV_Channel::k_throttle:
-            case SRV_Channel::k_throttleLeft:
-            case SRV_Channel::k_motor1:
-            default:
-                relay_function = AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_1;
-                break;
-            case SRV_Channel::k_throttleRight:
-            case SRV_Channel::k_motor2:
-                relay_function = AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_2;
-                break;
-            case SRV_Channel::k_motor3:
-                relay_function = AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_3;
-                break;
-            case SRV_Channel::k_motor4:
-                relay_function = AP_Relay_Params::FUNCTION::BRUSHED_REVERSE_4;
-                break;
-        }
-        relay->set(relay_function, relay_high);
-
-        // invert the output to always have positive value calculated by calc_pwm
-        throttle = reverse_multiplier * fabsf(throttle);
-    }
-#endif  // AP_RELAY_ENABLED
 
     // output to servo channel
     switch (function) {

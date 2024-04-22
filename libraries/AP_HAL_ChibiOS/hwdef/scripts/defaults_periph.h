@@ -138,10 +138,6 @@
 #define AP_GHST_TELEM_ENABLED 0
 
 
-#ifndef AP_RELAY_ENABLED
-#define AP_RELAY_ENABLED 0
-#endif
-
 /*
  * GPS Backends - we selectively turn backends on.
  *   Note also that f103-GPS explicitly disables some of these backends.
@@ -290,7 +286,6 @@
 #define AP_COMPASS_ENABLED defined(HAL_PERIPH_ENABLE_MAG)
 #define AP_BARO_ENABLED defined(HAL_PERIPH_ENABLE_BARO)
 #define AP_GPS_ENABLED 1  // FIXME: should be defined(HAL_PERIPH_ENABLE_GPS)
-#define AP_RPM_ENABLED defined(HAL_PERIPH_ENABLE_RPM)
 #define AP_RCPROTOCOL_ENABLED defined(HAL_PERIPH_ENABLE_RCIN)
 #define AP_RTC_ENABLED defined(HAL_PERIPH_ENABLE_RTC)
 
@@ -337,9 +332,6 @@
 #define AP_TERRAIN_AVAILABLE 0
 #endif
 
-#ifndef AP_ICENGINE_ENABLED
-#define AP_ICENGINE_ENABLED 0
-#endif
 
 #ifndef AP_FILTER_ENABLED
 #define AP_FILTER_ENABLED 0

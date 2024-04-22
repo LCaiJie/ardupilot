@@ -96,9 +96,6 @@ define MODE_SYSTEMID_ENABLED 0
 define WEATHERVANE_ENABLED 0
 define MODE_AUTOROTATE_ENABLED 0
 
-# don't send RELAY_STATUS messages:
-define AP_MAVLINK_MSG_RELAY_STATUS_ENABLED 0
-
 
 # don't need payload place mission items on these boards, it's very niche:
 define AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED 0

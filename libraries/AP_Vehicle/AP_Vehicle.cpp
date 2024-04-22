@@ -11,7 +11,6 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AP_OSD/AP_OSD.h>
-#include <AP_RPM/AP_RPM.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Motors/AP_Motors.h>
 #include <AR_Motors/AP_MotorsUGV.h>
@@ -621,22 +620,6 @@ void AP_Vehicle::update_dynamic_notch(AP_InertialSensor::HarmonicNotch &notch)
             // set the harmonic notch filter frequency approximately scaled on motor rpm implied by throttle
             update_throttle_notch(notch);
             break;
-
-#if AP_RPM_ENABLED
-        case HarmonicNotchDynamicMode::UpdateRPM: // rpm sensor based tracking
-        case HarmonicNotchDynamicMode::UpdateRPM2: {
-            const auto *rpm_sensor = AP::rpm();
-            uint8_t sensor = (notch.params.tracking_mode()==HarmonicNotchDynamicMode::UpdateRPM?0:1);
-            float rpm;
-            if (rpm_sensor != nullptr && rpm_sensor->get_rpm(sensor, rpm)) {
-                // set the harmonic notch filter frequency from the main rotor rpm
-                notch.update_freq_hz(MAX(ref_freq * notch.params.freq_min_ratio(), rpm * ref * (1.0/60)));
-            } else {
-                notch.update_freq_hz(ref_freq);
-            }
-            break;
-        }
-#endif  // AP_RPM_ENABLED
 #if HAL_WITH_ESC_TELEM
         case HarmonicNotchDynamicMode::UpdateBLHeli: // BLHeli based tracking
             // set the harmonic notch filter frequency scaled on measured frequency

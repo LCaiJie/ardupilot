@@ -261,11 +261,6 @@ void AP_WindVane::init(const AP_SerialManager& serial_manager)
             }
             break;
 #endif  // AP_WINDVANE_NMEA_ENABLED
-#if AP_WINDVANE_RPM_ENABLED
-        case Speed_type::WINDSPEED_RPM:
-            _speed_driver = new AP_WindVane_RPM(*this);
-            break;
-#endif
     }
 }
 

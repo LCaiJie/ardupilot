@@ -17,7 +17,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include <GCS_MAVLink/GCS.h>
 #include "AP_MotorsHeli_RSC.h"
-#include <AP_RPM/AP_RPM.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -246,21 +245,7 @@ void AP_MotorsHeli_RSC::set_throttle_curve()
 // output - update value to send to ESC/Servo
 void AP_MotorsHeli_RSC::output(RotorControlState state)
 {
-    // _rotor_RPM available to the RSC output
-#if AP_RPM_ENABLED
-    const AP_RPM *rpm = AP_RPM::get_singleton();
-    if (rpm != nullptr) {
-        if (!rpm->get_rpm(0, _rotor_rpm)) {
-            // No valid RPM data
-            _rotor_rpm = -1;
-        }
-    } else {
-        // No RPM because pointer is null
-        _rotor_rpm = -1;
-    }
-#else
     _rotor_rpm = -1;
-#endif
 
     float dt;
     uint64_t now = AP_HAL::micros64();
