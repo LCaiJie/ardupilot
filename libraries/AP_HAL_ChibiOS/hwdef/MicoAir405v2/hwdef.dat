@@ -155,7 +155,6 @@ ROMFS_WILDCARD libraries/AP_OSD/fonts/font0.bin
 
 # reduce flash usage
 define HAL_GENERATOR_ENABLED 0
-define AP_GRIPPER_ENABLED 0
 define AP_BARO_PROBE_EXTERNAL_I2C_BUSES 0
 define OFFBOARD_GUIDED 0
 define QAUTOTUNE_ENABLED 0

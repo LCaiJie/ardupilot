@@ -305,36 +305,12 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::PARACHUTE_ENABLE:
-#if PARACHUTE == ENABLED
-            // Parachute enable/disable
-            copter.parachute.enabled(ch_flag == AuxSwitchPos::HIGH);
-#endif
             break;
 
         case AUX_FUNC::PARACHUTE_RELEASE:
-#if PARACHUTE == ENABLED
-            if (ch_flag == AuxSwitchPos::HIGH) {
-                copter.parachute_manual_release();
-            }
-#endif
             break;
 
         case AUX_FUNC::PARACHUTE_3POS:
-#if PARACHUTE == ENABLED
-            // Parachute disable, enable, release with 3 position switch
-            switch (ch_flag) {
-                case AuxSwitchPos::LOW:
-                    copter.parachute.enabled(false);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    copter.parachute.enabled(true);
-                    break;
-                case AuxSwitchPos::HIGH:
-                    copter.parachute.enabled(true);
-                    copter.parachute_manual_release();
-                    break;
-            }
-#endif
             break;
 
         case AUX_FUNC::ATTCON_FEEDFWD:
@@ -498,9 +474,6 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::FLOWHOLD:
-#if MODE_FLOWHOLD_ENABLED
-            do_aux_function_change_mode(Mode::Number::FLOWHOLD, ch_flag);
-#endif
             break;
 
         case AUX_FUNC::CIRCLE:

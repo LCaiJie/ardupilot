@@ -444,11 +444,6 @@ const AP_Param::Info Copter::var_info[] = {
 
     // variables not in the g class which contain EEPROM saved variables
 
-#if PARACHUTE == ENABLED
-    // @Group: CHUTE_
-    // @Path: ../libraries/AP_Parachute/AP_Parachute.cpp
-    GOBJECT(parachute, "CHUTE_", AP_Parachute),
-#endif
 
 #if AP_LANDINGGEAR_ENABLED
     // @Group: LGR_
@@ -619,12 +614,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(terrain,                "TERRAIN_", AP_Terrain),
 #endif
 
-#if AP_OPTICALFLOW_ENABLED
-    // @Group: FLOW
-    // @Path: ../libraries/AP_OpticalFlow/AP_OpticalFlow.cpp
-    GOBJECT(optflow,   "FLOW", AP_OpticalFlow),
-#endif
-
 #if AC_PRECLAND_ENABLED
     // @Group: PLND_
     // @Path: ../libraries/AC_PrecLand/AC_PrecLand.cpp
@@ -775,12 +764,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(stats, "STAT", 12, ParametersG2, AP_Stats),
 #endif
 
-#if AP_GRIPPER_ENABLED
-    // @Group: GRIP_
-    // @Path: ../libraries/AP_Gripper/AP_Gripper.cpp
-    AP_SUBGROUPINFO(gripper, "GRIP_", 13, ParametersG2, AP_Gripper),
-#endif
-
     // @Param: FRAME_CLASS
     // @DisplayName: Frame Class
     // @Description: Controls major frame class for multicopter component
@@ -826,11 +809,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("LAND_ALT_LOW", 25, ParametersG2, land_alt_low, 1000),
 
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    // @Group: FHLD
-    // @Path: mode_flowhold.cpp
-    AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
-#endif
 
 #if MODE_FOLLOW_ENABLED == ENABLED
     // @Group: FOLL
@@ -1180,9 +1158,6 @@ ParametersG2::ParametersG2(void)
 #endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ,smart_rtl()
-#endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ,mode_flowhold_ptr(&copter.mode_flowhold)
 #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
     ,follow()

@@ -123,8 +123,6 @@ define HAL_PROBE_EXTERNAL_I2C_COMPASSES
 define HAL_I2C_INTERNAL_MASK 0
 define HAL_COMPASS_AUTO_ROT_DEFAULT 2
 
-# disable parachute and sprayer to save flash
-define HAL_PARACHUTE_ENABLED 0
 
 # save FLASH, but leave above when flash issue is fixed
 include ../include/minimize_fpv_osd.inc

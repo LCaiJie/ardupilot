@@ -35,7 +35,6 @@ extern const AP_HAL::HAL& hal;
 #include <AC_Avoidance/AC_Avoid.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_Generator/AP_Generator.h>
-#include <AP_Gripper/AP_Gripper.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_ADSB/AP_ADSB.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
@@ -47,7 +46,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_Avoidance/AP_Avoidance.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AC_Fence/AC_Fence.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_VideoTX/AP_VideoTX.h>
@@ -669,9 +667,6 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const AuxSwitchPo
     case AUX_FUNC::FENCE:
     case AUX_FUNC::GPS_DISABLE:
     case AUX_FUNC::GPS_DISABLE_YAW:
-#if AP_GRIPPER_ENABLED
-    case AUX_FUNC::GRIPPER:
-#endif
 #if AP_INERTIALSENSOR_KILL_IMU_ENABLED
     case AUX_FUNC::KILL_IMU1:
     case AUX_FUNC::KILL_IMU2:
@@ -957,28 +952,6 @@ void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
 }
 #endif
 
-#if AP_GRIPPER_ENABLED
-void RC_Channel::do_aux_function_gripper(const AuxSwitchPos ch_flag)
-{
-    AP_Gripper *gripper = AP::gripper();
-    if (gripper == nullptr) {
-        return;
-    }
-
-    switch (ch_flag) {
-    case AuxSwitchPos::LOW:
-        gripper->release();
-        break;
-    case AuxSwitchPos::MIDDLE:
-        // nothing
-        break;
-    case AuxSwitchPos::HIGH:
-        gripper->grab();
-        break;
-    }
-}
-#endif  // AP_GRIPPER_ENABLED
-
 void RC_Channel::do_aux_function_lost_vehicle_sound(const AuxSwitchPos ch_flag)
 {
     switch (ch_flag) {
@@ -1082,12 +1055,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
 #if AP_FENCE_ENABLED
     case AUX_FUNC::FENCE:
         do_aux_function_fence(ch_flag);
-        break;
-#endif
-
-#if AP_GRIPPER_ENABLED
-    case AUX_FUNC::GRIPPER:
-        do_aux_function_gripper(ch_flag);
         break;
 #endif
 
@@ -1220,22 +1187,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
             break;
         }
         break;
-
-#if AP_OPTICALFLOW_CALIBRATOR_ENABLED
-    case AUX_FUNC::OPTFLOW_CAL: {
-        AP_OpticalFlow *optflow = AP::opticalflow();
-        if (optflow == nullptr) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "OptFlow Cal: failed sensor not enabled");
-            break;
-        }
-        if (ch_flag == AuxSwitchPos::HIGH) {
-            optflow->start_calibration();
-        } else {
-            optflow->stop_calibration();
-        }
-        break;
-    }
-#endif
 
 #if AP_INERTIALSENSOR_KILL_IMU_ENABLED
     case AUX_FUNC::KILL_IMU1:

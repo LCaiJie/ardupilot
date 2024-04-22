@@ -186,8 +186,6 @@ define HAL_GYROFFT_ENABLED 0
 
 # save some flash
 include ../include/save_some_flash.inc
-define AP_GRIPPER_ENABLED 0
-define HAL_PARACHUTE_ENABLED 0
 define HAL_RUNCAM_ENABLED 0
 define HAL_HOTT_TELEM_ENABLED 0
 define HAL_NMEA_OUTPUT_ENABLED 0

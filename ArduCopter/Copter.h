@@ -63,11 +63,9 @@
 #include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
 #include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
 #include <AC_AutoTune/AC_AutoTune_Heli.h>   // ArduCopter autotune library. support for autotune of helicopters.
-#include <AP_Parachute/AP_Parachute.h>      // ArduPilot parachute release library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AC_PrecLand/AC_PrecLand_config.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
 
 // Configuration
 #include "defines.h"
@@ -101,10 +99,6 @@
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
  #include <AC_WPNav/AC_WPNav_OA.h>
  #include <AC_Avoidance/AP_OAPathPlanner.h>
-#endif
-#include <AP_Gripper/AP_Gripper_config.h>
-#if AP_GRIPPER_ENABLED
- # include <AP_Gripper/AP_Gripper.h>
 #endif
 #if AC_PRECLAND_ENABLED
  # include <AC_PrecLand/AC_PrecLand.h>
@@ -293,11 +287,6 @@ private:
 
     // Arming/Disarming management class
     AP_Arming_Copter arming;
-
-    // Optical flow sensor
-#if AP_OPTICALFLOW_ENABLED
-    AP_OpticalFlow optflow;
-#endif
 
     // external control library
 #if AP_EXTERNAL_CONTROL_ENABLED
@@ -492,11 +481,6 @@ private:
     // Rally library
 #if HAL_RALLY_ENABLED
     AP_Rally_Copter rally;
-#endif
-
-    // Parachute release
-#if PARACHUTE == ENABLED
-    AP_Parachute parachute;
 #endif
 
     // Landing Gear Controller
@@ -968,9 +952,6 @@ private:
 #endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
-#endif
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-    ModeFlowHold mode_flowhold;
 #endif
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ModeZigZag mode_zigzag;

@@ -624,9 +624,7 @@ private:
     void do_set_home(const AP_Mission::Mission_Command& cmd);
     void do_roi(const AP_Mission::Mission_Command& cmd);
     void do_mount_control(const AP_Mission::Mission_Command& cmd);
-#if PARACHUTE == ENABLED
-    void do_parachute(const AP_Mission::Mission_Command& cmd);
-#endif
+    
     void do_payload_place(const AP_Mission::Mission_Command& cmd);
     void do_RTL(void);
     void do_nav_attitude_time(const AP_Mission::Mission_Command& cmd);
@@ -886,94 +884,6 @@ private:
     int8_t    pitch_dir;           // pitch direction (-1 = pitch forward, 1 = pitch back)
 };
 
-
-#if MODE_FLOWHOLD_ENABLED == ENABLED
-/*
-  class to support FLOWHOLD mode, which is a position hold mode using
-  optical flow directly, avoiding the need for a rangefinder
- */
-
-class ModeFlowHold : public Mode {
-public:
-    // need a constructor for parameters
-    ModeFlowHold(void);
-    Number mode_number() const override { return Number::FLOWHOLD; }
-
-    bool init(bool ignore_checks) override;
-    void run(void) override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool has_user_takeoff(bool must_navigate) const override {
-        return !must_navigate;
-    }
-    bool allows_flip() const override { return true; }
-
-    static const struct AP_Param::GroupInfo var_info[];
-
-protected:
-    const char *name() const override { return "FLOWHOLD"; }
-    const char *name4() const override { return "FHLD"; }
-
-private:
-
-    // FlowHold states
-    enum FlowHoldModeState {
-        FlowHold_MotorStopped,
-        FlowHold_Takeoff,
-        FlowHold_Flying,
-        FlowHold_Landed
-    };
-
-    // calculate attitude from flow data
-    void flow_to_angle(Vector2f &bf_angle);
-
-    LowPassFilterVector2f flow_filter;
-
-    bool flowhold_init(bool ignore_checks);
-    void flowhold_run();
-    void flowhold_flow_to_angle(Vector2f &angle, bool stick_input);
-    void update_height_estimate(void);
-
-    // minimum assumed height
-    const float height_min = 0.1f;
-
-    // maximum scaling height
-    const float height_max = 3.0f;
-
-    AP_Float flow_max;
-    AC_PI_2D flow_pi_xy{0.2f, 0.3f, 3000, 5, 0.0025f};
-    AP_Float flow_filter_hz;
-    AP_Int8  flow_min_quality;
-    AP_Int8  brake_rate_dps;
-
-    float quality_filtered;
-
-    uint8_t log_counter;
-    bool limited;
-    Vector2f xy_I;
-
-    // accumulated INS delta velocity in north-east form since last flow update
-    Vector2f delta_velocity_ne;
-
-    // last flow rate in radians/sec in north-east axis
-    Vector2f last_flow_rate_rps;
-
-    // timestamp of last flow data
-    uint32_t last_flow_ms;
-
-    float last_ins_height;
-    float height_offset;
-
-    // are we braking after pilot input?
-    bool braking;
-
-    // last time there was significant stick input
-    uint32_t last_stick_input_ms;
-};
-#endif // MODE_FLOWHOLD_ENABLED
 
 
 class ModeGuided : public Mode {

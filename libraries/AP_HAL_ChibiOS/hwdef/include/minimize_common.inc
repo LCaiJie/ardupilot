@@ -10,10 +10,6 @@ define AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED 0
 # things like satellite communications are required:
 define HAL_HIGH_LATENCY2_ENABLED 0
 
-# Gripper isn't a vital feature for smaller boards
-define AP_GRIPPER_ENABLED 0
-
-
 # disable use of onboard FFT library:
 define HAL_GYROFFT_ENABLED 0
 
@@ -86,7 +82,6 @@ define QAUTOTUNE_ENABLED 0
 
 # Copter-specific defines; these defines are only used in the Copter
 #  directory, but are seen across the entire codebase:
-define MODE_FLOWHOLD_ENABLED 0
 define MODE_ZIGZAG_ENABLED 0
 define AC_NAV_GUIDED 0
 define AC_OAPATHPLANNER_ENABLED 0

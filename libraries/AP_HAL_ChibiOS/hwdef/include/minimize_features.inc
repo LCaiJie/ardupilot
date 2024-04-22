@@ -6,7 +6,6 @@ include minimize_common.inc
 
 # remove various OSD features by default:
 define OSD_ENABLED 0
-define HAL_PLUSCODE_ENABLE 0
 define HAL_OSD_SIDEBAR_ENABLE 0
 define OSD_PARAM_ENABLED 0
 
@@ -30,5 +29,4 @@ define HAL_MSP_ENABLED 0
 
 # Copter-specific defines; these defines are only used in the Copter
 #  directory, but are seen across the entire codebase:
-define MODE_FLOWHOLD_ENABLED 0
 define MODE_TURTLE_ENABLED 0

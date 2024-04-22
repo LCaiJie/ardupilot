@@ -25,7 +25,6 @@
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <RC_Channel/RC_Channel.h>
 #include <GCS_MAVLink/GCS_config.h>
-#include <AP_OLC/AP_OLC.h>
 #include <AP_MSP/msp.h>
 #include <AP_Baro/AP_Baro.h>
 #if HAL_GCS_ENABLED
@@ -217,9 +216,6 @@ private:
     AP_OSD_Setting hgt_abvterr{false, 23, 7};
     AP_OSD_Setting fence{false, 14, 9};
     AP_OSD_Setting rngf;
-#if HAL_PLUSCODE_ENABLE
-    AP_OSD_Setting pluscode;
-#endif
     AP_OSD_Setting sidebars{false, 4, 5};
 
     // MSP OSD only
@@ -264,9 +260,6 @@ private:
     void draw_aspd1(uint8_t x, uint8_t y);
     void draw_aspd2(uint8_t x, uint8_t y);
     void draw_vspeed(uint8_t x, uint8_t y);
-#if HAL_PLUSCODE_ENABLE
-    void draw_pluscode(uint8_t x, uint8_t y);
-#endif
     //helper functions
     void draw_speed(uint8_t x, uint8_t y, float angle_rad, float magnitude);
     void draw_distance(uint8_t x, uint8_t y, float distance);

@@ -22,7 +22,6 @@
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Notify/AP_Notify.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_RTC/AP_RTC.h>
 #include <GCS_MAVLink/GCS.h>
@@ -523,13 +522,6 @@ MSPCommandResult AP_MSP_Telem_Backend::msp_process_sensor_command(uint16_t cmd_m
 
 void AP_MSP_Telem_Backend::msp_handle_opflow(const MSP::msp_opflow_data_message_t &pkt)
 {
-#if HAL_MSP_OPTICALFLOW_ENABLED
-    AP_OpticalFlow *optflow = AP::opticalflow();
-    if (optflow == nullptr) {
-        return;
-    }
-    optflow->handle_msp(pkt);
-#endif
 }
 
 void AP_MSP_Telem_Backend::msp_handle_rangefinder(const MSP::msp_rangefinder_data_message_t &pkt)

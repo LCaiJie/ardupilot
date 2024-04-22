@@ -178,8 +178,6 @@ include ../include/minimize_fpv_osd.inc
 include ../include/save_some_flash.inc
 include ../include/no_bootloader_DFU.inc
 
-define HAL_PARACHUTE_ENABLED 0
-define AP_GRIPPER_ENABLED 0
 define HAL_RUNCAM_ENABLED 0
 define HAL_HOTT_TELEM_ENABLED 0
 define HAL_NMEA_OUTPUT_ENABLED 0

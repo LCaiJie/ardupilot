@@ -30,9 +30,7 @@
 #include <AP_Arming/AP_Arming.h>
 #include <AP_InternalError/AP_InternalError.h>
 #include <AP_Logger/AP_Logger.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_Gripper/AP_Gripper.h>
 #include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
@@ -875,9 +873,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_TERRAIN_REQUEST,       MSG_TERRAIN},
 #if AP_MAVLINK_BATTERY2_ENABLED
         { MAVLINK_MSG_ID_BATTERY2,              MSG_BATTERY2},
-#endif
-#if AP_OPTICALFLOW_ENABLED
-        { MAVLINK_MSG_ID_OPTICAL_FLOW,          MSG_OPTICAL_FLOW},
 #endif
 #if COMPASS_CAL_ENABLED
         { MAVLINK_MSG_ID_MAG_CAL_PROGRESS,      MSG_MAG_CAL_PROGRESS},
@@ -2433,45 +2428,6 @@ MAV_RESULT GCS_MAVLINK::_set_mode_common(const MAV_MODE _base_mode, const uint32
     return MAV_RESULT_DENIED;
 }
 
-#if AP_OPTICALFLOW_ENABLED
-/*
-  send OPTICAL_FLOW message
- */
-void GCS_MAVLINK::send_opticalflow()
-{
-    const AP_OpticalFlow *optflow = AP::opticalflow();
-
-    // exit immediately if no optical flow sensor or not healthy
-    if (optflow == nullptr ||
-        !optflow->healthy()) {
-        return;
-    }
-
-    // get rates from sensor
-    const Vector2f &flowRate = optflow->flowRate();
-    const Vector2f &bodyRate = optflow->bodyRate();
-
-    float hagl;
-    if (!AP::ahrs().get_hagl(hagl)) {
-        hagl = 0;
-    }
-
-    // populate and send message
-    mavlink_msg_optical_flow_send(
-        chan,
-        AP_HAL::millis(),
-        0, // sensor id is zero
-        flowRate.x,
-        flowRate.y,
-        flowRate.x - bodyRate.x,
-        flowRate.y - bodyRate.y,
-        optflow->quality(),
-        hagl,  // ground distance (in meters) set to zero
-        flowRate.x,
-        flowRate.y);
-}
-#endif  // AP_OPTICALFLOW_ENABLED
-
 /*
   send AUTOPILOT_VERSION packet
  */
@@ -3443,18 +3399,6 @@ void GCS_MAVLINK::handle_rc_channels_override(const mavlink_message_t &msg)
 
 }
 
-#if AP_OPTICALFLOW_ENABLED
-void GCS_MAVLINK::handle_optical_flow(const mavlink_message_t &msg)
-{
-    AP_OpticalFlow *optflow = AP::opticalflow();
-    if (optflow == nullptr) {
-        return;
-    }
-    optflow->handle_msg(msg);
-}
-#endif
-
-
 #if COMPASS_CAL_ENABLED
 /*
   handle MAV_CMD_FIXED_MAG_CAL_YAW
@@ -3697,12 +3641,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE:
         handle_rc_channels_override(msg);
         break;
-
-#if AP_OPTICALFLOW_ENABLED
-    case MAVLINK_MSG_ID_OPTICAL_FLOW:
-        handle_optical_flow(msg);
-        break;
-#endif
 
     case MAVLINK_MSG_ID_DISTANCE_SENSOR:
         handle_distance_sensor(msg);
@@ -4161,38 +4099,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_set_ekf_source_set(const mavlink_command_
 }
 #endif
 
-#if AP_GRIPPER_ENABLED
-MAV_RESULT GCS_MAVLINK::handle_command_do_gripper(const mavlink_command_int_t &packet)
-{
-    AP_Gripper *gripper = AP::gripper();
-    if (gripper == nullptr) {
-        return MAV_RESULT_FAILED;
-    }
-
-    // param1 : gripper number (ignored)
-    // param2 : action (0=release, 1=grab). See GRIPPER_ACTIONS enum.
-    if(!gripper->enabled()) {
-        return MAV_RESULT_FAILED;
-    }
-
-    MAV_RESULT result = MAV_RESULT_ACCEPTED;
-
-    switch ((uint8_t)packet.param2) {
-    case GRIPPER_ACTION_RELEASE:
-        gripper->release();
-        break;
-    case GRIPPER_ACTION_GRAB:
-        gripper->grab();
-        break;
-    default:
-        result = MAV_RESULT_FAILED;
-        break;
-    }
-
-    return result;
-}
-#endif  // AP_GRIPPER_ENABLED
-
 
 #if AP_LANDINGGEAR_ENABLED
 /*
@@ -4582,11 +4488,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
 
     case MAV_CMD_DO_FLIGHTTERMINATION:
         return handle_flight_termination(packet);
-
-#if AP_GRIPPER_ENABLED
-    case MAV_CMD_DO_GRIPPER:
-        return handle_command_do_gripper(packet);
-#endif
 
 #if AP_MISSION_ENABLED
     case MAV_CMD_DO_JUMP_TAG:
@@ -5160,13 +5061,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         CHECK_PAYLOAD_SIZE(LOCAL_POSITION_NED);
         send_local_position();
         break;
-
-#if AP_OPTICALFLOW_ENABLED
-    case MSG_OPTICAL_FLOW:
-        CHECK_PAYLOAD_SIZE(OPTICAL_FLOW);
-        send_opticalflow();
-        break;
-#endif
 
     case MSG_ATTITUDE_TARGET:
         CHECK_PAYLOAD_SIZE(ATTITUDE_TARGET);

@@ -4,7 +4,6 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Vehicle/AP_Vehicle.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_WheelEncoder/AP_WheelEncoder.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
@@ -73,9 +72,6 @@ void AP_DAL::start_frame(AP_DAL::FrameType frametype)
     _RFRN.ahrs_airspeed_sensor_enabled = ahrs.airspeed_sensor_enabled(ahrs.get_active_airspeed_index());
     _RFRN.available_memory = hal.util->available_memory();
     _RFRN.ahrs_trim = ahrs.get_trim();
-#if AP_OPTICALFLOW_ENABLED
-    _RFRN.opticalflow_enabled = AP::opticalflow() && AP::opticalflow()->enabled();
-#endif
     _RFRN.wheelencoder_enabled = AP::wheelencoder() && (AP::wheelencoder()->num_sensors() > 0);
     _RFRN.ekf_type = ahrs.get_ekf_type();
     WRITE_REPLAY_BLOCK_IFCHANGED(RFRN, _RFRN, old);

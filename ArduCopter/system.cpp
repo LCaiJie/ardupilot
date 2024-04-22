@@ -23,11 +23,6 @@ void Copter::init_ardupilot()
 
     BoardConfig.init();
 
-    // init cargo gripper
-#if AP_GRIPPER_ENABLED
-    g2.gripper.init();
-#endif
-
     // initialise notify system
     notify.init();
     notify_flight_mode();
@@ -99,11 +94,6 @@ void Copter::init_ardupilot()
 #endif
 
     attitude_control->parameter_sanity_check();
-
-#if AP_OPTICALFLOW_ENABLED
-    // initialise optical flow sensor
-    optflow.init(MASK_LOG_OPTFLOW);
-#endif      // AP_OPTICALFLOW_ENABLED
 
 #if AC_PRECLAND_ENABLED
     // initialise precision landing
@@ -234,11 +224,6 @@ bool Copter::ekf_has_relative_position() const
 
     // return immediately if neither optflow nor visual odometry is enabled and dead reckoning is inactive
     bool enabled = false;
-#if AP_OPTICALFLOW_ENABLED
-    if (optflow.enabled()) {
-        enabled = true;
-    }
-#endif
     if (dead_reckoning.active && !dead_reckoning.timeout) {
         enabled = true;
     }

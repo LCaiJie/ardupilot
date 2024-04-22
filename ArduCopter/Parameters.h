@@ -6,10 +6,6 @@
 #include "RC_Channel.h"
 #include <AP_Proximity/AP_Proximity.h>
 
-#include <AP_Gripper/AP_Gripper_config.h>
-#if AP_GRIPPER_ENABLED
- # include <AP_Gripper/AP_Gripper.h>
-#endif
 #if MODE_FOLLOW_ENABLED == ENABLED
  # include <AP_Follow/AP_Follow.h>
 #endif
@@ -513,10 +509,6 @@ public:
     AP_Stats stats;
 #endif
 
-#if AP_GRIPPER_ENABLED
-    AP_Gripper gripper;
-#endif
-
 #if MODE_THROW_ENABLED == ENABLED
     // Throw mode parameters
     AP_Int8 throw_nextmode;
@@ -568,11 +560,6 @@ public:
 
 #if TOY_MODE_ENABLED == ENABLED
     ToyMode toy_mode;
-#endif
-
-#if MODE_FLOWHOLD_ENABLED
-    // we need a pointer to the mode for the G2 table
-    void *mode_flowhold_ptr;
 #endif
 
 #if MODE_FOLLOW_ENABLED == ENABLED

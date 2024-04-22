@@ -1196,31 +1196,6 @@ void PayloadPlace::run()
         }
     }
 
-#if AP_GRIPPER_ENABLED == ENABLED
-    // if pilot releases load manually:
-    if (AP::gripper() != nullptr &&
-        AP::gripper()->valid() && AP::gripper()->released()) {
-        switch (state) {
-        case State::FlyToLocation:
-        case State::Descent_Start:
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Manual release", prefix_str);
-            state = State::Done;
-            break;
-        case State::Descent:
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Manual release", prefix_str);
-            state = State::Release;
-            break;
-        case State::Release:
-        case State::Releasing:
-        case State::Delay:
-        case State::Ascent_Start:
-        case State::Ascent:
-        case State::Done:
-            break;
-        }
-    }
-#endif
-
     auto &inertial_nav = copter.inertial_nav;
     auto &g2 = copter.g2;
     const auto &g = copter.g;
@@ -1296,25 +1271,10 @@ void PayloadPlace::run()
     case State::Release:
         // Reinitialise vertical position controller to remove discontinuity due to touch down of payload
         pos_control->init_z_controller_no_descent();
-#if AP_GRIPPER_ENABLED == ENABLED
-        if (g2.gripper.valid()) {
-            gcs().send_text(MAV_SEVERITY_INFO, "%s Releasing the gripper", prefix_str);
-            g2.gripper.release();
-            state = State::Releasing;
-        } else {
-            state = State::Delay;
-        }
-#else
         state = State::Delay;
-#endif
         break;
 
     case State::Releasing:
-#if AP_GRIPPER_ENABLED == ENABLED
-        if (g2.gripper.valid() && !g2.gripper.released()) {
-            break;
-        }
-#endif
         state = State::Delay;
         FALLTHROUGH;
 

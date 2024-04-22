@@ -65,7 +65,6 @@ STORAGE_FLASH_PAGE 22
 env BUILD_ABIN True
 
 # Disable un-needed hardware drivers
-define AP_OPTICALFLOW_ENABLED 0
 define AP_FRSKY_TELEM_ENABLED 0
 define HAL_ADSB_SAGETECH_ENABLED 0
 define HAL_ADSB_UAVIONIX_MAVLINK_ENABLED 0
@@ -78,7 +77,6 @@ define HAL_GENERATOR_ENABLED 0
 define HAL_HOTT_TELEM_ENABLED 0
 define HAL_MSP_SENSORS_ENABLED 0
 define HAL_NMEA_OUTPUT_ENABLED 0
-define HAL_PARACHUTE_ENABLED 0
 define HAL_RUNCAM_ENABLED 0
 define AP_SMARTAUDIO_ENABLED 0
 define HAL_SPEKTRUM_TELEM_ENABLED 0
@@ -122,9 +120,6 @@ define INS_MAX_INSTANCES 1
 # SkyViper doesn't have any rangefinder, but might get mavlink?
 define AP_RANGEFINDER_BACKEND_DEFAULT_ENABLED 0
 define AP_RANGEFINDER_MAVLINK_ENABLED 1
-
-# SkyViper doesn't have a gripper:
-define AP_GRIPPER_ENABLED 0
 
 # SkyViper has a very limited set of blinkenlights
 define AP_NOTIFY_NCP5623_ENABLED 0

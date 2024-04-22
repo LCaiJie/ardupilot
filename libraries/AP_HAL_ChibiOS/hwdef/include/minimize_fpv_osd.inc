@@ -4,8 +4,6 @@
 
 include minimize_common.inc
 
-define AP_OPTICALFLOW_ENABLED 0
-
 define AP_GPS_BACKEND_DEFAULT_ENABLED 0
 define AP_GPS_UBLOX_ENABLED 1
 define AP_GPS_NMEA_ENABLED 1

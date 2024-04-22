@@ -149,9 +149,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(fence_check,           25,    100,  7),
 #endif
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
-#if AP_OPTICALFLOW_ENABLED
-    SCHED_TASK_CLASS(AP_OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
-#endif
     SCHED_TASK(update_batt_compass,   10,    120, 15),
     SCHED_TASK_CLASS(RC_Channels, (RC_Channels*)&copter.g2.rc_channels, read_aux_all,    10,  50,  18),
     SCHED_TASK(arm_motors_check,      10,     50, 21),
@@ -207,9 +204,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 #if AP_TERRAIN_AVAILABLE
     SCHED_TASK(terrain_update,        10,    100, 144),
-#endif
-#if AP_GRIPPER_ENABLED
-    SCHED_TASK_CLASS(AP_Gripper,           &copter.g2.gripper,          update,          10,  75, 147),
 #endif
 #ifdef USERHOOK_FASTLOOP
     SCHED_TASK(userhook_FastLoop,    100,     75, 153),

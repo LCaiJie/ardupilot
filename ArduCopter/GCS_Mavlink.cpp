@@ -528,9 +528,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #if AP_BATTERY_ENABLED
     MSG_BATTERY_STATUS,
 #endif
-#if AP_OPTICALFLOW_ENABLED
-    MSG_OPTICAL_FLOW,
-#endif
 #if COMPASS_CAL_ENABLED
     MSG_MAG_CAL_REPORT,
     MSG_MAG_CAL_PROGRESS,
@@ -758,10 +755,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
     case MAV_CMD_NAV_VTOL_TAKEOFF:
         return handle_MAV_CMD_NAV_TAKEOFF(packet);
 
-#if PARACHUTE == ENABLED
-    case MAV_CMD_DO_PARACHUTE:
-        return handle_MAV_CMD_DO_PARACHUTE(packet);
-#endif
 
 #if AC_MAVLINK_SOLO_BUTTON_COMMAND_HANDLING_ENABLED
     // Solo user presses pause button
@@ -905,26 +898,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_MISSION_START(const mavlink_comman
 #endif
 
 
-
-#if PARACHUTE == ENABLED
-MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_PARACHUTE(const mavlink_command_int_t &packet)
-{
-        // configure or release parachute
-        switch ((uint16_t)packet.param1) {
-        case PARACHUTE_DISABLE:
-            copter.parachute.enabled(false);
-            return MAV_RESULT_ACCEPTED;
-        case PARACHUTE_ENABLE:
-            copter.parachute.enabled(true);
-            return MAV_RESULT_ACCEPTED;
-        case PARACHUTE_RELEASE:
-            // treat as a manual release which performs some additional check of altitude
-            copter.parachute_manual_release();
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-}
-#endif
 
 MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_MOTOR_TEST(const mavlink_command_int_t &packet)
 {

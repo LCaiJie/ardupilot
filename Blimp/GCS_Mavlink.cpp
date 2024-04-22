@@ -1,7 +1,6 @@
 #include "Blimp.h"
 
 #include "GCS_Mavlink.h"
-#include <AP_OpticalFlow/AP_OpticalFlow_config.h>
 
 MAV_TYPE GCS_Blimp::frame_type() const
 {
@@ -359,9 +358,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
     MSG_DISTANCE_SENSOR,
 #if AP_BATTERY_ENABLED
     MSG_BATTERY_STATUS,
-#endif
-#if AP_OPTICALFLOW_ENABLED
-    MSG_OPTICAL_FLOW,
 #endif
 #if COMPASS_CAL_ENABLED
     MSG_MAG_CAL_REPORT,

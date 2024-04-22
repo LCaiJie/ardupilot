@@ -37,7 +37,6 @@
 #include <AP_ADSB/AP_ADSB.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_RCMapper/AP_RCMapper.h>
-#include <AP_Parachute/AP_Parachute.h>
 #include <AP_OSD/AP_OSD.h>
 #include <RC_Channel/RC_Channel.h>
 #include <AP_Button/AP_Button.h>
@@ -1034,13 +1033,6 @@ bool AP_Arming::system_checks(bool report)
     }
 
     if (check_enabled(ARMING_CHECK_PARAMETERS)) {
-#if HAL_PARACHUTE_ENABLED
-        auto *chute = AP::parachute();
-        if (chute && !chute->arming_checks(sizeof(buffer), buffer)) {
-            check_failed(ARMING_CHECK_PARAMETERS, report, "%s", buffer);
-            return false;
-        }
-#endif
 #if HAL_BUTTON_ENABLED
         const auto &button = AP::button();
         if (!button.arming_checks(sizeof(buffer), buffer)) {

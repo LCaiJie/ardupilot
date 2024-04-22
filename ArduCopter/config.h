@@ -141,11 +141,6 @@
  # define AUTOTUNE_ENABLED  ENABLED
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
-// Parachute release
-#ifndef PARACHUTE
- # define PARACHUTE HAL_PARACHUTE_ENABLED
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Nav-Guided - allows external nav computer to control vehicle
@@ -259,12 +254,6 @@
 // Turtle - allow vehicle to be flipped over after a crash
 #ifndef MODE_TURTLE_ENABLED
 # define MODE_TURTLE_ENABLED HAL_DSHOT_ENABLED && FRAME_CONFIG != HELI_FRAME
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-// Flowhold - use optical flow to hover in place
-#ifndef MODE_FLOWHOLD_ENABLED
-# define MODE_FLOWHOLD_ENABLED AP_OPTICALFLOW_ENABLED
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

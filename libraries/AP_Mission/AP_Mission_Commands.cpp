@@ -5,8 +5,6 @@
 #include "AP_Mission.h"
 
 #include <GCS_MAVLink/GCS.h>
-#include <AP_Gripper/AP_Gripper.h>
-#include <AP_Parachute/AP_Parachute.h>
 #include <RC_Channel/RC_Channel.h>
 
 #if AP_RC_CHANNEL_ENABLED
@@ -30,63 +28,10 @@ bool AP_Mission::start_command_do_aux_function(const AP_Mission::Mission_Command
 }
 #endif  // AP_RC_CHANNEL_ENABLED
 
-#if AP_GRIPPER_ENABLED
-bool AP_Mission::start_command_do_gripper(const AP_Mission::Mission_Command& cmd)
-{
-    AP_Gripper *gripper = AP::gripper();
-    if (gripper == nullptr) {
-        return false;
-    }
-
-    // Note: we ignore the gripper num parameter because we only
-    // support one gripper
-    switch (cmd.content.gripper.action) {
-    case GRIPPER_ACTION_RELEASE:
-        gripper->release();
-        // Log_Write_Event(DATA_GRIPPER_RELEASE);
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Gripper Released");
-        return true;
-    case GRIPPER_ACTION_GRAB:
-        gripper->grab();
-        // Log_Write_Event(DATA_GRIPPER_GRAB);
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Gripper Grabbed");
-        return true;
-    default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        AP_HAL::panic("Unhandled gripper case");
-#endif
-        return false;
-    }
-}
-#endif  // AP_GRIPPER_ENABLED
 
 bool AP_Mission::start_command_parachute(const AP_Mission::Mission_Command& cmd)
 {
-#if HAL_PARACHUTE_ENABLED
-    AP_Parachute *parachute = AP::parachute();
-    if (parachute == nullptr) {
-        return false;
-    }
-
-    switch (cmd.p1) {
-    case PARACHUTE_DISABLE:
-        parachute->enabled(false);
-        break;
-    case PARACHUTE_ENABLE:
-        parachute->enabled(true);
-        break;
-    case PARACHUTE_RELEASE:
-        parachute->release();
-        break;
-    default:
-        // do nothing
-        return false;
-    }
-
-    return true;
-#else
     return false;
-#endif // HAL_PARACHUTE_ENABLED
 }
 
 bool AP_Mission::command_do_set_repeat_dist(const AP_Mission::Mission_Command& cmd)

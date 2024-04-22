@@ -37,7 +37,6 @@
 #include <AP_GPS/AP_GPS.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_MSP/msp.h>
-#include <AP_OLC/AP_OLC.h>
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_Vehicle/AP_Vehicle.h>
@@ -850,23 +849,6 @@ const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
     AP_SUBGROUPINFO(arming, "ARMING", 51, AP_OSD_Screen, AP_OSD_Setting),
 #endif //HAL_MSP_ENABLED
 
-#if HAL_PLUSCODE_ENABLE
-    // @Param: PLUSCODE_EN
-    // @DisplayName: PLUSCODE_EN
-    // @Description: Displays pluscode (OLC) element
-    // @Values: 0:Disabled,1:Enabled
-
-    // @Param: PLUSCODE_X
-    // @DisplayName: PLUSCODE_X
-    // @Description: Horizontal position on screen
-    // @Range: 0 59
-
-    // @Param: PLUSCODE_Y
-    // @DisplayName: PLUSCODE_Y
-    // @Description: Vertical position on screen
-    // @Range: 0 21
-    AP_SUBGROUPINFO(pluscode, "PLUSCODE", 52, AP_OSD_Screen, AP_OSD_Setting),
-#endif
 
 #if AP_OSD_CALLSIGN_FROM_SD_ENABLED
     // @Param: CALLSIGN_EN
@@ -2064,20 +2046,6 @@ void AP_OSD_Screen::draw_clk(uint8_t x, uint8_t y)
 }
 #endif
 
-#if HAL_PLUSCODE_ENABLE
-void AP_OSD_Screen::draw_pluscode(uint8_t x, uint8_t y)
-{
-    AP_GPS & gps = AP::gps();
-    const Location &loc = gps.location();
-    char buff[16];
-    if (gps.status() == AP_GPS::NO_GPS || gps.status() == AP_GPS::NO_FIX){
-        backend->write(x, y, false, "--------+--");
-    } else {
-        AP_OLC::olc_encode(loc.lat, loc.lng, 10, buff, sizeof(buff));
-        backend->write(x, y, false, "%s", buff);
-    }
-}
-#endif
 
 /*
   support callsign display from a file called callsign.txt
@@ -2233,9 +2201,6 @@ void AP_OSD_Screen::draw(void)
 
     DRAW_SETTING(gps_latitude);
     DRAW_SETTING(gps_longitude);
-#if HAL_PLUSCODE_ENABLE
-    DRAW_SETTING(pluscode);
-#endif
     DRAW_SETTING(dist);
     DRAW_SETTING(stat);
     DRAW_SETTING(climbeff);

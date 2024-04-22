@@ -501,11 +501,5 @@ void Copter::do_failsafe_action(FailsafeAction action, ModeReason reason){
             set_mode_brake_or_land_with_pause(reason);
             break;
     }
-
-#if AP_GRIPPER_ENABLED
-    if (failsafe_option(FailsafeOption::RELEASE_GRIPPER)) {
-        copter.g2.gripper.release();
-    }
-#endif
 }
 

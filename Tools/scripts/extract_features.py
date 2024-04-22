@@ -68,9 +68,6 @@ class ExtractFeatures(object):
 
             ('AP_GPS_{type}_ENABLED', r'AP_GPS_(?P<type>.*)::read\b',),
 
-            ('AP_OPTICALFLOW_ENABLED', 'AP_OpticalFlow::AP_OpticalFlow',),
-            ('AP_OPTICALFLOW_{type}_ENABLED', r'AP_OpticalFlow_(?P<type>.*)::update\b',),
-
             ('AP_BARO_{type}_ENABLED', r'AP_Baro_(?P<type>.*)::update\b',),
 
             ('AP_MOTORS_FRAME_{type}_ENABLED', r'AP_MotorsMatrix::setup_(?P<type>.*)_matrix\b',),
@@ -104,7 +101,6 @@ class ExtractFeatures(object):
             ('AP_PROXIMITY_CYGBOT_ENABLED', 'AP_Proximity_Cygbot_D1::update',),
             ('AP_PROXIMITY_LIGHTWARE_{type}_ENABLED', 'AP_Proximity_LightWare(?P<type>.*)::update',),
 
-            ('HAL_PARACHUTE_ENABLED', 'AP_Parachute::update',),
             ('AP_FENCE_ENABLED', r'AC_Fence::check\b',),
             ('HAL_RALLY_ENABLED', r'AP_Rally::get_rally_max\b',),
             ('AC_AVOID_ENABLED', 'AC_Avoid::AC_Avoid',),
@@ -116,7 +112,6 @@ class ExtractFeatures(object):
             ('AP_GENERATOR_{type}_ENABLED', r'AP_Generator_(?P<type>.*)::init',),
 
             ('OSD_ENABLED', 'AP_OSD::update_osd',),
-            ('HAL_PLUSCODE_ENABLE', 'AP_OSD_Screen::draw_pluscode',),
             ('OSD_PARAM_ENABLED', 'AP_OSD_ParamScreen::AP_OSD_ParamScreen',),
             ('HAL_OSD_SIDEBAR_ENABLE', 'AP_OSD_Screen::draw_sidebars',),
 
@@ -130,7 +125,6 @@ class ExtractFeatures(object):
             ('HAL_SOARING_ENABLED', 'SoaringController::var_info',),
             ('HAL_LANDING_DEEPSTALL_ENABLED', r'AP_Landing_Deepstall::terminate\b',),
 
-            ('AP_GRIPPER_ENABLED', r'AP_Gripper::init\b',),
             ('AP_LANDINGGEAR_ENABLED', r'AP_LandingGear::init\b',),
 
             ('AP_RCPROTOCOL_ENABLED', r'AP_RCProtocol::init\b',),
