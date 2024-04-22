@@ -136,7 +136,7 @@ void ModeAuto::run()
 
     case SubMode::NAVGUIDED:
     case SubMode::NAV_SCRIPT_TIME:
-#if AC_NAV_GUIDED == ENABLED || AP_SCRIPTING_ENABLED
+#if AC_NAV_GUIDED == ENABLED
         nav_guided_run();
 #endif
         break;
@@ -248,28 +248,12 @@ bool ModeAuto::jump_to_landing_sequence_auto_RTL(ModeReason reason)
 // lua scripts use this to retrieve the contents of the active command
 bool ModeAuto::nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4)
 {
-#if AP_SCRIPTING_ENABLED
-    if (_mode == SubMode::NAV_SCRIPT_TIME) {
-        id = nav_scripting.id;
-        cmd = nav_scripting.command;
-        arg1 = nav_scripting.arg1;
-        arg2 = nav_scripting.arg2;
-        arg3 = nav_scripting.arg3;
-        arg4 = nav_scripting.arg4;
-        return true;
-    }
-#endif
     return false;
 }
 
 // lua scripts use this to indicate when they have complete the command
 void ModeAuto::nav_script_time_done(uint16_t id)
 {
-#if AP_SCRIPTING_ENABLED
-    if ((_mode == SubMode::NAV_SCRIPT_TIME) && (id == nav_scripting.id)) {
-        nav_scripting.done = true;
-    }
-#endif
 }
 
 // auto_loiter_start - initialises loitering in auto mode
@@ -685,12 +669,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        do_nav_script_time(cmd);
-        break;
-#endif
-
     case MAV_CMD_NAV_ATTITUDE_TIME:
         do_nav_attitude_time(cmd);
         break;
@@ -922,12 +900,6 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
         cmd_complete = verify_nav_delay(cmd);
         break;
 
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_NAV_SCRIPT_TIME:
-        cmd_complete = verify_nav_script_time();
-        break;
-#endif
-
     case MAV_CMD_NAV_ATTITUDE_TIME:
         cmd_complete = verify_nav_attitude_time(cmd);
         break;
@@ -1053,7 +1025,7 @@ void ModeAuto::circle_run()
     attitude_control->input_thrust_vector_heading(pos_control->get_thrust_vector(), auto_yaw.get_heading());
 }
 
-#if AC_NAV_GUIDED == ENABLED || AP_SCRIPTING_ENABLED
+#if AC_NAV_GUIDED == ENABLED
 // auto_nav_guided_run - allows control by external navigation controller
 //      called by auto_run at 100hz or more
 void ModeAuto::nav_guided_run()
@@ -1061,7 +1033,7 @@ void ModeAuto::nav_guided_run()
     // call regular guided flight mode run function
     copter.mode_guided.run();
 }
-#endif  // AC_NAV_GUIDED || AP_SCRIPTING_ENABLED
+#endif  // AC_NAV_GUIDED
 
 // auto_loiter_run - loiter in AUTO flight mode
 //      called by auto_run at 100hz or more
@@ -1799,29 +1771,6 @@ void ModeAuto::do_nav_delay(const AP_Mission::Mission_Command& cmd)
     gcs().send_text(MAV_SEVERITY_INFO, "Delaying %u sec", (unsigned)(nav_delay_time_max_ms/1000));
 }
 
-#if AP_SCRIPTING_ENABLED
-// start accepting position, velocity and acceleration targets from lua scripts
-void ModeAuto::do_nav_script_time(const AP_Mission::Mission_Command& cmd)
-{
-    // call regular guided flight mode initialisation
-    if (copter.mode_guided.init(true)) {
-        nav_scripting.done = false;
-        nav_scripting.id++;
-        nav_scripting.start_ms = millis();
-        nav_scripting.command = cmd.content.nav_script_time.command;
-        nav_scripting.timeout_s = cmd.content.nav_script_time.timeout_s;
-        nav_scripting.arg1 = cmd.content.nav_script_time.arg1.get();
-        nav_scripting.arg2 = cmd.content.nav_script_time.arg2.get();
-        nav_scripting.arg3 = cmd.content.nav_script_time.arg3;
-        nav_scripting.arg4 = cmd.content.nav_script_time.arg4;
-        set_submode(SubMode::NAV_SCRIPT_TIME);
-    } else {
-        // for safety we set nav_scripting to done to protect against the mission getting stuck
-        nav_scripting.done = true;
-    }
-}
-#endif
-
 // start maintaining an attitude for a specified time
 void ModeAuto::do_nav_attitude_time(const AP_Mission::Mission_Command& cmd)
 {
@@ -2200,20 +2149,6 @@ bool ModeAuto::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
     }
     return false;
 }
-
-#if AP_SCRIPTING_ENABLED
-// check if verify_nav_script_time command has completed
-bool ModeAuto::verify_nav_script_time()
-{
-    // if done or timeout then return true
-    if (nav_scripting.done ||
-        ((nav_scripting.timeout_s > 0) &&
-         (AP_HAL::millis() - nav_scripting.start_ms) > (nav_scripting.timeout_s * 1000))) {
-        return true;
-    }
-    return false;
-}
-#endif
 
 // check if nav_attitude_time command has completed
 bool ModeAuto::verify_nav_attitude_time(const AP_Mission::Mission_Command& cmd)

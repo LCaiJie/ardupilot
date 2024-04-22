@@ -11,5 +11,3 @@ if test -z "$CHECK_PATH"
 then
     CHECK_PATH="*/"
 fi
-
-luacheck ${CHECK_PATH} --config libraries/AP_Scripting/tests/luacheck.lua

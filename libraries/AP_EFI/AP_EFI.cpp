@@ -20,7 +20,6 @@
 #include "AP_EFI_Serial_MS.h"
 #include "AP_EFI_Serial_Lutan.h"
 #include "AP_EFI_Serial_Hirth.h"
-#include "AP_EFI_Scripting.h"
 #include "AP_EFI_MAV.h"
 
 #include <AP_Logger/AP_Logger.h>
@@ -99,12 +98,7 @@ void AP_EFI::init(void)
     case Type::Lutan:
         backend = new AP_EFI_Serial_Lutan(*this);
         break;
-#endif
-#if AP_EFI_SCRIPTING_ENABLED
-    case Type::SCRIPTING:
-        backend = new AP_EFI_Scripting(*this);
-        break;
-#endif        
+#endif       
 #if AP_EFI_SERIAL_HIRTH_ENABLED        
     case Type::Hirth:
         backend = new AP_EFI_Serial_Hirth(*this);

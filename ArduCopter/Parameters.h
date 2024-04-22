@@ -595,10 +595,6 @@ public:
     void *autotune_ptr;
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting scripting;
-#endif // AP_SCRIPTING_ENABLED
-
     AP_Float tuning_min;
     AP_Float tuning_max;
 

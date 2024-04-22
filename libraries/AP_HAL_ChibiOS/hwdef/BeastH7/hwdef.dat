@@ -139,6 +139,3 @@ define STM32_PWM_USE_ADVANCED TRUE
 
 define DEFAULT_NTF_LED_TYPES 257
 
-
-// disable scripting - no SD card
-define AP_SCRIPTING_ENABLED 0

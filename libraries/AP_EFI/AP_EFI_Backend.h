@@ -17,7 +17,6 @@
 #include "AP_EFI.h"
 #include "AP_EFI_State.h"
 #include <AP_HAL/Semaphores.h>
-#include <AP_Scripting/AP_Scripting_config.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
 
 class AP_EFI; //forward declaration
@@ -34,10 +33,6 @@ public:
     virtual void update() = 0;
 
     virtual void handle_EFI_message(const mavlink_message_t &msg) {};
-
-#if AP_SCRIPTING_ENABLED
-    virtual bool handle_scripting(const EFI_State &efi_state) { return false; }
-#endif
 
 protected:
     // Copies internal state to the frontend state

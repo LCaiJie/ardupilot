@@ -173,7 +173,7 @@ class MAVLinkDetector:
     VEHICLES = ('AntennaTracker', 'ArduCopter', 'ArduPlane', 'ArduSub', 'Rover')
 
     def __init__(self, common_files, vehicle='ALL',
-                 exclude_libraries=['SITL', 'AP_Scripting']):
+                 exclude_libraries=['SITL']):
         self.vehicle = vehicle
         vehicles = [vehicle] if vehicle != 'ALL' else self.VEHICLES
         files = chain(*((self.BASE_DIR / vehicle).glob('**/*.cpp') 

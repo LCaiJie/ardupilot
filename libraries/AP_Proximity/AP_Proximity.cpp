@@ -26,7 +26,6 @@
 #include "AP_Proximity_SITL.h"
 #include "AP_Proximity_AirSimSITL.h"
 #include "AP_Proximity_Cygbot_D1.h"
-#include "AP_Proximity_Scripting.h"
 #include "AP_Proximity_LD06.h"
 
 
@@ -206,12 +205,6 @@ void AP_Proximity::init()
         }
             break;
 # endif
-#if AP_PROXIMITY_SCRIPTING_ENABLED
-        case Type::Scripting:
-            state[instance].instance = instance;
-            drivers[instance] = new AP_Proximity_Scripting(*this, state[instance], params[instance]);
-        break;
-#endif
 #if AP_PROXIMITY_SITL_ENABLED
         case Type::SITL:
             state[instance].instance = instance;

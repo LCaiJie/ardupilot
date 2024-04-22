@@ -801,12 +801,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("PILOT_SPEED_DN", 24, ParametersG2, pilot_speed_dn, 0),
 
-#if AP_SCRIPTING_ENABLED
-    // @Group: SCR_
-    // @Path: ../libraries/AP_Scripting/AP_Scripting.cpp
-    AP_SUBGROUPINFO(scripting, "SCR_", 30, ParametersG2, AP_Scripting),
-#endif
-
     // @Param: FS_VIBE_ENABLE
     // @DisplayName: Vibration Failsafe enable
     // @Description: This enables the vibration failsafe which will use modified altitude estimation and control during high vibrations

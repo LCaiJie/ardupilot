@@ -42,7 +42,6 @@
 #include <AP_Mission/AP_Mission.h>                              // Mission command library
 #include <AP_Mission/AP_Mission_ChangeDetector.h>               // Mission command change detection library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>        // Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
 #include <AC_AttitudeControl/AC_AttitudeControl_Heli.h>         // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>                   // Position control library
 #include <AC_AttitudeControl/AC_CommandModel.h>                 // Command model library
@@ -136,9 +135,6 @@
 #endif
 #include <AP_RPM/AP_RPM.h>
 
-#if AP_SCRIPTING_ENABLED
-#include <AP_Scripting/AP_Scripting.h>
-#endif
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED == ENABLED
 #include <AC_CustomControl/AC_CustomControl.h>                  // Custom control library
@@ -647,32 +643,7 @@ private:
     void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
                              uint8_t &task_count,
                              uint32_t &log_bit) override;
-#if AP_SCRIPTING_ENABLED
-#if MODE_GUIDED_ENABLED == ENABLED
-    bool start_takeoff(float alt) override;
-    bool set_target_location(const Location& target_loc) override;
-    bool set_target_pos_NED(const Vector3f& target_pos, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool yaw_relative, bool terrain_alt) override;
-    bool set_target_posvel_NED(const Vector3f& target_pos, const Vector3f& target_vel) override;
-    bool set_target_posvelaccel_NED(const Vector3f& target_pos, const Vector3f& target_vel, const Vector3f& target_accel, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool yaw_relative) override;
-    bool set_target_velocity_NED(const Vector3f& vel_ned) override;
-    bool set_target_velaccel_NED(const Vector3f& target_vel, const Vector3f& target_accel, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool relative_yaw) override;
-    bool set_target_angle_and_climbrate(float roll_deg, float pitch_deg, float yaw_deg, float climb_rate_ms, bool use_yaw_rate, float yaw_rate_degs) override;
-#endif
-#if MODE_CIRCLE_ENABLED == ENABLED
-    bool get_circle_radius(float &radius_m) override;
-    bool set_circle_rate(float rate_dps) override;
-#endif
-    bool set_desired_speed(float speed) override;
-#if MODE_AUTO_ENABLED == ENABLED
-    bool nav_scripting_enable(uint8_t mode) override;
-    bool nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4) override;
-    void nav_script_time_done(uint16_t id) override;
-#endif
-    // lua scripts use this to retrieve EKF failsafe state
-    // returns true if the EKF failsafe has triggered
-    bool has_ekf_failsafed() const override;
-#endif // AP_SCRIPTING_ENABLED
-    bool is_landing() const override;
+   bool is_landing() const override;
     bool is_taking_off() const override;
     void rc_loop();
     void throttle_loop();

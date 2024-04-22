@@ -36,7 +36,6 @@
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_ADSB/AP_ADSB.h>
-#include <AP_Scripting/AP_Scripting.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_VisualOdom/AP_VisualOdom.h>
@@ -1040,13 +1039,6 @@ bool AP_Arming::system_checks(bool report)
             return false;
         }
 #endif
-#if AP_SCRIPTING_ENABLED
-        const AP_Scripting *scripting = AP_Scripting::get_singleton();
-        if ((scripting != nullptr) && !scripting->arming_checks(sizeof(buffer), buffer)) {
-            check_failed(ARMING_CHECK_SYSTEM, report, "%s", buffer);
-            return false;
-        }
-#endif
 #if HAL_ADSB_ENABLED
         AP_ADSB *adsb = AP::ADSB();
         if ((adsb != nullptr) && adsb->enabled() && adsb->init_failed()) {
@@ -1236,124 +1228,6 @@ bool AP_Arming::fettec_checks(bool display_failure) const
 }
 #endif  // AP_FETTEC_ONEWIRE_ENABLED
 
-#if AP_ARMING_AUX_AUTH_ENABLED
-// request an auxiliary authorisation id.  This id should be used in subsequent calls to set_aux_auth_passed/failed
-// returns true on success
-bool AP_Arming::get_aux_auth_id(uint8_t& auth_id)
-{
-    WITH_SEMAPHORE(aux_auth_sem);
-
-    // check we have enough room to allocate another id
-    if (aux_auth_count >= aux_auth_count_max) {
-        aux_auth_error = true;
-        return false;
-    }
-
-    // allocate buffer for failure message
-    if (aux_auth_fail_msg == nullptr) {
-        aux_auth_fail_msg = (char *)calloc(aux_auth_str_len, sizeof(char));
-        if (aux_auth_fail_msg == nullptr) {
-            aux_auth_error = true;
-            return false;
-        }
-    }
-    auth_id = aux_auth_count;
-    aux_auth_count++;
-    return true;
-}
-
-// set auxiliary authorisation passed
-void AP_Arming::set_aux_auth_passed(uint8_t auth_id)
-{
-    WITH_SEMAPHORE(aux_auth_sem);
-
-    // sanity check auth_id
-    if (auth_id >= aux_auth_count) {
-        return;
-    }
-
-    aux_auth_state[auth_id] = AuxAuthStates::AUTH_PASSED;
-}
-
-// set auxiliary authorisation failed and provide failure message
-void AP_Arming::set_aux_auth_failed(uint8_t auth_id, const char* fail_msg)
-{
-    WITH_SEMAPHORE(aux_auth_sem);
-
-    // sanity check auth_id
-    if (auth_id >= aux_auth_count) {
-        return;
-    }
-
-    // update state
-    aux_auth_state[auth_id] = AuxAuthStates::AUTH_FAILED;
-
-    // store failure message if this authoriser has the lowest auth_id
-    for (uint8_t i = 0; i < auth_id; i++) {
-        if (aux_auth_state[i] == AuxAuthStates::AUTH_FAILED) {
-            return;
-        }
-    }
-    if (aux_auth_fail_msg != nullptr) {
-        if (fail_msg == nullptr) {
-            strncpy(aux_auth_fail_msg, "Auxiliary authorisation refused", aux_auth_str_len);
-        } else {
-            strncpy(aux_auth_fail_msg, fail_msg, aux_auth_str_len);
-        }
-        aux_auth_fail_msg_source = auth_id;
-    }
-}
-
-bool AP_Arming::aux_auth_checks(bool display_failure)
-{
-    // handle error cases
-    if (aux_auth_error) {
-        if (aux_auth_fail_msg == nullptr) {
-            check_failed(ARMING_CHECK_AUX_AUTH, display_failure, "memory low for auxiliary authorisation");
-        } else {
-            check_failed(ARMING_CHECK_AUX_AUTH, display_failure, "Too many auxiliary authorisers");
-        }
-        return false;
-    }
-
-    WITH_SEMAPHORE(aux_auth_sem);
-
-    // check results for each auxiliary authorisation id
-    bool some_failures = false;
-    bool failure_msg_sent = false;
-    bool waiting_for_responses = false;
-    for (uint8_t i = 0; i < aux_auth_count; i++) {
-        switch (aux_auth_state[i]) {
-        case AuxAuthStates::NO_RESPONSE:
-            waiting_for_responses = true;
-            break;
-        case AuxAuthStates::AUTH_FAILED:
-            some_failures = true;
-            if (i == aux_auth_fail_msg_source) {
-                check_failed(ARMING_CHECK_AUX_AUTH, display_failure, "%s", aux_auth_fail_msg);
-                failure_msg_sent = true;
-            }
-            break;
-        case AuxAuthStates::AUTH_PASSED:
-            break;
-        }
-    }
-
-    // send failure or waiting message
-    if (some_failures) {
-        if (!failure_msg_sent) {
-            check_failed(ARMING_CHECK_AUX_AUTH, display_failure, "Auxiliary authorisation refused");
-        }
-        return false;
-    } else if (waiting_for_responses) {
-        check_failed(ARMING_CHECK_AUX_AUTH, display_failure, "Waiting for auxiliary authorisation");
-        return false;
-    }
-
-    // if we got this far all auxiliary checks must have passed
-    return true;
-}
-#endif  // AP_ARMING_AUX_AUTH_ENABLED
 
 #if HAL_GENERATOR_ENABLED
 bool AP_Arming::generator_checks(bool display_failure) const
@@ -1459,9 +1333,6 @@ bool AP_Arming::pre_arm_checks(bool report)
 #endif
 #if HAL_VISUALODOM_ENABLED
         &  visodom_checks(report)
-#endif
-#if AP_ARMING_AUX_AUTH_ENABLED
-        &  aux_auth_checks(report)
 #endif
 #if AP_RC_CHANNEL_ENABLED
         &  disarm_switch_checks(report)

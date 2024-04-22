@@ -46,7 +46,6 @@
 #include <AP_Baro/AP_Baro.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_Proximity/AP_Proximity.h>
-#include <AP_Scripting/AP_Scripting.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_OSD/AP_OSD.h>
 #include <AP_RCTelemetry/AP_CRSF_Telem.h>
@@ -1593,14 +1592,6 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
     }
     if (msg.msgid == MAVLINK_MSG_ID_GLOBAL_POSITION_INT) {
     }
-#if AP_SCRIPTING_ENABLED
-    {
-        AP_Scripting *scripting = AP_Scripting::get_singleton();
-        if (scripting != nullptr) {
-            scripting->handle_message(msg, chan);
-        }
-    }
-#endif // AP_SCRIPTING_ENABLED
     if (!accept_packet(status, msg)) {
         // e.g. enforce-sysid says we shouldn't look at this packet
         return;
@@ -4645,13 +4636,6 @@ void GCS_MAVLINK::handle_command_long(const mavlink_message_t &msg)
     mavlink_command_long_t packet;
     mavlink_msg_command_long_decode(&msg, &packet);
 
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting *scripting = AP_Scripting::get_singleton();
-    if (scripting != nullptr && scripting->is_handling_command(packet.command)) {
-        // Scripting has registered to receive this command, do not procces it internaly
-        return;
-    }
-#endif
 
     hal.util->persistent_data.last_mavlink_cmd = packet.command;
 
@@ -4942,16 +4926,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
     case MAV_CMD_RUN_PREARM_CHECKS:
         return handle_command_run_prearm_checks(packet);
 
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_SCRIPTING:
-        {
-            AP_Scripting *scripting = AP_Scripting::get_singleton();
-            if (scripting == nullptr) {
-                return MAV_RESULT_UNSUPPORTED;
-            }
-            return scripting->handle_command_int_packet(packet);
-        }
-#endif // AP_SCRIPTING_ENABLED
 
 #if AP_AHRS_ENABLED
     case MAV_CMD_SET_EKF_SOURCE_SET:
@@ -4987,14 +4961,6 @@ void GCS_MAVLINK::handle_command_int(const mavlink_message_t &msg)
     // decode packet
     mavlink_command_int_t packet;
     mavlink_msg_command_int_decode(&msg, &packet);
-
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting *scripting = AP_Scripting::get_singleton();
-    if (scripting != nullptr && scripting->is_handling_command(packet.command)) {
-        // Scripting has registered to receive this command, do not procces it internaly
-        return;
-    }
-#endif
 
     hal.util->persistent_data.last_mavlink_cmd = packet.command;
 

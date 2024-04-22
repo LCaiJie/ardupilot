@@ -99,9 +99,6 @@ public:
         return (uint16_t(_params._options.get()) & uint16_t(option)) != 0;
     }
     
-#if AP_BATTERY_SCRIPTING_ENABLED
-    virtual bool handle_scripting(const BattMonitorScript_State &battmon_state) { return false; }
-#endif
 
 protected:
     AP_BattMonitor                      &_mon;      // reference to front-end
@@ -122,22 +119,3 @@ private:
     float       _resistance_current_ref; // current used for maximum resistance calculation
 };
 
-#if AP_BATTERY_SCRIPTING_ENABLED
-struct BattMonitorScript_State {
-    float voltage; // Battery voltage in volts
-    bool healthy; // True if communicating properly
-    uint8_t cell_count; // Number of valid cells in state
-    uint8_t capacity_remaining_pct=UINT8_MAX; // Remaining battery capacity in percent, 255 for invalid
-    uint16_t cell_voltages[32]; // allow script to have up to 32 cells, will be limited internally
-    uint16_t cycle_count=UINT16_MAX; // Battery cycle count, 65535 for unavailable
-    /*
-      all of the following float variables should be set to NaN by the
-      script if they are not known.
-      consumed_mah will auto-integrate if set to NaN
-     */
-    float current_amps=nanf(""); // Battery current in amperes
-    float consumed_mah=nanf(""); // Total current drawn since start-up in milliampere hours
-    float consumed_wh=nanf(""); // Total energy drawn since start-up in watt hours
-    float temperature=nanf(""); // Battery temperature in degrees Celsius
-};
-#endif // AP_BATTERY_SCRIPTING_ENABLED

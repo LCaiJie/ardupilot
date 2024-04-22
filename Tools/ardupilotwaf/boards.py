@@ -52,20 +52,6 @@ class Board:
             LUA_32BITS = 1,
         )
 
-        env.AP_LIBRARIES += [
-            'AP_Scripting',
-            'AP_Scripting/lua/src',
-        ]
-
-        if cfg.options.enable_scripting:
-            env.DEFINES.update(
-                AP_SCRIPTING_ENABLED = 1,
-            )
-        elif cfg.options.disable_scripting:
-            env.DEFINES.update(
-                AP_SCRIPTING_ENABLED = 0,
-            )
-
         # allow GCS disable for AP_DAL example
         if cfg.options.no_gcs:
             env.CXXFLAGS += ['-DHAL_GCS_ENABLED=0']
@@ -85,23 +71,10 @@ class Board:
             env.DEFINES.update(AP_DDS_ENABLED = 0)
 
         # setup for supporting onvif cam control
-        if cfg.options.enable_onvif:
-            cfg.recurse('libraries/AP_ONVIF')
-            env.ENABLE_ONVIF = True
-            env.ROMFS_FILES += [('scripts/ONVIF_Camera_Control.lua',
-                                'libraries/AP_Scripting/applets/ONVIF_Camera_Control.lua')]
-            env.DEFINES.update(
-                ENABLE_ONVIF=1,
-                SCRIPTING_ENABLE_DEFAULT=1,
-            )
-            env.AP_LIBRARIES += [
-                'AP_ONVIF'
-            ]
-        else:
-            env.ENABLE_ONVIF = False
-            env.DEFINES.update(
-                ENABLE_ONVIF=0,
-            )
+        env.ENABLE_ONVIF = False
+        env.DEFINES.update(
+            ENABLE_ONVIF=0,
+        )
 
         if cfg.options.enable_gps_logging:
             env.DEFINES.update(
@@ -214,11 +187,6 @@ class Board:
             '-Werror=undef',
             '-DARDUPILOT_BUILD',
         ]
-
-        if cfg.options.scripting_checks:
-            env.DEFINES.update(
-                AP_SCRIPTING_CHECKS = 1,
-                )
 
         cfg.msg("CXX Compiler", "%s %s"  % (cfg.env.COMPILER_CXX, ".".join(cfg.env.CC_VERSION)))
 
@@ -605,7 +573,6 @@ class sitl(Board):
         env.DEFINES.update(
             CONFIG_HAL_BOARD = 'HAL_BOARD_SITL',
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_NONE',
-            AP_SCRIPTING_CHECKS = 1, # SITL should always do runtime scripting checks
             AP_BARO_PROBE_EXTERNAL_I2C_BUSES = 1,
         )
 
@@ -808,7 +775,6 @@ class sitl_periph(sitl):
             AP_RCPROTOCOL_ENABLED = 0,
             AP_RTC_ENABLED = 0,
             AP_SCHEDULER_ENABLED = 0,
-            AP_SCRIPTING_ENABLED = 0,
             AP_STATS_ENABLED = 0,
             AP_UART_MONITOR_ENABLED = 1,
             COMPASS_CAL_ENABLED = 0,

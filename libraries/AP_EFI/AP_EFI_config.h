@@ -1,7 +1,6 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL_Boards.h>
-#include <AP_Scripting/AP_Scripting_config.h>
 
 #ifndef HAL_EFI_ENABLED
 #define HAL_EFI_ENABLED BOARD_FLASH_SIZE > 1024
@@ -14,10 +13,6 @@
 
 #ifndef AP_EFI_MAV_ENABLED
 #define AP_EFI_MAV_ENABLED AP_EFI_BACKEND_DEFAULT_ENABLED
-#endif
-
-#ifndef AP_EFI_SCRIPTING_ENABLED
-#define AP_EFI_SCRIPTING_ENABLED (AP_EFI_BACKEND_DEFAULT_ENABLED && AP_SCRIPTING_ENABLED)
 #endif
 
 #ifndef AP_EFI_SERIAL_MS_ENABLED

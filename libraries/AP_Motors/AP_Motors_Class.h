@@ -208,11 +208,6 @@ public:
     // set limit flag for pitch, roll and yaw
     void set_limit_flag_pitch_roll_yaw(bool flag);
 
-#if AP_SCRIPTING_ENABLED
-    // set limit flag for pitch, roll and yaw
-    void set_external_limits(bool roll, bool pitch, bool yaw, bool throttle_lower, bool throttle_upper);
-#endif
-
     //
     // virtual functions that should be implemented by child classes
     //
@@ -272,9 +267,6 @@ public:
     // direct motor write
     virtual void        rc_write(uint8_t chan, uint16_t pwm);
 
-#if AP_SCRIPTING_ENABLED
-    void set_frame_string(const char * str);
-#endif
 
 #if HAL_LOGGING_ENABLED
     // write log, to be called at 10hz
@@ -374,14 +366,6 @@ protected:
     //  motor_seq is the motor's sequence number from 1 to the number of motors on the frame
     //  pwm value is an actual pwm value that will be output, normally in the range of 1000 ~ 2000
     virtual void _output_test_seq(uint8_t motor_seq, int16_t pwm) = 0;
-
-#if AP_SCRIPTING_ENABLED
-    // Custom frame string set from scripting
-    char* custom_frame_string;
-
-    // external limits from scripting
-    AP_Motors_limit external_limits;
-#endif
 
 private:
 

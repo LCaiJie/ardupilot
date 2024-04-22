@@ -276,13 +276,7 @@ void AP_MotorsMulticopter::output()
 
 void AP_MotorsMulticopter::update_external_limits()
 {
-#if AP_SCRIPTING_ENABLED
-    limit.roll |= external_limits.roll;
-    limit.pitch |= external_limits.pitch;
-    limit.yaw |= external_limits.yaw;
-    limit.throttle_lower |= external_limits.throttle_lower;
-    limit.throttle_upper |= external_limits.throttle_upper;
-#endif
+
 }
 
 // output booster throttle, if any

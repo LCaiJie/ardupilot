@@ -7,7 +7,6 @@
 #include <GCS_MAVLink/GCS_MAVLink.h>
 #endif
 #include <AP_SerialLED/AP_SerialLED_config.h>
-#include <AP_Scripting/AP_Scripting_config.h>
 
 #ifndef AP_NOTIFY_DISCRETE_RGB_ENABLED
 #define AP_NOTIFY_DISCRETE_RGB_ENABLED 0
@@ -47,10 +46,6 @@
 
 #ifndef AP_NOTIFY_PROFILED_SPI_ENABLED
 #define AP_NOTIFY_PROFILED_SPI_ENABLED 0  // requires hwdef to have SPI line
-#endif
-
-#ifndef AP_NOTIFY_SCRIPTING_LED_ENABLED
-#define AP_NOTIFY_SCRIPTING_LED_ENABLED AP_SCRIPTING_ENABLED
 #endif
 
 #ifndef AP_NOTIFY_SERIALLED_ENABLED

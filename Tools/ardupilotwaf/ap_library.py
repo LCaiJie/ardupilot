@@ -171,7 +171,6 @@ class ap_library_check_headers(Task.Task):
     whitelist = (
         'libraries/AP_Vehicle/AP_Vehicle_Type.h',
         'libraries/AP_Common/AP_FWVersionDefine.h',
-        'libraries/AP_Scripting/lua_generated_bindings.h',
         'libraries/AP_NavEKF3/AP_NavEKF3_feature.h',
         'libraries/AP_LandingGear/AP_LandingGear_config.h',
     )

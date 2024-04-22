@@ -9,14 +9,10 @@ define AP_NETWORKING_BACKEND_PPP 1
 define AP_PERIPH_NET_PPP_PORT_DEFAULT 1
 define AP_PERIPH_NET_PPP_BAUD_DEFAULT 12500000
 
-// add scripting for web interface
-define AP_SCRIPTING_ENABLED 1
 
 // ROMFS filesystem only
 define AP_FILESYSTEM_ROMFS_ENABLED 1
 
-// allow scripts to add parameters
-define AP_PARAM_DYNAMIC_ENABLED 1
 
 ROMFS_DIRECTORY Tools/AP_Periph/Web
 

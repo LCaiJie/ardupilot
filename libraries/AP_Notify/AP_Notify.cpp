@@ -38,7 +38,6 @@
 #include <stdio.h>
 #include "AP_BoardLED2.h"
 #include "ProfiLED.h"
-#include "ScriptingLED.h"
 #include "DShotLED.h"
 
 extern const AP_HAL::HAL& hal;
@@ -355,11 +354,6 @@ void AP_Notify::add_backends(void)
                 if (_oreo_theme) {
                     ADD_BACKEND(new OreoLED_I2C(0, _oreo_theme));
                 }
-                break;
-#endif
-#if AP_NOTIFY_SCRIPTING_LED_ENABLED
-            case Notify_LED_Scripting:
-                ADD_BACKEND(new ScriptingLED());
                 break;
 #endif
 #if AP_NOTIFY_DSHOT_LED_ENABLED

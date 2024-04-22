@@ -74,9 +74,6 @@ public:
 #if AP_NOTIFY_PROFILED_ENABLED
         Notify_LED_ProfiLED                 = (1 << 9), // ProfiLED
 #endif
-#if AP_NOTIFY_SCRIPTING_LED_ENABLED
-        Notify_LED_Scripting                = (1 << 10),// Colour accessor for scripting
-#endif
 #if AP_NOTIFY_DSHOT_LED_ENABLED
         Notify_LED_DShot                    = (1 << 11),// Use dshot commands to set ESC LEDs
 #endif

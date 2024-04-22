@@ -197,8 +197,6 @@ class EnumDocco(object):
         _next = []
         for _dir in dirs_to_search:
             for entry in os.listdir(_dir):
-                if "AP_Scripting/lua" in _dir:
-                    continue
                 if "modules" in _dir:
                     continue
                 if "examples" in _dir:
