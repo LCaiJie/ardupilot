@@ -34,9 +34,6 @@ void Copter::init_ardupilot()
 
     // initialise battery monitor
     battery.init();
-
-    // Init RSSI
-    rssi.init();
     
     barometer.init();
 
@@ -143,11 +140,6 @@ void Copter::init_ardupilot()
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();
-#endif
-
-#if AP_RPM_ENABLED
-    // initialise AP_RPM library
-    rpm_sensor.init();
 #endif
 
 #if MODE_AUTO_ENABLED == ENABLED

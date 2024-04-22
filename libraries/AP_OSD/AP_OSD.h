@@ -247,8 +247,6 @@ private:
     void draw_avgcellvolt(uint8_t x, uint8_t y);
     void draw_avgcellrestvolt(uint8_t x, uint8_t y);
     void draw_restvolt(uint8_t x, uint8_t y);
-    void draw_rssi(uint8_t x, uint8_t y);
-    void draw_link_quality(uint8_t x, uint8_t y);
     void draw_current(uint8_t x, uint8_t y);
     void draw_current(uint8_t instance, uint8_t x, uint8_t y);
     void draw_batused(uint8_t x, uint8_t y);

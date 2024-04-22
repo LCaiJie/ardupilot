@@ -23,7 +23,6 @@
 #include "rc.h"
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_SBusOut/AP_SBusOut.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -46,7 +45,6 @@ void sbus_out_write(uint16_t *channels, uint8_t nchannels)
 {
     if (sd3_config == 0) {
         uint8_t buffer[25];
-        AP_SBusOut::sbus_format_frame(channels, nchannels, buffer);
         chnWrite(&SD3, buffer, sizeof(buffer));
     }
 }

@@ -298,10 +298,6 @@ private:
         bool reset_target;          // true if target should be reset because of change in surface being tracked
     } surface_tracking;
 
-#if AP_RPM_ENABLED
-    AP_RPM rpm_sensor;
-#endif
-
     // Inertial Navigation EKF - different viewpoint
     AP_AHRS_View *ahrs_view;
 

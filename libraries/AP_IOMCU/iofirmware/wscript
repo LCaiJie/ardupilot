@@ -13,7 +13,6 @@ def build(bld):
         'AP_RCProtocol',
         'AP_BoardConfig',
         'AP_ESC_Telem',
-        'AP_SBusOut'
         ],
         exclude_src=[
             'libraries/AP_HAL_ChibiOS/Storage.cpp'

@@ -26,7 +26,6 @@
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_RCMapper/AP_RCMapper.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <AP_RTC/AP_RTC.h>
 #include <GCS_MAVLink/GCS.h>
 
@@ -1261,19 +1260,7 @@ bool AP_MSP_Telem_Backend::displaying_stats_screen() const
 
 bool AP_MSP_Telem_Backend::get_rssi(float &rssi) const
 {
-#if AP_RSSI_ENABLED
-    AP_RSSI* ap_rssi = AP::rssi();
-    if (ap_rssi == nullptr) {
-        return false;
-    }
-    if (!ap_rssi->enabled()) {
-        return false;
-    }
-    rssi =  ap_rssi->read_receiver_rssi(); // range is [0-1]
-    return true;
-#else
     return false;
-#endif
 }
 
 #endif //HAL_MSP_ENABLED

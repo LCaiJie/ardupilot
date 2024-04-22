@@ -623,8 +623,10 @@ void AP_Baro::init(void)
     return;
 #endif
 
+
 #if defined(HAL_BARO_PROBE_LIST)
     // probe list from BARO lines in hwdef.dat
+    HAL_BARO_PROBE_LIST;
     HAL_BARO_PROBE_LIST;
 #elif AP_FEATURE_BOARD_DETECT
     switch (AP_BoardConfig::get_board_type()) {

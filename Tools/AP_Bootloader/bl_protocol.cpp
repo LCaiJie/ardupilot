@@ -48,7 +48,6 @@
 
 #include "bl_protocol.h"
 #include "support.h"
-#include "can.h"
 #include <AP_HAL_ChibiOS/hwdef/common/watchdog.h>
 #if EXT_FLASH_SIZE_MB
 #include <AP_FlashIface/AP_FlashIface_JEDEC.h>

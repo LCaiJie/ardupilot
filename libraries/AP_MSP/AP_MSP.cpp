@@ -14,7 +14,6 @@
 */
 
 #include <AP_AHRS/AP_AHRS.h>
-#include <AP_RSSI/AP_RSSI.h>
 
 #include "AP_MSP.h"
 #include "AP_MSP_Telem_Generic.h"

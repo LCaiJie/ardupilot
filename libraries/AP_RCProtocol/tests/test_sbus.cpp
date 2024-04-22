@@ -2,7 +2,6 @@
   test that SBUS decoding matches SBUS encoding
  */
 #include <AP_gtest.h>
-#include <AP_SBusOut/AP_SBusOut.h>
 #include <AP_RCProtocol/AP_RCProtocol.h>
 #include <AP_RCProtocol/AP_RCProtocol_SBUS.h>
 
@@ -28,7 +27,6 @@ TEST(SBUSEncodeDecode, test_sbus_encode_decode)
         for (uint8_t i=0; i<num_channels; i++) {
             values_in[i] = v;
         }
-        AP_SBusOut::sbus_format_frame(values_in, num_channels, frame);
         uint16_t num_values = 0;
         bool sbus_failsafe=false;
         AP_RCProtocol_SBUS::sbus_decode(frame, values_out, &num_values, sbus_failsafe, num_channels);

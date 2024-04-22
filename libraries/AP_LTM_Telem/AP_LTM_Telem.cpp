@@ -23,7 +23,6 @@
 #include <AP_GPS/AP_GPS.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_Notify/AP_Notify.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 
 extern const AP_HAL::HAL& hal;
@@ -137,10 +136,6 @@ void AP_LTM_Telem::send_Sframe(void)
     const uint8_t flightmode = AP_Notify::flags.flight_mode; // flight mode
 
     uint8_t rssi = 0; // radio RSSI (%a)
-    AP_RSSI *ap_rssi = AP_RSSI::get_singleton();
-    if (ap_rssi) {
-        rssi = ap_rssi->read_receiver_rssi_uint8();
-    }
 
     const uint8_t armstat = AP_Notify::flags.armed;                                     // 0: disarmed, 1: armed
     const uint8_t failsafe = AP_Notify::flags.failsafe_radio;                           // 0: normal,   1: failsafe

@@ -30,7 +30,6 @@
 #include <AP_HAL/Util.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_Stats/AP_Stats.h>
 #include <AP_Common/Location.h>
@@ -1410,30 +1409,6 @@ void AP_OSD_Screen::draw_restvolt(uint8_t x, uint8_t y)
     draw_bat_volt(0,VoltageType::RESTING_VOLTAGE,x,y);
 }
 
-#if AP_RSSI_ENABLED
-void AP_OSD_Screen::draw_rssi(uint8_t x, uint8_t y)
-{
-    AP_RSSI *ap_rssi = AP_RSSI::get_singleton();
-    if (ap_rssi) {
-        const uint8_t rssiv = ap_rssi->read_receiver_rssi() * 100;
-        backend->write(x, y, rssiv < osd->warn_rssi, "%c%2d", SYMBOL(SYM_RSSI), rssiv);
-    }
-}
-
-void AP_OSD_Screen::draw_link_quality(uint8_t x, uint8_t y)
-{
-    AP_RSSI *ap_rssi = AP_RSSI::get_singleton();
-    if (ap_rssi) {
-        const int16_t lqv = ap_rssi->read_receiver_link_quality();
-        if (lqv < 0){
-            backend->write(x, y, false, "%c--", SYMBOL(SYM_LQ));
-        } else {
-            backend->write(x, y, false, "%c%2d", SYMBOL(SYM_LQ), lqv);
-        }
-    }
-}
-#endif  // AP_RSSI_ENABLED
-
 void AP_OSD_Screen::draw_current(uint8_t instance, uint8_t x, uint8_t y)
 {
     float amps;
@@ -2302,8 +2277,6 @@ void AP_OSD_Screen::draw(void)
     DRAW_SETTING(avgcellvolt);
     DRAW_SETTING(avgcellrestvolt);
     DRAW_SETTING(restvolt);
-    DRAW_SETTING(rssi);
-    DRAW_SETTING(link_quality);
     DRAW_SETTING(current);
     DRAW_SETTING(batused);
     DRAW_SETTING(bat2used);

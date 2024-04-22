@@ -205,33 +205,7 @@ void AC_Autorotation::set_collective(float collective_filter_cutoff) const
 float AC_Autorotation::get_rpm(bool update_counter)
 {
     float current_rpm = 0.0f;
-
-#if AP_RPM_ENABLED
-    // Get singleton for RPM library
-    const AP_RPM *rpm = AP_RPM::get_singleton();
-
-    //Get current rpm, checking to ensure no nullptr
-    if (rpm != nullptr) {
-        //Check requested rpm instance to ensure either 0 or 1.  Always defaults to 0.
-        if ((_param_rpm_instance > 1) || (_param_rpm_instance < 0)) {
-            _param_rpm_instance.set(0);
-        }
-
-        //Get RPM value
-        uint8_t instance = _param_rpm_instance;
-
-        //Check RPM sensor is returning a healthy status
-        if (!rpm->get_rpm(instance, current_rpm) || current_rpm <= -1) {
-            //unhealthy, rpm unreliable
-            _flags.bad_rpm = true;
-        }
-
-    } else {
-        _flags.bad_rpm = true;
-    }
-#else
     _flags.bad_rpm = true;
-#endif
 
     if (_flags.bad_rpm) {
         //count unhealthy rpm updates and reset healthy rpm counter

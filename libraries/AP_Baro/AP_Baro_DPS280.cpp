@@ -55,7 +55,7 @@ AP_Baro_Backend *AP_Baro_DPS280::probe(AP_Baro &baro,
     if (!_dev) {
         return nullptr;
     }
-
+    
     AP_Baro_DPS280 *sensor = new AP_Baro_DPS280(baro, std::move(_dev));
     if (sensor) {
         sensor->is_dps310 = _is_dps310;
@@ -155,6 +155,7 @@ void AP_Baro_DPS280::set_config_registers(void)
 
 bool AP_Baro_DPS280::init(bool _is_dps310)
 {
+    hal.console->printf("AP_Baro_DPS280 init \r\n");
     if (!dev) {
         return false;
     }
@@ -164,7 +165,7 @@ bool AP_Baro_DPS280::init(bool _is_dps310)
     if (dev->bus_type() == AP_HAL::Device::BUS_TYPE_SPI) {
         dev->set_read_flag(0x80);
     }
-
+    hal.console->printf("AP_Baro_DPS280 set_speed \r\n");
     dev->set_speed(AP_HAL::Device::SPEED_HIGH);
 
     // the DPS310 can get into a state on boot where the whoami is not
@@ -176,9 +177,13 @@ bool AP_Baro_DPS280::init(bool _is_dps310)
     uint8_t whoami=0;
     if (!dev->read_registers(DPS280_REG_PID, &whoami, 1) ||
         whoami != DPS280_WHOAMI) {
+
+            hal.console->printf("AP_Baro_DPS280 DPS280_REG_PID  err %x \r\n", whoami);
         dev->get_semaphore()->give();
         return false;
     }
+
+    hal.console->printf("AP_Baro_DPS280 DPS280_REG_PID  su \r\n");
 
     if (!read_calibration()) {
         dev->get_semaphore()->give();

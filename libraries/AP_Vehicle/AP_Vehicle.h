@@ -40,7 +40,6 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Relay/AP_Relay.h>                      // APM relay
-#include <AP_RSSI/AP_RSSI.h>                        // RSSI Library
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
@@ -297,10 +296,6 @@ protected:
     AP_Button button;
 #endif
     RangeFinder rangefinder;
-
-#if AP_RSSI_ENABLED
-    AP_RSSI rssi;
-#endif
 
 #if HAL_GYROFFT_ENABLED
     AP_GyroFFT gyro_fft;

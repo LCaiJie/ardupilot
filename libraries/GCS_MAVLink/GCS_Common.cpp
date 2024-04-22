@@ -39,7 +39,6 @@
 #include <AC_Sprayer/AC_Sprayer.h>
 #include <AP_BLHeli/AP_BLHeli.h>
 #include <AP_Relay/AP_Relay.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>
@@ -1955,11 +1954,7 @@ void GCS_MAVLINK::send_rc_channels() const
         values[15],
         values[16],
         values[17],
-#if AP_RSSI_ENABLED
-        receiver_rssi()
-#else
         255  // meaning "unknown"
-#endif
         );
 }
 
@@ -1991,11 +1986,7 @@ void GCS_MAVLINK::send_rc_channels_raw() const
         values[5],
         values[6],
         values[7],
-#if AP_RSSI_ENABLED
-        receiver_rssi()
-#else
         255  // meaning "unknown"
-#endif
 );
 }
 
@@ -6416,24 +6407,6 @@ void GCS_MAVLINK::handle_manual_control(const mavlink_message_t &msg)
     // from the ground station for failsafe purposes
     gcs().sysid_myggcs_seen(tnow);
 }
-
-
-#if AP_RSSI_ENABLED
-uint8_t GCS_MAVLINK::receiver_rssi() const
-{
-    AP_RSSI *aprssi = AP::rssi();
-    if (aprssi == nullptr) {
-        return 255;
-    }
-
-    if (!aprssi->enabled()) {
-        return 255;
-    }
-
-    // scale across the full valid range
-    return aprssi->read_receiver_rssi() * 254;
-}
-#endif
 
 GCS &gcs()
 {

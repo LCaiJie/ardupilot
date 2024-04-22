@@ -31,7 +31,6 @@
 #include "support.h"
 #include "bl_protocol.h"
 #include "flash_from_sd.h"
-#include "can.h"
 #include <stdio.h>
 #if EXT_FLASH_SIZE_MB
 #include <AP_FlashIface/AP_FlashIface_JEDEC.h>
@@ -113,6 +112,7 @@ int main(void)
     } else if (m == RTC_BOOT_FAST) {
         try_boot = true;
         timeout = 0;
+        
     }
     const auto ok = check_good_firmware();
     if (ok != check_fw_result_t::CHECK_FW_OK) {

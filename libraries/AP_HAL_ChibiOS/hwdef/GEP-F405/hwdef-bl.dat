@@ -13,7 +13,7 @@ FLASH_SIZE_KB 1024
 FLASH_RESERVE_START_KB 0
 
 # location of application code
-FLASH_BOOTLOADER_LOAD_KB 16
+FLASH_BOOTLOADER_LOAD_KB 48
 
 # uarts and USB to run bootloader protocol on
 SERIAL_ORDER OTG1 

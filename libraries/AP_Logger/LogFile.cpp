@@ -9,7 +9,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Param/AP_Param.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <RC_Channel/RC_Channel.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AC_PID/AP_PIDInfo.h>
@@ -248,24 +247,6 @@ void AP_Logger::Write_RCOUT(void)
 
 }
 
-#if AP_RSSI_ENABLED
-// Write an RSSI packet
-void AP_Logger::Write_RSSI()
-{
-    AP_RSSI *rssi = AP::rssi();
-    if (rssi == nullptr) {
-        return;
-    }
-
-    const struct log_RSSI pkt{
-        LOG_PACKET_HEADER_INIT(LOG_RSSI_MSG),
-        time_us       : AP_HAL::micros64(),
-        RXRSSI        : rssi->read_receiver_rssi(),
-        RXLQ          : rssi->read_receiver_link_quality()
-    };
-    WriteBlock(&pkt, sizeof(pkt));
-}
-#endif
 
 void AP_Logger::Write_Command(const mavlink_command_int_t &packet,
                               uint8_t source_system,

@@ -16,7 +16,6 @@
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Stats/AP_Stats.h>
-#include <AP_RSSI/AP_RSSI.h>
 #include <AP_Notify/AP_Notify.h>
 
 #include "AP_MSP.h"
@@ -224,17 +223,7 @@ bool AP_MSP_Telem_DJI::get_rssi(float &rssi) const
     if (!displaying_stats_screen()) {
         return true;
     }
-#if AP_RSSI_ENABLED
-    AP_RSSI* ap_rssi = AP::rssi();
-    if (ap_rssi == nullptr) {
-        return false;
-    }
-    if (!ap_rssi->enabled()) {
-        return false;
-    }
-#else
     return false;
-#endif
     AP_OSD *osd = AP::osd();
     if (osd == nullptr) {
         return false;

@@ -35,10 +35,6 @@ extern const AP_HAL::HAL& hal;
 SRV_Channel *SRV_Channels::channels;
 SRV_Channels *SRV_Channels::_singleton;
 
-#if AP_SBUSOUTPUT_ENABLED
-AP_SBusOut *SRV_Channels::sbus_ptr;
-#endif
-
 #if AP_ROBOTISSERVO_ENABLED
 AP_RobotisServo *SRV_Channels::robotis_ptr;
 #endif
@@ -178,12 +174,6 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @User: Advanced
     // @Units: Hz
     AP_GROUPINFO("_RATE",  18, SRV_Channels, default_rate, 50),
-
-#if AP_SBUSOUTPUT_ENABLED
-    // @Group: _SBUS_
-    // @Path: ../AP_SBusOut/AP_SBusOut.cpp
-    AP_SUBGROUPINFO(sbus, "_SBUS_",  20, SRV_Channels, AP_SBusOut),
-#endif
 
 #if HAL_SUPPORT_RCOUT_SERIAL
     // @Group: _BLH_
@@ -368,10 +358,6 @@ SRV_Channels::SRV_Channels(void)
     fetteconwire_ptr = &fetteconwire;
 #endif
 
-#if AP_SBUSOUTPUT_ENABLED
-    sbus_ptr = &sbus;
-#endif
-
 #if AP_ROBOTISSERVO_ENABLED
     robotis_ptr = &robotis;
 #endif // AP_ROBOTISSERVO_ENABLED
@@ -494,11 +480,6 @@ void SRV_Channels::cork()
 void SRV_Channels::push()
 {
     hal.rcout->push();
-
-#if AP_SBUSOUTPUT_ENABLED
-    // give sbus library a chance to update
-    sbus_ptr->update();
-#endif
 
 #if AP_ROBOTISSERVO_ENABLED
     // give robotis library a chance to update

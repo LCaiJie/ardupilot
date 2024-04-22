@@ -373,9 +373,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #endif
     MSG_EKF_STATUS_REPORT,
     MSG_VIBRATION,
-#if AP_RPM_ENABLED
-    MSG_RPM,
-#endif
 #if HAL_WITH_ESC_TELEM
     MSG_ESC_TELEMETRY,
 #endif
