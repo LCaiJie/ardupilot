@@ -27,7 +27,6 @@
 /// change in your local copy of APM_Config.h.
 ///
 #include "APM_Config.h"
-#include <AP_ADSB/AP_ADSB_config.h>
 #include <AP_Follow/AP_Follow_config.h>
 
 
@@ -575,9 +574,6 @@
   #error SmartRTL requires ModeRTL which is disabled
 #endif
 
-#if HAL_ADSB_ENABLED && !MODE_GUIDED_ENABLED
-  #error ADSB requires ModeGuided which is disabled
-#endif
 
 #if MODE_FOLLOW_ENABLED && !MODE_GUIDED_ENABLED
   #error Follow requires ModeGuided which is disabled

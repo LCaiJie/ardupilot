@@ -47,16 +47,8 @@ class ExtractFeatures(object):
             ('AC_PRECLAND_ENABLED', 'AC_PrecLand::AC_PrecLand',),
             ('AC_PRECLAND_{type}_ENABLED', 'AC_PrecLand_(?P<type>.*)::update',),
 
-            ('HAL_ADSB_ENABLED', 'AP_ADSB::AP_ADSB',),
-            ('HAL_ADSB_{type}_ENABLED', r'AP_ADSB_(?P<type>.*)::update',),
-            ('HAL_ADSB_UCP_ENABLED', 'AP_ADSB_uAvionix_UCP::update',),
-
             ('AP_COMPASS_{type}_ENABLED', r'AP_Compass_(?P<type>.*)::read\b',),
             ('AP_COMPASS_ICM20948_ENABLED', r'AP_Compass_AK09916::probe_ICM20948',),
-
-
-            ('HAL_EFI_ENABLED', 'AP_EFI::AP_EFI',),
-            ('AP_EFI_{type}_ENABLED', 'AP_EFI_(?P<type>.*)::update',),
 
             ('HAL_TORQEEDO_ENABLED', 'AP_Torqeedo::AP_Torqeedo'),
 
@@ -108,9 +100,7 @@ class ExtractFeatures(object):
             ('AC_PAYLOAD_PLACE_ENABLED', 'PayloadPlace::start_descent'),
             ('AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED', ExtractFeatures.FindString('PayloadPlace')),
             ('AP_EFI_SERIAL_HIRTH_ENABLED', r'AP_EFI_Serial_Hirth::update\b',),
-            ('HAL_GENERATOR_ENABLED', 'AP_Generator::AP_Generator',),
-            ('AP_GENERATOR_{type}_ENABLED', r'AP_Generator_(?P<type>.*)::init',),
-
+            
             ('OSD_ENABLED', 'AP_OSD::update_osd',),
             ('OSD_PARAM_ENABLED', 'AP_OSD_ParamScreen::AP_OSD_ParamScreen',),
             ('HAL_OSD_SIDEBAR_ENABLE', 'AP_OSD_Screen::draw_sidebars',),
@@ -173,7 +163,6 @@ class ExtractFeatures(object):
             ('AP_SERIALMANAGER_IMUOUT_ENABLED', 'AP_InertialSensor::send_uart_data'),
             ('AP_NETWORKING_BACKEND_PPP', 'AP_Networking_PPP::init'),
             ('FORCE_APJ_DEFAULT_PARAMETERS', 'AP_Param::param_defaults_data'),
-            ('HAL_BUTTON_ENABLED', 'AP_Button::update'),
             ('HAL_LOGGING_ENABLED', 'AP_Logger::Init'),
         ]
 

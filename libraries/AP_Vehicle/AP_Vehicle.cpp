@@ -55,22 +55,10 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(frsky_parameters, "FRSKY_", 6, AP_Vehicle, AP_Frsky_Parameters),
 #endif
 
-#if HAL_GENERATOR_ENABLED
-    // @Group: GEN_
-    // @Path: ../AP_Generator/AP_Generator.cpp
-    AP_SUBGROUPINFO(generator, "GEN_", 7, AP_Vehicle, AP_Generator),
-#endif
-
 #if HAL_EXTERNAL_AHRS_ENABLED
     // @Group: EAHRS
     // @Path: ../AP_ExternalAHRS/AP_ExternalAHRS.cpp
     AP_SUBGROUPINFO(externalAHRS, "EAHRS", 8, AP_Vehicle, AP_ExternalAHRS),
-#endif
-
-#if HAL_EFI_ENABLED
-    // @Group: EFI
-    // @Path: ../AP_EFI/AP_EFI.cpp
-    AP_SUBGROUPINFO(efi, "EFI", 9, AP_Vehicle, AP_EFI),
 #endif
 
     // @Group: CUST_ROT
@@ -293,10 +281,6 @@ void AP_Vehicle::setup()
     externalAHRS.init();
 #endif
 
-#if HAL_GENERATOR_ENABLED
-    generator.init();
-#endif
-
     // init_ardupilot is where the vehicle does most of its initialisation.
     init_ardupilot();
 
@@ -328,11 +312,6 @@ void AP_Vehicle::setup()
 #endif
 
     send_watchdog_reset_statustext();
-
-// init EFI monitoring
-#if HAL_EFI_ENABLED
-    efi.init();
-#endif
 
 
 #if HAL_NMEA_OUTPUT_ENABLED
@@ -450,9 +429,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #if HAL_WITH_ESC_TELEM
     SCHED_TASK_CLASS(AP_ESC_Telem, &vehicle.esc_telem,      update,                  100,  50, 230),
 #endif
-#if HAL_GENERATOR_ENABLED
-    SCHED_TASK_CLASS(AP_Generator, &vehicle.generator,      update,                   10,  50, 235),
-#endif
 #if AP_NETWORKING_ENABLED
     SCHED_TASK_CLASS(AP_Networking, &vehicle.networking,    update,                   10,  50, 238),
 #endif
@@ -464,9 +440,6 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #endif
 #if AP_FENCE_ENABLED
     SCHED_TASK_CLASS(AC_Fence,     &vehicle.fence,          update,                   10, 100, 248),
-#endif
-#if HAL_EFI_ENABLED
-    SCHED_TASK_CLASS(AP_EFI,       &vehicle.efi,            update,                   50, 200, 250),
 #endif
     SCHED_TASK(one_Hz_update,                                                         1, 100, 252),
 #if HAL_WITH_ESC_TELEM && HAL_GYROFFT_ENABLED

@@ -125,12 +125,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
-#if HAL_ADSB_ENABLED
-        case Mode::Number::AVOID_ADSB:
-            ret = &mode_avoid_adsb;
-            break;
-#endif
-
 #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
         case Mode::Number::GUIDED_NOGPS:
             ret = &mode_guided_nogps;
@@ -358,11 +352,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     logger.Write_Mode((uint8_t)flightmode->mode_number(), reason);
 #endif
     gcs().send_message(MSG_HEARTBEAT);
-
-#if HAL_ADSB_ENABLED
-    adsb.set_is_auto_mode((mode == Mode::Number::AUTO) || (mode == Mode::Number::RTL) || (mode == Mode::Number::GUIDED));
-#endif
-
+    
 #if AP_FENCE_ENABLED
     // pilot requested flight mode change during a fence breach indicates pilot is attempting to manually recover
     // this flight mode change could be automatic (i.e. fence, battery, GPS or GCS failsafe)

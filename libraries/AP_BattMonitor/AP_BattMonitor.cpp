@@ -12,8 +12,6 @@
 #include "AP_BattMonitor_Sum.h"
 #include "AP_BattMonitor_FuelFlow.h"
 #include "AP_BattMonitor_FuelLevel_PWM.h"
-#include "AP_BattMonitor_Generator.h"
-#include "AP_BattMonitor_EFI.h"
 #include "AP_BattMonitor_INA2xx.h"
 #include "AP_BattMonitor_INA239.h"
 #include "AP_BattMonitor_LTC2946.h"
@@ -508,14 +506,7 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_FuelLevel_Analog(*this, state[instance], _params[instance]);
                 break;
 #endif // AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
-#if HAL_GENERATOR_ENABLED
-            case Type::GENERATOR_ELEC:
-                drivers[instance] = new AP_BattMonitor_Generator_Elec(*this, state[instance], _params[instance]);
-                break;
-            case Type::GENERATOR_FUEL:
-                drivers[instance] = new AP_BattMonitor_Generator_FuelLevel(*this, state[instance], _params[instance]);
-                break;
-#endif // HAL_GENERATOR_ENABLED
+
 #if AP_BATTERY_INA2XX_ENABLED
             case Type::INA2XX:
                 drivers[instance] = new AP_BattMonitor_INA2XX(*this, state[instance], _params[instance]);
@@ -541,11 +532,6 @@ AP_BattMonitor::init()
                 drivers[instance] = new AP_BattMonitor_INA239(*this, state[instance], _params[instance]);
                 break;
 #endif
-#if AP_BATTERY_EFI_ENABLED
-            case Type::EFI:
-                drivers[instance] = new AP_BattMonitor_EFI(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_EFI_ENABLED
 #if AP_BATTERY_AD7091R5_ENABLED
             case Type::AD7091R5:
                 drivers[instance] = new AP_BattMonitor_AD7091R5(*this, state[instance], _params[instance]);

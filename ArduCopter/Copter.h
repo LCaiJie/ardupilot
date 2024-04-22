@@ -63,7 +63,6 @@
 #include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
 #include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
 #include <AC_AutoTune/AC_AutoTune_Heli.h>   // ArduCopter autotune library. support for autotune of helicopters.
-#include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AC_PrecLand/AC_PrecLand_config.h>
 
@@ -111,10 +110,6 @@
  # include <AP_Terrain/AP_Terrain.h>
 #endif
 
-#if HAL_BUTTON_ENABLED
- # include <AP_Button/AP_Button.h>
-#endif
-
 #if OSD_ENABLED || OSD_PARAM_ENABLED
  #include <AP_OSD/AP_OSD.h>
 #endif
@@ -139,9 +134,6 @@
   #error AP_OAPathPlanner relies on AP_FENCE_ENABLED which is disabled
 #endif
 
-#if HAL_ADSB_ENABLED
-#include "avoidance_adsb.h"
-#endif
 // Local modules
 #include "Parameters.h"
 #if USER_PARAMS_ENABLED
@@ -156,7 +148,6 @@ public:
     friend class AP_Rally_Copter;
     friend class Parameters;
     friend class ParametersG2;
-    friend class AP_Avoidance_Copter;
 
 #if ADVANCED_FAILSAFE == ENABLED
     friend class AP_AdvancedFailsafe_Copter;
@@ -505,13 +496,6 @@ private:
     AC_InputManager_Heli input_manager;
 #endif
 
-#if HAL_ADSB_ENABLED
-    AP_ADSB adsb;
-
-    // avoidance of adsb enabled vehicles (normally manned vehicles)
-    AP_Avoidance_Copter avoidance_adsb{adsb};
-#endif
-
     // last valid RC input time
     uint32_t last_radio_update_ms;
 
@@ -654,11 +638,6 @@ private:
 
     // avoidance.cpp
     void low_alt_avoidance();
-
-#if HAL_ADSB_ENABLED
-    // avoidance_adsb.cpp
-    void avoidance_adsb_update(void);
-#endif
 
     // baro_ground_effect.cpp
     void update_ground_effect_detector(void);
@@ -940,9 +919,6 @@ private:
 #endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ModeSystemId mode_systemid;
-#endif
-#if HAL_ADSB_ENABLED
-    ModeAvoidADSB mode_avoid_adsb;
 #endif
 #if MODE_THROW_ENABLED == ENABLED
     ModeThrow mode_throw;

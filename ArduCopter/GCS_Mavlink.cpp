@@ -1,7 +1,6 @@
 #include "Copter.h"
 
 #include "GCS_Mavlink.h"
-#include <AP_EFI/AP_EFI_config.h>
 
 MAV_TYPE GCS_Copter::frame_type() const
 {
@@ -342,10 +341,6 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
         break;
 
     case MSG_ADSB_VEHICLE: {
-#if HAL_ADSB_ENABLED
-        CHECK_PAYLOAD_SIZE(ADSB_VEHICLE);
-        copter.adsb.send_adsb_vehicle(chan);
-#endif
 #if AC_OAPATHPLANNER_ENABLED == ENABLED
         AP_OADatabase *oadb = AP_OADatabase::get_singleton();
         if (oadb != nullptr) {
@@ -537,12 +532,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #if HAL_WITH_ESC_TELEM
     MSG_ESC_TELEMETRY,
 #endif
-#if HAL_GENERATOR_ENABLED
-    MSG_GENERATOR_STATUS,
-#endif
-#if HAL_EFI_ENABLED
-    MSG_EFI_STATUS,
-#endif
 };
 static const ap_message STREAM_PARAMS_msgs[] = {
     MSG_NEXT_PARAM
@@ -585,12 +574,6 @@ void GCS_MAVLINK_Copter::packetReceived(const mavlink_status_t &status,
                                         const mavlink_message_t &msg)
 {
     // we handle these messages here to avoid them being blocked by mavlink routing code
-#if HAL_ADSB_ENABLED
-    if (copter.g2.dev_options.get() & DevOptionADSBMAVLink) {
-        // optional handling of GLOBAL_POSITION_INT as a MAVLink based avoidance source
-        copter.avoidance_adsb.handle_msg(msg);
-    }
-#endif
 #if MODE_FOLLOW_ENABLED == ENABLED
     // pass message to follow library
     copter.g2.follow.handle_msg(msg);

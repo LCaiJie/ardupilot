@@ -16,7 +16,6 @@ def build(bld):
             'AP_InertialNav',
             'AP_Motors',
             'AP_RCMapper',
-            'AP_Avoidance',
             'AP_AdvancedFailsafe',
             'AP_SmartRTL',
             'AP_Arming',

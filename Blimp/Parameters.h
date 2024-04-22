@@ -89,8 +89,6 @@ public:
         k_param_throttle_behavior,
         k_param_pilot_takeoff_alt, //unused
 
-        // AP_ADSB Library
-        k_param_adsb,
         k_param_notify,
 
         //PID Controllers

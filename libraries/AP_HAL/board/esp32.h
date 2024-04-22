@@ -45,7 +45,6 @@
 
 // disable uncommon stuff that we'd otherwise get 
 #define HAL_EXTERNAL_AHRS_ENABLED 0
-#define HAL_GENERATOR_ENABLED 0
 
 #define __LITTLE_ENDIAN  1234
 #define __BYTE_ORDER     __LITTLE_ENDIAN
@@ -94,8 +93,6 @@
 #define AP_AIRSPEED_AUTOCAL_ENABLE 0
 #define HAL_SOARING_ENABLED 0
 #define AP_TERRAIN_AVAILABLE 0
-#define HAL_ADSB_ENABLED 0
-#define HAL_BUTTON_ENABLED 0 
 #define AP_LANDINGGEAR_ENABLED 0
 
 // disable avoid-fence-follow in copter, these all kinda need each other, so its all or none.

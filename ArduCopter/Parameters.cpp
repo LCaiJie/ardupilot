@@ -620,16 +620,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(precland, "PLND_", AC_PrecLand),
 #endif
 
-#if HAL_ADSB_ENABLED
-    // @Group: ADSB_
-    // @Path: ../libraries/AP_ADSB/AP_ADSB.cpp
-    GOBJECT(adsb,                "ADSB_", AP_ADSB),
-
-    // @Group: AVD_
-    // @Path: ../libraries/AP_Avoidance/AP_Avoidance.cpp
-    GOBJECT(avoidance_adsb, "AVD_", AP_Avoidance_Copter),
-#endif
-
     // @Group: NTF_
     // @Path: ../libraries/AP_Notify/AP_Notify.cpp
     GOBJECT(notify, "NTF_",  AP_Notify),
@@ -692,11 +682,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("WP_NAVALT_MIN", 1, ParametersG2, wp_navalt_min, 0),
 
-#if HAL_BUTTON_ENABLED
-    // @Group: BTN_
-    // @Path: ../libraries/AP_Button/AP_Button.cpp
-    AP_SUBGROUPPTR(button_ptr, "BTN_", 2, ParametersG2, AP_Button),
-#endif
 
 #if MODE_THROW_ENABLED == ENABLED
     // @Param: THROW_NEXTMODE
@@ -1173,9 +1158,6 @@ ParametersG2::ParametersG2(void)
 #endif
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     ,arot()
-#endif
-#if HAL_BUTTON_ENABLED
-    ,button_ptr(&copter.button)
 #endif
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ,mode_zigzag_ptr(&copter.mode_zigzag)

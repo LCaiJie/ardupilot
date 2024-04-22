@@ -23,7 +23,6 @@
 
 #include <AC_Fence/AC_Fence.h>
 #include <AP_Compass/AP_Compass.h>
-#include <AP_ADSB/AP_ADSB.h>
 #include <AP_AdvancedFailsafe/AP_AdvancedFailsafe.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_HAL/AP_HAL.h>
@@ -38,7 +37,6 @@
 #include <AP_RCTelemetry/AP_Spektrum_Telem.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_EFI/AP_EFI.h>
 #include <AP_Proximity/AP_Proximity.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_OSD/AP_OSD.h>
@@ -886,9 +884,6 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_ATTITUDE_TARGET,       MSG_ATTITUDE_TARGET},
         { MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT,  MSG_POSITION_TARGET_GLOBAL_INT},
         { MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED,  MSG_POSITION_TARGET_LOCAL_NED},
-#if HAL_ADSB_ENABLED
-        { MAVLINK_MSG_ID_ADSB_VEHICLE,          MSG_ADSB_VEHICLE},
-#endif
 #if AP_BATTERY_ENABLED
         { MAVLINK_MSG_ID_BATTERY_STATUS,        MSG_BATTERY_STATUS},
 #endif
@@ -898,20 +893,11 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
 #endif
         { MAVLINK_MSG_ID_EXTENDED_SYS_STATE,    MSG_EXTENDED_SYS_STATE},
         { MAVLINK_MSG_ID_AUTOPILOT_VERSION,     MSG_AUTOPILOT_VERSION},
-#if HAL_EFI_ENABLED
-        { MAVLINK_MSG_ID_EFI_STATUS,            MSG_EFI_STATUS},
-#endif
-#if HAL_GENERATOR_ENABLED
-        { MAVLINK_MSG_ID_GENERATOR_STATUS,      MSG_GENERATOR_STATUS},
-#endif
 #if HAL_WITH_ESC_TELEM
         { MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4,  MSG_ESC_TELEMETRY},
 #endif
 #if HAL_HIGH_LATENCY2_ENABLED
         { MAVLINK_MSG_ID_HIGH_LATENCY2,         MSG_HIGH_LATENCY2},
-#endif
-#if AP_MAVLINK_MSG_UAVIONIX_ADSB_OUT_STATUS_ENABLED
-        { MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS, MSG_UAVIONIX_ADSB_OUT_STATUS},
 #endif
             };
 
@@ -3447,16 +3433,6 @@ void GCS_MAVLINK::handle_obstacle_distance_3d(const mavlink_message_t &msg)
 }
 #endif
 
-#if HAL_ADSB_ENABLED
-void GCS_MAVLINK::handle_adsb_message(const mavlink_message_t &msg)
-{
-    AP_ADSB *adsb = AP::ADSB();
-    if (adsb != nullptr) {
-        adsb->handle_message(chan, msg);
-    }
-}
-#endif
-
 #if OSD_PARAM_ENABLED
 void GCS_MAVLINK::handle_osd_param_config(const mavlink_message_t &msg) const
 {
@@ -3663,16 +3639,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
         break;
 #endif
 
-#if HAL_ADSB_ENABLED
-    case MAVLINK_MSG_ID_ADSB_VEHICLE:
-    case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG:
-    case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_DYNAMIC:
-    case MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT:
-    case MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CONTROL:
-        handle_adsb_message(msg);
-        break;
-#endif
-
     case MAVLINK_MSG_ID_LANDING_TARGET:
         handle_landing_target(msg);
         break;
@@ -3680,17 +3646,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
         handle_named_value(msg);
         break;
-
-#if AP_EFI_MAV_ENABLED
-    case MAVLINK_MSG_ID_EFI_STATUS:
-    {
-        AP_EFI *efi = AP::EFI();
-        if (efi) {
-            efi->handle_EFI_message(msg);
-        }
-        break;
-    }
-#endif
     }
 
 }
@@ -4470,14 +4425,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
     case MAV_CMD_DEBUG_TRAP:
         return handle_command_debug_trap(packet);
 
-#if HAL_ADSB_ENABLED
-    case MAV_CMD_DO_ADSB_OUT_IDENT:
-        if ((AP::ADSB() != nullptr) && AP::ADSB()->ident_start()) {
-            return MAV_RESULT_ACCEPTED;
-        }
-        return  MAV_RESULT_FAILED;
-#endif
-
     case MAV_CMD_DO_AUX_FUNCTION:
         return handle_command_do_aux_function(packet);
 
@@ -4840,27 +4787,6 @@ void GCS_MAVLINK::send_set_position_target_global_int(uint8_t target_system, uin
             0,0);   // yaw, yaw_rate
 }
 
-#if HAL_GENERATOR_ENABLED
-void GCS_MAVLINK::send_generator_status() const
-{
-    AP_Generator *generator = AP::generator();
-    if (generator == nullptr) {
-        return;
-    }
-    generator->send_generator_status(*this);
-}
-#endif
-
-#if HAL_ADSB_ENABLED
-void GCS_MAVLINK::send_uavionix_adsb_out_status() const
-{
-    AP_ADSB *adsb = AP::ADSB();
-    if (adsb != nullptr) {
-        adsb->send_adsb_out_status(chan);
-    }
-}
-#endif
-
 
 void GCS_MAVLINK::send_autopilot_state_for_gimbal_device() const
 {
@@ -5191,13 +5117,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         send_vibration();
         break;
 
-#if HAL_GENERATOR_ENABLED
-    case MSG_GENERATOR_STATUS:
-    	CHECK_PAYLOAD_SIZE(GENERATOR_STATUS);
-    	send_generator_status();
-    	break;
-#endif
-
     case MSG_AUTOPILOT_VERSION:
         CHECK_PAYLOAD_SIZE(AUTOPILOT_VERSION);
         send_autopilot_version();
@@ -5209,30 +5128,12 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         break;
 #endif
 
-#if HAL_EFI_ENABLED
-    case MSG_EFI_STATUS: {
-        CHECK_PAYLOAD_SIZE(EFI_STATUS);
-        AP_EFI *efi = AP::EFI();
-        if (efi) {
-            efi->send_mavlink_status(chan);
-        }
-        break;
-    }
-#endif
-
 #if HAL_HIGH_LATENCY2_ENABLED
     case MSG_HIGH_LATENCY2:
         CHECK_PAYLOAD_SIZE(HIGH_LATENCY2);
         send_high_latency2();
         break;
 #endif // HAL_HIGH_LATENCY2_ENABLED
-
-#if AP_MAVLINK_MSG_UAVIONIX_ADSB_OUT_STATUS_ENABLED
-    case MSG_UAVIONIX_ADSB_OUT_STATUS:
-        CHECK_PAYLOAD_SIZE(UAVIONIX_ADSB_OUT_STATUS);
-        send_uavionix_adsb_out_status();
-        break;
-#endif
 
     default:
         // try_send_message must always at some stage return true for

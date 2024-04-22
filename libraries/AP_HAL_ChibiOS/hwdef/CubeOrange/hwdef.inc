@@ -333,8 +333,6 @@ define AP_NOTIFY_OREOLED_ENABLED 1
 undef AP_BATTERY_SMBUS_SOLO_ENABLED
 define AP_BATTERY_SMBUS_SOLO_ENABLED AP_BATTERY_SMBUS_ENABLED
 
-# Enable Sagetech MXS ADSB transponder
-define HAL_ADSB_SAGETECH_MXS_ENABLED HAL_ADSB_ENABLED
 
 # enable DFU reboot for installing bootloader
 # note that if firmware is build with --secure-bl then DFU is

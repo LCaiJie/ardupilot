@@ -271,13 +271,6 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
 #endif
 
         // check adsb avoidance failsafe
-#if HAL_ADSB_ENABLED
-        if (copter.failsafe.adsb) {
-            check_failed(ARMING_CHECK_PARAMETERS, display_failure, "ADSB threat detected");
-            return false;
-        }
-#endif
-
         // ensure controllers are OK with us arming:
         char failure_msg[50] = {};
         if (!copter.pos_control->pre_arm_checks("PSC", failure_msg, ARRAY_SIZE(failure_msg))) {
@@ -578,16 +571,6 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
             return false;
         }
     }
-
-    // check adsb
-#if HAL_ADSB_ENABLED
-    if (check_enabled(ARMING_CHECK_PARAMETERS)) {
-        if (copter.failsafe.adsb) {
-            check_failed(ARMING_CHECK_PARAMETERS, true, "ADSB threat detected");
-            return false;
-        }
-    }
-#endif
 
     // check throttle
     if (check_enabled(ARMING_CHECK_RC)) {

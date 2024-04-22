@@ -34,16 +34,13 @@ extern const AP_HAL::HAL& hal;
 
 #include <AC_Avoidance/AC_Avoid.h>
 #include <AP_Compass/AP_Compass.h>
-#include <AP_Generator/AP_Generator.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
-#include <AP_ADSB/AP_ADSB.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 #include <AP_Logger/AP_Logger.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Arming/AP_Arming.h>
-#include <AP_Avoidance/AP_Avoidance.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_AHRS/AP_AHRS.h>
@@ -847,32 +844,7 @@ void RC_Channel::do_aux_function_armdisarm(const AuxSwitchPos ch_flag)
 
 void RC_Channel::do_aux_function_avoid_adsb(const AuxSwitchPos ch_flag)
 {
-#if HAL_ADSB_ENABLED
-    AP_Avoidance *avoidance = AP::ap_avoidance();
-    if (avoidance == nullptr) {
-        return;
-    }
-    if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_ADSB *adsb = AP::ADSB();
-        if (adsb == nullptr) {
-            return;
-        }
-        // try to enable AP_Avoidance
-        if (!adsb->enabled() || !adsb->healthy()) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB not available");
-            return;
-        }
-        avoidance->enable();
-        LOGGER_WRITE_EVENT(LogEvent::AVOIDANCE_ADSB_ENABLE);
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB Avoidance Enabled");
-        return;
-    }
 
-    // disable AP_Avoidance
-    avoidance->disable();
-    LOGGER_WRITE_EVENT(LogEvent::AVOIDANCE_ADSB_DISABLE);
-    GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB Avoidance Disabled");
-#endif
 }
 
 void RC_Channel::do_aux_function_avoid_proximity(const AuxSwitchPos ch_flag)
@@ -928,29 +900,6 @@ void RC_Channel::do_aux_function_clear_wp(const AuxSwitchPos ch_flag)
         mission->clear();
     }
 }
-
-
-#if HAL_GENERATOR_ENABLED
-void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
-{
-    AP_Generator *generator = AP::generator();
-    if (generator == nullptr) {
-        return;
-    }
-
-    switch (ch_flag) {
-    case AuxSwitchPos::LOW:
-        generator->stop();
-        break;
-    case AuxSwitchPos::MIDDLE:
-        generator->idle();
-        break;
-    case AuxSwitchPos::HIGH:
-        generator->run();
-        break;
-    }
-}
-#endif
 
 void RC_Channel::do_aux_function_lost_vehicle_sound(const AuxSwitchPos ch_flag)
 {
@@ -1089,12 +1038,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     case AUX_FUNC::FFT_NOTCH_TUNE:
         do_aux_function_fft_notch_tune(ch_flag);
         break;
-
-#if HAL_GENERATOR_ENABLED
-    case AUX_FUNC::GENERATOR:
-        do_aux_function_generator(ch_flag);
-        break;
-#endif
 
     case AUX_FUNC::BATTERY_MPPT_ENABLE:
         if (ch_flag != AuxSwitchPos::MIDDLE) {

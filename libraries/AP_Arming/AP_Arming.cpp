@@ -32,14 +32,11 @@
 #include <AP_Declination/AP_Declination.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Baro/AP_Baro.h>
-#include <AP_Generator/AP_Generator.h>
 #include <AP_Terrain/AP_Terrain.h>
-#include <AP_ADSB/AP_ADSB.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_RCMapper/AP_RCMapper.h>
 #include <AP_OSD/AP_OSD.h>
 #include <RC_Channel/RC_Channel.h>
-#include <AP_Button/AP_Button.h>
 #include <AP_FETtecOneWire/AP_FETtecOneWire.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -1013,13 +1010,6 @@ bool AP_Arming::system_checks(bool report)
             return false;
         }
 #endif
-#if HAL_ADSB_ENABLED
-        AP_ADSB *adsb = AP::ADSB();
-        if ((adsb != nullptr) && adsb->enabled() && adsb->init_failed()) {
-            check_failed(ARMING_CHECK_SYSTEM, report, "ADSB out of memory");
-            return false;
-        }
-#endif
     }
     if (AP::internalerror().errors() != 0) {
         AP::internalerror().errors_as_string((uint8_t*)buffer, ARRAY_SIZE(buffer));
@@ -1033,13 +1023,6 @@ bool AP_Arming::system_checks(bool report)
     }
 
     if (check_enabled(ARMING_CHECK_PARAMETERS)) {
-#if HAL_BUTTON_ENABLED
-        const auto &button = AP::button();
-        if (!button.arming_checks(sizeof(buffer), buffer)) {
-            check_failed(ARMING_CHECK_PARAMETERS, report, "%s", buffer);
-            return false;
-        }
-#endif
     }
 
     return true;
@@ -1188,23 +1171,6 @@ bool AP_Arming::fettec_checks(bool display_failure) const
 }
 #endif  // AP_FETTEC_ONEWIRE_ENABLED
 
-
-#if HAL_GENERATOR_ENABLED
-bool AP_Arming::generator_checks(bool display_failure) const
-{
-    const AP_Generator *generator = AP::generator();
-    if (generator == nullptr) {
-        return true;
-    }
-    char failure_msg[50] = {};
-    if (!generator->pre_arm_check(failure_msg, sizeof(failure_msg))) {
-        check_failed(display_failure, "Generator: %s", failure_msg);
-        return false;
-    }
-    return true;
-}
-#endif  // HAL_GENERATOR_ENABLED
-
 //Check for multiple RC in serial protocols
 bool AP_Arming::serial_protocol_checks(bool display_failure)
 {
@@ -1279,9 +1245,6 @@ bool AP_Arming::pre_arm_checks(bool report)
         &  board_voltage_checks(report)
         &  system_checks(report)
         &  terrain_checks(report)
-#if HAL_GENERATOR_ENABLED
-        &  generator_checks(report)
-#endif
 #if HAL_PROXIMITY_ENABLED
         &  proximity_checks(report)
 #endif

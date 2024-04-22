@@ -149,8 +149,6 @@ public:
         k_param_gps_glitch,             // deprecated
         k_param_baro_glitch,            // 71 - deprecated
 
-        // AP_ADSB Library
-        k_param_adsb,                   // 72
         k_param_notify,                 // 73
 
         // 74: precision landing object
@@ -498,11 +496,6 @@ public:
 
     // altitude at which nav control can start in takeoff
     AP_Float wp_navalt_min;
-
-    // button checking
-#if HAL_BUTTON_ENABLED
-    AP_Button *button_ptr;
-#endif
 
 #if STATS_ENABLED == ENABLED
     // vehicle statistics

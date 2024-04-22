@@ -781,7 +781,6 @@ class sitl_periph(sitl):
             COMPASS_MOT_ENABLED = 0,
             HAL_CAN_DEFAULT_NODE_ID = 0,
             HAL_GCS_ENABLED = 0,
-            HAL_GENERATOR_ENABLED = 0,
             HAL_LOGGING_ENABLED = 0,
             HAL_LOGGING_MAVLINK_ENABLED = 0,
             HAL_PROXIMITY_ENABLED = 0,

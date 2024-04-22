@@ -29,12 +29,9 @@
 #include <AP_AccelCal/AP_AccelCal.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>     // board configuration library
-#include <AP_Button/AP_Button.h>
 #include <AP_Compass/AP_Compass.h>
-#include <AP_EFI/AP_EFI.h>
 #include <AP_ExternalControl/AP_ExternalControl_config.h>
 #include <AP_GPS/AP_GPS.h>
-#include <AP_Generator/AP_Generator.h>
 #include <AP_Notify/AP_Notify.h>                    // Notify library
 #include <AP_Param/AP_Param.h>
 #include <AP_Scheduler/AP_Scheduler.h>
@@ -219,9 +216,6 @@ protected:
     AP_Baro barometer;
     Compass compass;
     AP_InertialSensor ins;
-#if HAL_BUTTON_ENABLED
-    AP_Button button;
-#endif
 
 #if HAL_GYROFFT_ENABLED
     AP_GyroFFT gyro_fft;
@@ -250,10 +244,6 @@ protected:
     AP_MSP msp;
 #endif
 
-#if HAL_GENERATOR_ENABLED
-    AP_Generator generator;
-#endif
-
 #if HAL_EXTERNAL_AHRS_ENABLED
     AP_ExternalAHRS externalAHRS;
 #endif
@@ -268,11 +258,6 @@ protected:
 
 #if AP_NETWORKING_ENABLED
     AP_Networking networking;
-#endif
-
-#if HAL_EFI_ENABLED
-    // EFI Engine Monitor
-    AP_EFI efi;
 #endif
 #if HAL_NMEA_OUTPUT_ENABLED
     AP_NMEA_Output nmea;

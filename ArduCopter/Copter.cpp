@@ -196,9 +196,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if HAL_LOGGING_ENABLED
     SCHED_TASK_CLASS(AP_Scheduler,         &copter.scheduler,           update_logging, 0.1,  75, 126),
 #endif
-#if HAL_ADSB_ENABLED
-    SCHED_TASK(avoidance_adsb_update, 10,    100, 138),
-#endif
 #if ADVANCED_FAILSAFE == ENABLED
     SCHED_TASK(afs_fs_check,          10,    100, 141),
 #endif
@@ -219,9 +216,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 #ifdef USERHOOK_SUPERSLOWLOOP
     SCHED_TASK(userhook_SuperSlowLoop, 1,     75, 165),
-#endif
-#if HAL_BUTTON_ENABLED
-    SCHED_TASK_CLASS(AP_Button,            &copter.button,              update,           5, 100, 168),
 #endif
 #if STATS_ENABLED == ENABLED
     SCHED_TASK_CLASS(AP_Stats,             &copter.g2.stats,            update,           1, 100, 171),
@@ -438,10 +432,6 @@ void Copter::one_hz_loop()
 #if HAL_LOGGING_ENABLED
     // log terrain data
     terrain_logging();
-#endif
-
-#if HAL_ADSB_ENABLED
-    adsb.set_is_flying(!ap.land_complete);
 #endif
 
     AP_Notify::flags.flying = !ap.land_complete;

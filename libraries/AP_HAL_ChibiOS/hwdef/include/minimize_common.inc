@@ -58,8 +58,6 @@ define AP_BARO_PROBE_EXTERNAL_I2C_BUSES 0
 # no wind compensation code:
 define HAL_BARO_WIND_COMP_ENABLED 0
 
-# no generator:
-define HAL_GENERATOR_ENABLED 0
 
 # no NMEA output:
 define HAL_NMEA_OUTPUT_ENABLED 0
