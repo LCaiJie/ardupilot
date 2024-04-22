@@ -376,10 +376,6 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     fence.manual_recovery_start();
 #endif
 
-#if AP_CAMERA_ENABLED
-    camera.set_is_auto_mode(flightmode->mode_number() == Mode::Number::AUTO);
-#endif
-
     // set rate shaping time constants
 #if MODE_ACRO_ENABLED == ENABLED || MODE_SPORT_ENABLED == ENABLED
     attitude_control->set_roll_pitch_rate_tc(g2.command_model_acro_rp.get_rate_tc());

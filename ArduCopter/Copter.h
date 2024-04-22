@@ -99,11 +99,6 @@
 #include "AP_ExternalControl_Copter.h"
 #endif
 
-#include <AP_Beacon/AP_Beacon_config.h>
-#if AP_BEACON_ENABLED
- #include <AP_Beacon/AP_Beacon.h>
-#endif
-
 #if AC_AVOID_ENABLED == ENABLED
  #include <AC_Avoidance/AC_Avoid.h>
 #endif
@@ -128,10 +123,6 @@
 #if RANGEFINDER_ENABLED == ENABLED
  # include <AP_RangeFinder/AP_RangeFinder.h>
 #endif
-
-#include <AP_Mount/AP_Mount.h>
-
-#include <AP_Camera/AP_Camera.h>
 
 #if HAL_BUTTON_ENABLED
  # include <AP_Button/AP_Button.h>
@@ -511,16 +502,6 @@ private:
     // Used to exit the roll and pitch auto trim function
     uint8_t auto_trim_counter;
     bool auto_trim_started = false;
-
-    // Camera
-#if AP_CAMERA_ENABLED
-    AP_Camera camera{MASK_LOG_CAMERA};
-#endif
-
-    // Camera/Antenna mount tracking and stabilisation stuff
-#if HAL_MOUNT_ENABLED
-    AP_Mount camera_mount;
-#endif
 
 #if AC_AVOID_ENABLED == ENABLED
     AC_Avoid avoid;

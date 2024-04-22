@@ -444,12 +444,6 @@ const AP_Param::Info Copter::var_info[] = {
 
     // variables not in the g class which contain EEPROM saved variables
 
-#if AP_CAMERA_ENABLED
-    // @Group: CAM
-    // @Path: ../libraries/AP_Camera/AP_Camera.cpp
-    GOBJECT(camera, "CAM", AP_Camera),
-#endif
-
 #if AP_RELAY_ENABLED
     // @Group: RELAY
     // @Path: ../libraries/AP_Relay/AP_Relay.cpp
@@ -547,12 +541,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Group: AHRS_
     // @Path: ../libraries/AP_AHRS/AP_AHRS.cpp
     GOBJECT(ahrs,                   "AHRS_",    AP_AHRS),
-
-#if HAL_MOUNT_ENABLED
-    // @Group: MNT
-    // @Path: ../libraries/AP_Mount/AP_Mount.cpp
-    GOBJECT(camera_mount,           "MNT",  AP_Mount),
-#endif
 
 #if HAL_LOGGING_ENABLED
     // @Group: LOG
@@ -790,12 +778,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Bitmask: 0:ADSBMavlinkProcessing,1:DevOptionVFR_HUDRelativeAlt
     // @User: Advanced
     AP_GROUPINFO("DEV_OPTIONS", 7, ParametersG2, dev_options, 0),
-
-#if AP_BEACON_ENABLED
-    // @Group: BCN
-    // @Path: ../libraries/AP_Beacon/AP_Beacon.cpp
-    AP_SUBGROUPINFO(beacon, "BCN", 14, ParametersG2, AP_Beacon),
-#endif
 
 #if HAL_PROXIMITY_ENABLED
     // @Group: PRX
@@ -1261,9 +1243,6 @@ ParametersG2::ParametersG2(void)
     : command_model_pilot(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
 #if AP_TEMPCALIBRATION_ENABLED
     , temp_calibration()
-#endif
-#if AP_BEACON_ENABLED
-    , beacon()
 #endif
 #if HAL_PROXIMITY_ENABLED
     , proximity()

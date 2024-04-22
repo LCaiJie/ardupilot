@@ -64,7 +64,6 @@ class ExtractFeatures(object):
             ('AP_TEMPERATURE_SENSOR_ENABLED', 'AP_TemperatureSensor::AP_TemperatureSensor',),
             ('AP_TEMPERATURE_SENSOR_{type}_ENABLED', 'AP_TemperatureSensor_(?P<type>.*)::update',),
 
-            ('AP_BEACON_ENABLED', 'AP_Beacon::AP_Beacon',),
             ('HAL_TORQEEDO_ENABLED', 'AP_Torqeedo::AP_Torqeedo'),
 
             ('HAL_NAVEKF3_AVAILABLE', 'NavEKF3::NavEKF3',),
@@ -103,12 +102,6 @@ class ExtractFeatures(object):
             ('AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED', r'AP_BattMonitor_Backend::update_esc_telem_outbound\b',),
             ('AP_BATTERY_WATT_MAX_ENABLED', 'AP_BattMonitor_Params::_watt_max',),
 
-            ('HAL_MOUNT_ENABLED', 'AP_Mount::AP_Mount',),
-            ('HAL_MOUNT_{type}_ENABLED', r'AP_Mount_(?P<type>.*)::update\b',),
-            ('HAL_SOLO_GIMBAL_ENABLED', 'AP_Mount_SoloGimbal::init',),
-            ('HAL_MOUNT_STORM32SERIAL_ENABLED', 'AP_Mount_SToRM32_serial::init',),
-            ('HAL_MOUNT_STORM32MAVLINK_ENABLED', 'AP_Mount_SToRM32::init',),
-
             ('HAL_{type}_TELEM_ENABLED', r'AP_(?P<type>.*)_Telem::init',),
             ('AP_{type}_TELEM_ENABLED', r'AP_(?P<type>.*)_Telem::init',),
             ('HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED', 'AP_CRSF_Telem::calc_text_selection',),
@@ -122,11 +115,6 @@ class ExtractFeatures(object):
 
             ('MODE_{type}_ENABLED', r'Mode(?P<type>.+)::init',),
             ('MODE_GUIDED_NOGPS_ENABLED', r'ModeGuidedNoGPS::init',),
-
-            ('AP_CAMERA_ENABLED', 'AP_Camera::var_info',),
-            ('AP_CAMERA_{type}_ENABLED', 'AP_Camera_(?P<type>.*)::trigger_pic',),
-            ('AP_CAMERA_SEND_FOV_STATUS_ENABLED', 'AP_Camera::send_camera_fov_status'),
-            ('HAL_RUNCAM_ENABLED', 'AP_RunCam::AP_RunCam',),
 
             ('HAL_PROXIMITY_ENABLED', 'AP_Proximity::AP_Proximity',),
             ('AP_PROXIMITY_{type}_ENABLED', 'AP_Proximity_(?P<type>.*)::update',),
@@ -226,8 +214,6 @@ class ExtractFeatures(object):
             ('AP_MAVLINK_MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES_ENABLED', 'GCS_MAVLINK::handle_command_request_autopilot_capabilities'),  # noqa
             ('AP_MAVLINK_MSG_RELAY_STATUS_ENABLED', 'GCS_MAVLINK::send_relay_status'),
             ('AP_MAVLINK_BATTERY2_ENABLED', 'GCS_MAVLINK::send_battery2'),
-            ('AP_MAVLINK_MSG_MOUNT_CONTROL_ENABLED', 'AP_Mount::handle_mount_control'),
-            ('AP_MAVLINK_MSG_MOUNT_CONFIGURE_ENABLED', 'AP_Mount::handle_mount_configure'),
             ('AP_MAVLINK_MSG_DEVICE_OP_ENABLED', 'GCS_MAVLINK::handle_device_op_write'),
             ('AP_MAVLINK_SERVO_RELAY_ENABLED', 'GCS_MAVLINK::handle_servorelay_message'),
             ('AP_MAVLINK_MSG_SERIAL_CONTROL_ENABLED', 'GCS_MAVLINK::handle_serial_control'),

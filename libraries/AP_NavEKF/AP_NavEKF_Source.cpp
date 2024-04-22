@@ -460,11 +460,7 @@ bool AP_NavEKF_Source::pre_arm_check(bool requires_position, char *failure_msg, 
     }
 
     if (beacon_required) {
-#if AP_BEACON_ENABLED
-        const bool beacon_available = (dal.beacon() != nullptr && dal.beacon()->enabled());
-#else
         const bool beacon_available = false;
-#endif
         if (!beacon_available) {
             hal.util->snprintf(failure_msg, failure_msg_len, ekf_requires_msg, "Beacon");
             return false;

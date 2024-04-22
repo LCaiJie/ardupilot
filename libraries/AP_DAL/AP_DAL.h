@@ -6,7 +6,6 @@
 #include "AP_DAL_RangeFinder.h"
 #include "AP_DAL_Compass.h"
 #include "AP_DAL_Airspeed.h"
-#include "AP_DAL_Beacon.h"
 #include "AP_DAL_VisualOdom.h"
 
 #include "LogStructure.h"
@@ -137,11 +136,6 @@ public:
     AP_DAL_Airspeed *airspeed() {
         return _airspeed;
     }
-#if AP_BEACON_ENABLED
-    AP_DAL_Beacon *beacon() {
-        return _beacon;
-    }
-#endif
 #if HAL_VISUALODOM_ENABLED
     AP_DAL_VisualOdom *visualodom() {
         return _visualodom;
@@ -291,20 +285,8 @@ public:
     }
 
     void handle_message(const log_RBCH &msg) {
-#if AP_BEACON_ENABLED
-        if (_beacon == nullptr) {
-            _beacon = new AP_DAL_Beacon;
-        }
-        _beacon->handle_message(msg);
-#endif
     }
     void handle_message(const log_RBCI &msg) {
-#if AP_BEACON_ENABLED
-        if (_beacon == nullptr) {
-            _beacon = new AP_DAL_Beacon;
-        }
-        _beacon->handle_message(msg);
-#endif
     }
     void handle_message(const log_RVOH &msg) {
 #if HAL_VISUALODOM_ENABLED
@@ -361,9 +343,6 @@ private:
     AP_DAL_RangeFinder *_rangefinder;
     AP_DAL_Compass _compass;
     AP_DAL_Airspeed *_airspeed;
-#if AP_BEACON_ENABLED
-    AP_DAL_Beacon *_beacon;
-#endif
 #if HAL_VISUALODOM_ENABLED
     AP_DAL_VisualOdom *_visualodom;
 #endif

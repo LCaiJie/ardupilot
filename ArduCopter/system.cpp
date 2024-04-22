@@ -124,16 +124,6 @@ void Copter::init_ardupilot()
     optflow.init(MASK_LOG_OPTFLOW);
 #endif      // AP_OPTICALFLOW_ENABLED
 
-#if HAL_MOUNT_ENABLED
-    // initialise camera mount
-    camera_mount.init();
-#endif
-
-#if AP_CAMERA_ENABLED
-    // initialise camera
-    camera.init();
-#endif
-
 #if AC_PRECLAND_ENABLED
     // initialise precision landing
     init_precland();
@@ -161,11 +151,6 @@ void Copter::init_ardupilot()
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();
-#endif
-
-#if AP_BEACON_ENABLED
-    // init beacons used for non-gps position estimation
-    g2.beacon.init();
 #endif
 
 #if AP_RPM_ENABLED

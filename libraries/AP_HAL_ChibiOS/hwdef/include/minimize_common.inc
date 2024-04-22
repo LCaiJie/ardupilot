@@ -45,18 +45,12 @@ define NUM_SERVO_CHANNELS 16
 define AP_WINCH_ENABLED 0
 
 # prune out some odd camera backends:
-define AP_CAMERA_BACKEND_DEFAULT_ENABLED 0
-define AP_CAMERA_RELAY_ENABLED AP_CAMERA_ENABLED
-define AP_CAMERA_SERVO_ENABLED AP_CAMERA_ENABLED
-
 # no SLCAN on these boards (use can-over-mavlink if required)
 define AP_CAN_SLCAN_ENABLED 0
 
 # no PiccoloCAN:
 define HAL_PICCOLO_CAN_ENABLE 0
 
-# no beacon support on minimized boards:
-define AP_BEACON_ENABLED 0
 
 # restricted battery backends:
 define AP_BATTERY_BACKEND_DEFAULT_ENABLED 0
@@ -78,9 +72,6 @@ define AP_BARO_PROBE_EXTERNAL_I2C_BUSES 0
 
 # no wind compensation code:
 define HAL_BARO_WIND_COMP_ENABLED 0
-
-# no mounts:
-define HAL_MOUNT_ENABLED 0
 
 # no generator:
 define HAL_GENERATOR_ENABLED 0

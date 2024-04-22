@@ -121,7 +121,6 @@ const struct MultiplierStructure log_Multipliers[] = {
 #define HEAD_BYTE1  0xA3    // Decimal 163
 #define HEAD_BYTE2  0x95    // Decimal 149
 
-#include <AP_Beacon/LogStructure.h>
 #include <AP_DAL/LogStructure.h>
 #include <AP_NavEKF2/LogStructure.h>
 #include <AP_NavEKF3/LogStructure.h>
@@ -130,8 +129,6 @@ const struct MultiplierStructure log_Multipliers[] = {
 #include <AP_BattMonitor/LogStructure.h>
 #include <AP_InertialSensor/LogStructure.h>
 #include <AP_AHRS/LogStructure.h>
-#include <AP_Camera/LogStructure.h>
-#include <AP_Mount/LogStructure.h>
 #include <AP_Baro/LogStructure.h>
 #include <AP_VisualOdom/LogStructure.h>
 #include <AC_PrecLand/LogStructure.h>
@@ -1250,8 +1247,6 @@ LOG_STRUCTURE_FROM_PRECLAND \
       "MAVC", "QBBBBBHffffiifBB","TimeUS,TS,TC,SS,SC,Fr,Cmd,P1,P2,P3,P4,X,Y,Z,Res,WL", "s---------------", "F---------------" }, \
     { LOG_RADIO_MSG, sizeof(log_Radio), \
       "RAD", "QBBBBBHH", "TimeUS,RSSI,RemRSSI,TxBuf,Noise,RemNoise,RxErrors,Fixed", "s-------", "F-------", true }, \
-LOG_STRUCTURE_FROM_CAMERA \
-LOG_STRUCTURE_FROM_MOUNT \
     { LOG_ARSP_MSG, sizeof(log_ARSP), "ARSP",  "QBffcffBBffB", "TimeUS,I,Airspeed,DiffPress,Temp,RawPress,Offset,U,H,Hp,TR,Pri", "s#nPOPP-----", "F-00B00-----", true }, \
     LOG_STRUCTURE_FROM_BATTMONITOR \
     { LOG_MAG_MSG, sizeof(log_MAG), \
@@ -1262,7 +1257,6 @@ LOG_STRUCTURE_FROM_MOUNT \
       "RFND", "QBCBBb", "TimeUS,Instance,Dist,Stat,Orient,Quality", "s#m--%", "F-B---", true }, \
     { LOG_MAV_STATS, sizeof(log_MAV_Stats), \
       "DMS", "QIIIIBBBBBBBBB",         "TimeUS,N,Dp,RT,RS,Fa,Fmn,Fmx,Pa,Pmn,Pmx,Sa,Smn,Smx", "s-------------", "F-------------" }, \
-    LOG_STRUCTURE_FROM_BEACON                                       \
     LOG_STRUCTURE_FROM_PROXIMITY                                    \
     { LOG_PERFORMANCE_MSG, sizeof(log_Performance),                     \
       "PM",  "QHHHIIHHIIIIII", "TimeUS,LR,NLon,NL,MaxT,Mem,Load,ErrL,IntE,ErrC,SPIC,I2CC,I2CI,Ex", "sz---b%------s", "F----0A------F" }, \

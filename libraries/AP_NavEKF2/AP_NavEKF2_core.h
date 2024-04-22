@@ -594,9 +594,6 @@ private:
     // determine when to perform fusion of GPS position and  velocity measurements
     void SelectVelPosFusion();
 
-    // determine when to perform fusion of range measurements take relative to a beacon at a known NED position
-    void SelectRngBcnFusion();
-
     // determine when to perform fusion of magnetometer measurements
     void SelectMagFusion();
 
@@ -1029,11 +1026,7 @@ private:
     ftype varInnovRngBcn;               // range beacon observation innovation variance (m^2)
     ftype innovRngBcn;                  // range beacon observation innovation (m)
     uint32_t lastTimeRngBcn_ms[10];     // last time we received a range beacon measurement (msec)
-#if AP_BEACON_ENABLED
-    bool rngBcnDataToFuse;              // true when there is new range beacon data to fuse
-#else
     const bool rngBcnDataToFuse = false;              // true when there is new range beacon data to fuse
-#endif
     Vector3F beaconVehiclePosNED;       // NED position estimate from the beacon system (NED)
     ftype beaconVehiclePosErr;          // estimated position error from the beacon system (m)
     uint32_t rngBcnLast3DmeasTime_ms;   // last time the beacon system returned a 3D fix (msec)

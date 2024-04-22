@@ -379,13 +379,6 @@
 #define AP_PARAM_DYNAMIC_ENABLED 0
 #endif
 
-#ifndef HAL_MOUNT_ENABLED
-#define HAL_MOUNT_ENABLED 0
-#endif
-
-#ifndef AP_CAMERA_ENABLED
-#define AP_CAMERA_ENABLED 0
-#endif
 
 #ifndef AP_TERRAIN_AVAILABLE
 #define AP_TERRAIN_AVAILABLE 0

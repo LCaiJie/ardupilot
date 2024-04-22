@@ -554,9 +554,6 @@ static const ap_message STREAM_EXTRA3_msgs[] = {
 #if AP_BATTERY_ENABLED
     MSG_BATTERY_STATUS,
 #endif
-#if HAL_MOUNT_ENABLED
-    MSG_GIMBAL_DEVICE_ATTITUDE_STATUS,
-#endif
 #if AP_OPTICALFLOW_ENABLED
     MSG_OPTICAL_FLOW,
 #endif
@@ -855,24 +852,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
     }
 }
 
-#if HAL_MOUNT_ENABLED
-MAV_RESULT GCS_MAVLINK_Copter::handle_command_mount(const mavlink_command_int_t &packet, const mavlink_message_t &msg)
-{
-    switch (packet.command) {
-    case MAV_CMD_DO_MOUNT_CONTROL:
-        // if vehicle has a camera mount but it doesn't do pan control then yaw the entire vehicle instead
-        if ((copter.camera_mount.get_mount_type() != AP_Mount::Type::None) &&
-            !copter.camera_mount.has_pan_control()) {
-            copter.flightmode->auto_yaw.set_yaw_angle_rate((float)packet.param3, 0.0f);
-        }
-        break;
-    default:
-        break;
-    }
-    return GCS_MAVLINK::handle_command_mount(packet, msg);
-}
-#endif
-
 MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_NAV_TAKEOFF(const mavlink_command_int_t &packet)
 {
     if (packet.frame != MAV_FRAME_GLOBAL_RELATIVE_ALT) {
@@ -1120,25 +1099,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_pause_continue(const mavlink_comma
     }
     return MAV_RESULT_DENIED;
 }
-
-#if HAL_MOUNT_ENABLED
-void GCS_MAVLINK_Copter::handle_mount_message(const mavlink_message_t &msg)
-{
-    switch (msg.msgid) {
-    case MAVLINK_MSG_ID_MOUNT_CONTROL:
-        // if vehicle has a camera mount but it doesn't do pan control then yaw the entire vehicle instead
-        if ((copter.camera_mount.get_mount_type() != AP_Mount::Type::None) &&
-            !copter.camera_mount.has_pan_control()) {
-            copter.flightmode->auto_yaw.set_yaw_angle_rate(
-                mavlink_msg_mount_control_get_input_c(&msg) * 0.01f,
-                0.0f);
-
-            break;
-        }
-    }
-    GCS_MAVLINK::handle_mount_message(msg);
-}
-#endif
 
 // this is called on receipt of a MANUAL_CONTROL packet and is
 // expected to call manual_override to override RC input on desired

@@ -73,9 +73,6 @@ void ModeAuto::exit()
     if (copter.mode_auto.mission.state() == AP_Mission::MISSION_RUNNING) {
         copter.mode_auto.mission.stop();
     }
-#if HAL_MOUNT_ENABLED
-    copter.camera_mount.set_mode_to_default();
-#endif  // HAL_MOUNT_ENABLED
 
     auto_RTL = false;
 }
@@ -1912,15 +1909,6 @@ void ModeAuto::do_roi(const AP_Mission::Mission_Command& cmd)
 // point the camera to a specified angle
 void ModeAuto::do_mount_control(const AP_Mission::Mission_Command& cmd)
 {
-#if HAL_MOUNT_ENABLED
-    // if vehicle has a camera mount but it doesn't do pan control then yaw the entire vehicle instead
-    if ((copter.camera_mount.get_mount_type() != AP_Mount::Type::None) &&
-        !copter.camera_mount.has_pan_control()) {
-        auto_yaw.set_yaw_angle_rate(cmd.content.mount_control.yaw,0.0f);
-    }
-    // pass the target angles to the camera mount
-    copter.camera_mount.set_angle_target(cmd.content.mount_control.roll, cmd.content.mount_control.pitch, cmd.content.mount_control.yaw, false);
-#endif
 }
 
 #if AP_WINCH_ENABLED

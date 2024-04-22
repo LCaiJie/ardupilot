@@ -139,10 +139,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     FAST_TASK(update_land_and_crash_detectors),
     // surface tracking update
     FAST_TASK(update_rangefinder_terrain_offset),
-#if HAL_MOUNT_ENABLED
-    // camera mount's fast update
-    FAST_TASK_CLASS(AP_Mount, &copter.camera_mount, update_fast),
-#endif
 #if HAL_LOGGING_ENABLED
     FAST_TASK(Log_Video_Stabilisation),
 #endif
@@ -169,9 +165,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 #if HAL_PROXIMITY_ENABLED
     SCHED_TASK_CLASS(AP_Proximity,         &copter.g2.proximity,        update,         200,  50,  36),
-#endif
-#if AP_BEACON_ENABLED
-    SCHED_TASK_CLASS(AP_Beacon,            &copter.g2.beacon,           update,         400,  50,  39),
 #endif
     SCHED_TASK(update_altitude,       10,    100,  42),
     SCHED_TASK(run_nav_updates,       50,    100,  45),
@@ -208,12 +201,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(lost_vehicle_check,    10,     50,  99),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_receive, 400, 180, 102),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_send,    400, 550, 105),
-#if HAL_MOUNT_ENABLED
-    SCHED_TASK_CLASS(AP_Mount,             &copter.camera_mount,        update,          50,  75, 108),
-#endif
-#if AP_CAMERA_ENABLED
-    SCHED_TASK_CLASS(AP_Camera,            &copter.camera,              update,          50,  75, 111),
-#endif
 #if HAL_LOGGING_ENABLED
     SCHED_TASK(ten_hz_logging_loop,   10,    350, 114),
     SCHED_TASK(twentyfive_hz_logging, 25,    110, 117),
@@ -575,9 +562,6 @@ void Copter::ten_hz_logging_loop()
 #if HAL_PROXIMITY_ENABLED
         g2.proximity.log();  // Write proximity sensor distances
 #endif
-#if AP_BEACON_ENABLED
-        g2.beacon.log();
-#endif
     }
 #if FRAME_CONFIG == HELI_FRAME
     Log_Write_Heli();
@@ -585,11 +569,6 @@ void Copter::ten_hz_logging_loop()
 #if AP_WINCH_ENABLED
     if (should_log(MASK_LOG_ANY)) {
         g2.winch.write_log();
-    }
-#endif
-#if HAL_MOUNT_ENABLED
-    if (should_log(MASK_LOG_CAMERA)) {
-        camera_mount.write_log();
     }
 #endif
 }

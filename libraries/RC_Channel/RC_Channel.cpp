@@ -34,8 +34,6 @@ extern const AP_HAL::HAL& hal;
 
 #include <AC_Avoidance/AC_Avoid.h>
 #include <AC_Sprayer/AC_Sprayer.h>
-#include <AP_Camera/AP_Camera.h>
-#include <AP_Camera/AP_RunCam.h>
 #include <AP_Compass/AP_Compass.h>
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Gripper/AP_Gripper.h>
@@ -54,7 +52,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
 #include <AP_VisualOdom/AP_VisualOdom.h>
 #include <AP_AHRS/AP_AHRS.h>
-#include <AP_Mount/AP_Mount.h>
 #include <AP_Notify/AP_Notify.h>
 #include <AP_VideoTX/AP_VideoTX.h>
 #include <AP_Torqeedo/AP_Torqeedo.h>
@@ -691,10 +688,6 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const AuxSwitchPo
     case AUX_FUNC::SPRAYER:
     case AUX_FUNC::DISABLE_AIRSPEED_USE:
     case AUX_FUNC::FFT_NOTCH_TUNE:
-#if HAL_MOUNT_ENABLED
-    case AUX_FUNC::RETRACT_MOUNT1:
-    case AUX_FUNC::MOUNT_LOCK:
-#endif
     case AUX_FUNC::LOG_PAUSE:
     case AUX_FUNC::ARM_EMERGENCY_STOP:
     case AUX_FUNC::CAMERA_REC_VIDEO:
@@ -912,145 +905,12 @@ void RC_Channel::do_aux_function_avoid_proximity(const AuxSwitchPos ch_flag)
 #endif // !APM_BUILD_ArduPlane
 }
 
-#if AP_CAMERA_ENABLED
-void RC_Channel::do_aux_function_camera_trigger(const AuxSwitchPos ch_flag)
-{
-    if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_Camera *camera = AP::camera();
-        if (camera == nullptr) {
-            return;
-        }
-        camera->take_picture();
-    }
-}
-
-bool RC_Channel::do_aux_function_record_video(const AuxSwitchPos ch_flag)
-{
-    AP_Camera *camera = AP::camera();
-    if (camera == nullptr) {
-        return false;
-    }
-    return camera->record_video(ch_flag == AuxSwitchPos::HIGH);
-}
-
-bool RC_Channel::do_aux_function_camera_zoom(const AuxSwitchPos ch_flag)
-{
-    AP_Camera *camera = AP::camera();
-    if (camera == nullptr) {
-        return false;
-    }
-    int8_t zoom_step = 0;   // zoom out = -1, hold = 0, zoom in = 1
-    switch (ch_flag) {
-    case AuxSwitchPos::HIGH:
-        zoom_step = 1;  // zoom in
-        break;
-    case AuxSwitchPos::MIDDLE:
-        zoom_step = 0;  // zoom hold
-        break;
-    case AuxSwitchPos::LOW:
-        zoom_step = -1; // zoom out
-        break;
-    }
-    return camera->set_zoom(ZoomType::RATE, zoom_step);
-}
-
-bool RC_Channel::do_aux_function_camera_manual_focus(const AuxSwitchPos ch_flag)
-{
-    AP_Camera *camera = AP::camera();
-    if (camera == nullptr) {
-        return false;
-    }
-    int8_t focus_step = 0;  // focus in = -1, focus hold = 0, focus out = 1
-    switch (ch_flag) {
-    case AuxSwitchPos::HIGH:
-        // wide shot, focus out
-        focus_step = 1;
-        break;
-    case AuxSwitchPos::MIDDLE:
-        focus_step = 0;
-        break;
-    case AuxSwitchPos::LOW:
-        // close shot, focus in
-        focus_step = -1;
-        break;
-    }
-    return camera->set_focus(FocusType::RATE, focus_step) == SetFocusResult::ACCEPTED;
-}
-
-bool RC_Channel::do_aux_function_camera_auto_focus(const AuxSwitchPos ch_flag)
-{
-    if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_Camera *camera = AP::camera();
-        if (camera == nullptr) {
-            return false;
-        }
-        return camera->set_focus(FocusType::AUTO, 0) == SetFocusResult::ACCEPTED;
-    }
-    return false;
-}
-
-bool RC_Channel::do_aux_function_camera_image_tracking(const AuxSwitchPos ch_flag)
-{
-    AP_Camera *camera = AP::camera();
-    if (camera == nullptr) {
-        return false;
-    }
-    // High position enables tracking a POINT in middle of image
-    // Low or Mediums disables tracking.  (0.5,0.5) is still passed in but ignored
-    return camera->set_tracking(ch_flag == AuxSwitchPos::HIGH ? TrackingType::TRK_POINT : TrackingType::TRK_NONE, Vector2f{0.5, 0.5}, Vector2f{});
-}
-
-bool RC_Channel::do_aux_function_camera_lens(const AuxSwitchPos ch_flag)
-{
-    AP_Camera *camera = AP::camera();
-    if (camera == nullptr) {
-        return false;
-    }
-    // Low selects lens 0 (default), Mediums selects lens1, High selects lens2
-    return camera->set_lens((uint8_t)ch_flag);
-}
-#endif
-
 void RC_Channel::do_aux_function_runcam_control(const AuxSwitchPos ch_flag)
 {
-#if HAL_RUNCAM_ENABLED
-    AP_RunCam *runcam = AP::runcam();
-    if (runcam == nullptr) {
-        return;
-    }
-
-    switch (ch_flag) {
-    case AuxSwitchPos::HIGH:
-        runcam->start_recording();
-        break;
-    case AuxSwitchPos::MIDDLE:
-        runcam->osd_option();
-        break;
-    case AuxSwitchPos::LOW:
-        runcam->stop_recording();
-        break;
-    }
-#endif
 }
 
 void RC_Channel::do_aux_function_runcam_osd_control(const AuxSwitchPos ch_flag)
 {
-#if HAL_RUNCAM_ENABLED
-    AP_RunCam *runcam = AP::runcam();
-    if (runcam == nullptr) {
-        return;
-    }
-
-    switch (ch_flag) {
-    case AuxSwitchPos::HIGH:
-        runcam->enter_osd();
-        break;
-    case AuxSwitchPos::MIDDLE:
-    case AuxSwitchPos::LOW:
-        runcam->exit_osd();
-        break;
-    }
-#endif
 }
 
 #if AP_FENCE_ENABLED
@@ -1478,78 +1338,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         break;
 #endif  // AP_INERTIALSENSOR_KILL_IMU_ENABLED
 
-#if AP_CAMERA_ENABLED
-    case AUX_FUNC::CAMERA_TRIGGER:
-        do_aux_function_camera_trigger(ch_flag);
-        break;
-
-    case AUX_FUNC::CAM_MODE_TOGGLE: {
-        // Momentary switch to for cycling camera modes
-        AP_Camera *camera = AP_Camera::get_singleton();
-        if (camera == nullptr) {
-            break;
-        }
-        switch (ch_flag) {
-        case AuxSwitchPos::LOW:
-            // nothing
-            break;
-        case AuxSwitchPos::MIDDLE:
-            // nothing
-            break;
-        case AuxSwitchPos::HIGH:
-            camera->cam_mode_toggle();
-            break;
-        }
-        break;
-    }
-    case AUX_FUNC::CAMERA_REC_VIDEO:
-        return do_aux_function_record_video(ch_flag);
-
-    case AUX_FUNC::CAMERA_ZOOM:
-        return do_aux_function_camera_zoom(ch_flag);
-
-    case AUX_FUNC::CAMERA_MANUAL_FOCUS:
-        return do_aux_function_camera_manual_focus(ch_flag);
-
-    case AUX_FUNC::CAMERA_AUTO_FOCUS:
-        return do_aux_function_camera_auto_focus(ch_flag);
-
-    case AUX_FUNC::CAMERA_IMAGE_TRACKING:
-        return do_aux_function_camera_image_tracking(ch_flag);
-
-    case AUX_FUNC::CAMERA_LENS:
-        return do_aux_function_camera_lens(ch_flag);
-#endif
-
-#if HAL_MOUNT_ENABLED
-    case AUX_FUNC::RETRACT_MOUNT1: {
-        AP_Mount *mount = AP::mount();
-        if (mount == nullptr) {
-            break;
-        }
-        switch (ch_flag) {
-        case AuxSwitchPos::HIGH:
-            mount->set_mode(0,MAV_MOUNT_MODE_RETRACT);
-            break;
-        case AuxSwitchPos::MIDDLE:
-            // nothing
-            break;
-        case AuxSwitchPos::LOW:
-            mount->set_mode_to_default(0);
-            break;
-        }
-        break;
-    }
-
-    case AUX_FUNC::MOUNT_LOCK: {
-        AP_Mount *mount = AP::mount();
-        if (mount == nullptr) {
-            break;
-        }
-        mount->set_yaw_lock(ch_flag == AuxSwitchPos::HIGH);
-        break;
-    }
-#endif
 
 #if HAL_LOGGING_ENABLED
     case AUX_FUNC::LOG_PAUSE: {

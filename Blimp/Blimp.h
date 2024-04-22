@@ -67,7 +67,6 @@
 #include "GCS_Blimp.h"
 #include "AP_Arming.h"
 
-#include <AP_Mount/AP_Mount.h>
 
 // Local modules
 
