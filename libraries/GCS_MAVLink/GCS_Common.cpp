@@ -1940,16 +1940,6 @@ void GCS_MAVLINK::send_scaled_pressure()
     send_scaled_pressure_instance(0, mavlink_msg_scaled_pressure_send);
 }
 
-void GCS_MAVLINK::send_scaled_pressure2()
-{
-    send_scaled_pressure_instance(1, mavlink_msg_scaled_pressure2_send);
-}
-
-void GCS_MAVLINK::send_scaled_pressure3()
-{
-    send_scaled_pressure_instance(2, mavlink_msg_scaled_pressure3_send);
-}
-
 void GCS_MAVLINK::send_ahrs()
 {
 #if AP_AHRS_ENABLED
@@ -5013,16 +5003,6 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_SCALED_PRESSURE:
         CHECK_PAYLOAD_SIZE(SCALED_PRESSURE);
         send_scaled_pressure();
-        break;
-
-    case MSG_SCALED_PRESSURE2:
-        CHECK_PAYLOAD_SIZE(SCALED_PRESSURE2);
-        send_scaled_pressure2();
-        break;
-
-    case MSG_SCALED_PRESSURE3:
-        CHECK_PAYLOAD_SIZE(SCALED_PRESSURE3);
-        send_scaled_pressure3();
         break;
 
     case MSG_SERVO_OUTPUT_RAW:
