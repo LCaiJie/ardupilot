@@ -29,8 +29,6 @@
 #define HAL_HAVE_BOARD_VOLTAGE 0
 #define HAL_HAVE_SERVO_VOLTAGE 0
 
-#define HAL_WITH_IO_MCU 0
-
 #define O_CLOEXEC 0
 #define HAL_STORAGE_SIZE (16384)
 

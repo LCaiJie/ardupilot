@@ -474,13 +474,6 @@ private:
     static pwm_group pwm_group_list[];
     static const uint8_t NUM_GROUPS;
 
-#if HAL_WITH_IO_MCU
-    // cached values of AP_BoardConfig::io_enabled() and AP_BoardConfig::io_dshot()
-    // in case the user changes them
-    bool iomcu_enabled;
-    bool iomcu_dshot;
-#endif
-
     // offset of first local channel
     uint8_t chan_offset;
 

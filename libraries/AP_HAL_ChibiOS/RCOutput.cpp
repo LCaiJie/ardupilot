@@ -55,10 +55,7 @@ using namespace ChibiOS;
 
 extern const AP_HAL::HAL& hal;
 
-#if HAL_WITH_IO_MCU
-#include <AP_IOMCU/AP_IOMCU.h>
-extern AP_IOMCU iomcu;
-#endif
+
 
 #define RCOU_SERIAL_TIMING_DEBUG 0
 #define LED_THD_WA_SIZE 256
@@ -96,17 +93,6 @@ void RCOutput::init()
         // cannot init RCOutput twice
         return;
     }
-
-#if HAL_WITH_IO_MCU
-    if (AP_BoardConfig::io_enabled()) {
-        // with IOMCU the local (FMU) channels start at 8
-        chan_offset = 8;
-        iomcu_enabled = true;
-    }
-    if (AP_BoardConfig::io_dshot()) {
-        iomcu_dshot = true;
-    }
-#endif
 
     for (auto &group : pwm_group_list) {
         const uint8_t i = &group - pwm_group_list;
@@ -148,11 +134,6 @@ void RCOutput::init()
         chVTObjectInit(&group.dma_timeout);
     }
 
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.init();
-    }
-#endif
     chMtxObjectInit(&trigger_mutex);
     chVTObjectInit(&_dshot_rate_timer);
     // setup default output rate of 50Hz
@@ -398,27 +379,6 @@ void RCOutput::set_freq_group(pwm_group &group)
  */
 void RCOutput::set_freq(uint32_t chmask, uint16_t freq_hz)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        // change frequency on IOMCU
-        uint16_t io_chmask = chmask & 0xFF;
-        if (io_chmask) {
-            // disallow changing frequency of this group if it is greater than the default
-            for (uint8_t i=0; i<ARRAY_SIZE(iomcu.ch_masks); i++) {
-                const uint16_t mask = io_chmask & iomcu.ch_masks[i];
-                if (mask != 0) {
-                    if (freq_hz > 50) {
-                        io_fast_channel_mask |= mask;
-                    } else {
-                        io_fast_channel_mask &= ~mask;
-                    }
-                }
-            }
-            iomcu.set_freq(io_fast_channel_mask, freq_hz);
-        }
-    }
-#endif
-
     // convert to a local (FMU) channel mask
     chmask >>= chan_offset;
     if (chmask == 0) {
@@ -455,11 +415,6 @@ void RCOutput::set_freq(uint32_t chmask, uint16_t freq_hz)
  */
 void RCOutput::set_default_rate(uint16_t freq_hz)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.set_default_rate(freq_hz);
-    }
-#endif
     for (auto &group : pwm_group_list) {
         if ((group.ch_mask & fast_channel_mask) || group.ch_mask == 0) {
             // don't change fast channels
@@ -482,11 +437,6 @@ void RCOutput::set_dshot_rate(uint8_t dshot_rate, uint16_t loop_rate_hz)
     if (loop_rate_hz <= 100 || dshot_rate == 0) {
         _dshot_period_us = 1000UL;
         _dshot_rate = 0;
-#if HAL_WITH_IO_MCU
-        if (iomcu_dshot) {
-            iomcu.set_dshot_period(1000UL, 0);
-        }
-#endif
         return;
     }
     // if there are non-dshot channels then do likewise
@@ -496,13 +446,6 @@ void RCOutput::set_dshot_rate(uint8_t dshot_rate, uint16_t loop_rate_hz)
             group.current_mode == MODE_PWM_BRUSHED) {
             _dshot_period_us = 1000UL;
             _dshot_rate = 0;
-#if HAL_WITH_IO_MCU
-            // this is not strictly neccessary since the iomcu could run at a different rate,
-            // but there is only one parameter to control this
-            if (iomcu_dshot) {
-                iomcu.set_dshot_period(1000UL, 0);
-            }
-#endif
             return;
         }
     }
@@ -522,11 +465,6 @@ void RCOutput::set_dshot_rate(uint8_t dshot_rate, uint16_t loop_rate_hz)
         drate = _dshot_rate * loop_rate_hz;
     }
     _dshot_period_us = 1000000UL / drate;
-#if HAL_WITH_IO_MCU
-    if (iomcu_dshot) {
-        iomcu.set_dshot_period(_dshot_period_us, _dshot_rate);
-    }
-#endif
 }
 
 #if HAL_DSHOT_ENABLED
@@ -549,11 +487,6 @@ void RCOutput::set_dshot_esc_type(DshotEscType dshot_esc_type)
             DSHOT_BIT_1_TICKS = DSHOT_BIT_1_TICKS_DEFAULT;
             break;
     }
-#if HAL_WITH_IO_MCU
-    if (iomcu_dshot) {
-        iomcu.set_dshot_esc_type(dshot_esc_type);
-    }
-#endif
 }
 #endif // #if HAL_DSHOT_ENABLED
 
@@ -610,11 +543,6 @@ uint32_t RCOutput::get_disabled_channels(uint32_t digital_mask)
 
 uint16_t RCOutput::get_freq(uint8_t chan)
 {
-#if HAL_WITH_IO_MCU
-    if (chan < chan_offset) {
-        return iomcu.get_freq(chan);
-    }
-#endif
     uint8_t i;
     pwm_group *grp = find_chan(chan, i);
     if (grp) {
@@ -626,12 +554,6 @@ uint16_t RCOutput::get_freq(uint8_t chan)
 
 void RCOutput::enable_ch(uint8_t chan)
 {
-#if HAL_WITH_IO_MCU
-    if (chan < chan_offset && iomcu_enabled) {
-        iomcu.enable_ch(chan);
-        return;
-    }
-#endif
     uint8_t i;
     pwm_group *grp = find_chan(chan, i);
     if (grp) {
@@ -642,12 +564,6 @@ void RCOutput::enable_ch(uint8_t chan)
 
 void RCOutput::disable_ch(uint8_t chan)
 {
-#if HAL_WITH_IO_MCU
-    if (chan < chan_offset && iomcu_enabled) {
-        iomcu.disable_ch(chan);
-        return;
-    }
-#endif
     uint8_t i;
     pwm_group *grp = find_chan(chan, i);
     if (grp) {
@@ -672,12 +588,6 @@ void RCOutput::write(uint8_t chan, uint16_t period_us)
     }
 #endif
 
-#if HAL_WITH_IO_MCU
-    // handle IO MCU channels
-    if (iomcu_enabled) {
-        iomcu.write_channel(chan, period_us);
-    }
-#endif
     if (chan < chan_offset) {
         return;
     }
@@ -795,11 +705,6 @@ uint16_t RCOutput::read(uint8_t chan)
     if (chan >= max_channels) {
         return 0;
     }
-#if HAL_WITH_IO_MCU
-    if (chan < chan_offset) {
-        return iomcu.read_channel(chan);
-    }
-#endif
     chan -= chan_offset;
     return period[chan];
 }
@@ -809,11 +714,6 @@ void RCOutput::read(uint16_t* period_us, uint8_t len)
     if (len > max_channels) {
         len = max_channels;
     }
-#if HAL_WITH_IO_MCU
-    for (uint8_t i=0; i<MIN(len, chan_offset); i++) {
-        period_us[i] = iomcu.read_channel(i);
-    }
-#endif
     if (len <= chan_offset) {
         return;
     }
@@ -1114,18 +1014,6 @@ void RCOutput::set_output_mode(uint32_t mask, const enum output_mode mode)
             set_group_mode(group);
         }
     }
-#if HAL_WITH_IO_MCU
-    const uint16_t iomcu_mask = (mask & ((1U<<chan_offset)-1));
-    if ((mode == MODE_PWM_ONESHOT ||
-         mode == MODE_PWM_ONESHOT125 ||
-         mode == MODE_PWM_BRUSHED ||
-         (mode >= MODE_PWM_DSHOT150 && mode <= MODE_PWM_DSHOT600)) &&
-        iomcu_mask &&
-        iomcu_enabled) {
-        iomcu.set_output_mode(iomcu_mask, mode);
-        return;
-    }
-#endif
 }
 
 /*
@@ -1156,11 +1044,6 @@ RCOutput::output_mode RCOutput::get_output_mode(uint32_t& mask)
  */
 void RCOutput::set_telem_request_mask(uint32_t mask)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_dshot && (mask & ((1U<<chan_offset)-1))) {
-        iomcu.set_telem_request_mask(mask);
-    }
-#endif
     telem_request_mask = (mask >> chan_offset);
 }
 
@@ -1177,22 +1060,6 @@ bool RCOutput::get_output_mode_banner(char banner_msg[], uint8_t banner_msg_len)
     // create array of each channel's mode
     output_mode ch_mode[chan_offset + NUM_GROUPS * ARRAY_SIZE(pwm_group::chan)] = {};
     bool have_nonzero_modes = false;
-
-#if HAL_WITH_IO_MCU
-    // fill in ch_mode array for IOMCU channels
-    if (iomcu_enabled) {
-        uint8_t iomcu_mask;
-        const output_mode iomcu_mode = iomcu.get_output_mode(iomcu_mask);
-        for (uint8_t i = 0; i < chan_offset; i++ ) {
-            if (iomcu_mask & 1U<<i) {
-                ch_mode[i] = iomcu_mode;
-            } else {
-                ch_mode[i] = MODE_PWM_NORMAL;
-            }
-        }
-        have_nonzero_modes = (chan_offset > 0) && (iomcu_mode != MODE_PWM_NONE);
-    }
-#endif
 
     // fill in ch_mode array for FMU channels
     for (auto &group : pwm_group_list) {
@@ -1242,11 +1109,6 @@ bool RCOutput::get_output_mode_banner(char banner_msg[], uint8_t banner_msg_len)
 void RCOutput::cork(void)
 {
     corked = true;
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.cork();
-    }
-#endif
 }
 
 /*
@@ -1256,11 +1118,6 @@ void RCOutput::push(void)
 {
     corked = false;
     push_local();
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.push();
-    }
-#endif
 }
 
 /*
@@ -1268,11 +1125,6 @@ void RCOutput::push(void)
  */
 bool RCOutput::enable_px4io_sbus_out(uint16_t rate_hz)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        return iomcu.enable_sbus_out(rate_hz);
-    }
-#endif
     return false;
 }
 
@@ -2109,11 +1961,6 @@ void RCOutput::serial_end(void)
  */
 AP_HAL::Util::safety_state RCOutput::_safety_switch_state(void)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        safety_state = iomcu.get_safety_switch_state();
-    }
-#endif
     if (!hal.util->was_watchdog_reset()) {
         hal.util->persistent_data.safety_state = safety_state;
     }
@@ -2125,11 +1972,6 @@ AP_HAL::Util::safety_state RCOutput::_safety_switch_state(void)
 */
 bool RCOutput::force_safety_on(void)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        return iomcu.force_safety_on();
-    }
-#endif
     safety_state = AP_HAL::Util::SAFETY_DISARMED;
     return true;
 }
@@ -2139,12 +1981,6 @@ bool RCOutput::force_safety_on(void)
 */
 void RCOutput::force_safety_off(void)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.force_safety_off();
-        return;
-    }
-#endif
     safety_state = AP_HAL::Util::SAFETY_ARMED;
 }
 
@@ -2185,14 +2021,6 @@ void RCOutput::safety_update(void)
     } else {
         safety_press_count = 0;
     }
-#elif HAL_WITH_IO_MCU
-    safety_state = _safety_switch_state();
-#endif
-
-#if HAL_WITH_IO_MCU
-    // regardless of if we have a FMU safety pin, if we have an IOMCU we need
-    // to pass the BRD_SAFETY_MASK to the IOMCU
-    iomcu.set_safety_mask(safety_mask);
 #endif
     
 #ifdef HAL_GPIO_PIN_LED_SAFETY
@@ -2207,11 +2035,6 @@ void RCOutput::safety_update(void)
 */
 void RCOutput::set_failsafe_pwm(uint32_t chmask, uint16_t period_us)
 {
-#if HAL_WITH_IO_MCU
-    if (iomcu_enabled) {
-        iomcu.set_failsafe_pwm(chmask, period_us);
-    }
-#endif
 }
 
 /*

@@ -4,9 +4,6 @@ namespace ChibiOS {
     class AnalogIn;
     class AnalogSource;
     class DigitalSource;
-#if HAL_WITH_IO_MCU
-    class IOMCU_DigitalSource;
-#endif
     class DSP;
     class GPIO;
     class I2CBus;

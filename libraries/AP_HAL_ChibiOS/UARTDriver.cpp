@@ -48,10 +48,6 @@ using namespace ChibiOS;
 #endif
 #endif
 
-#if HAL_WITH_IO_MCU
-extern ChibiOS::UARTDriver uart_io;
-#endif
-
 const UARTDriver::SerialDef UARTDriver::_serial_tab[] = { HAL_SERIAL_DEVICE_LIST };
 
 // handle for UART handling thread
@@ -252,14 +248,6 @@ void UARTDriver::_begin(uint32_t b, uint16_t rxS, uint16_t txS)
       protocols
      */
     bool rx_size_by_baudrate = true;
-#if HAL_WITH_IO_MCU
-    if (this == &uart_io) {
-        // iomcu doesn't need extra space, just speed
-        rx_size_by_baudrate = false;
-        min_tx_buffer = 0;
-        min_rx_buffer = 0;
-    }
-#endif
     if (rx_size_by_baudrate) {
         min_rx_buffer = MAX(min_rx_buffer, b/(40*10));
     }

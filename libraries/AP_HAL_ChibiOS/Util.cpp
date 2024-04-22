@@ -40,12 +40,6 @@
 #include <AP_Logger/AP_Logger.h>
 #endif
 
-#if HAL_WITH_IO_MCU
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_IOMCU/AP_IOMCU.h>
-extern AP_IOMCU iomcu;
-#endif
-
 #if AP_SIGNED_FIRMWARE && !defined(HAL_BOOTLOADER_BUILD)
 #endif
 
@@ -653,10 +647,6 @@ void Util::apply_persistent_params(void) const
 }
 #endif // HAL_ENABLE_SAVE_PERSISTENT_PARAMS
 
-#if HAL_WITH_IO_MCU
-extern ChibiOS::UARTDriver uart_io;
-#endif
-
 #if HAL_UART_STATS_ENABLED
 // request information on uart I/O
 void Util::uart_info(ExpandingString &str)
@@ -670,10 +660,6 @@ void Util::uart_info(ExpandingString &str)
             uart->uart_info(str);
         }
     }
-#if HAL_WITH_IO_MCU
-    str.printf("IOMCU   ");
-    uart_io.uart_info(str);
-#endif
 }
 #endif
 

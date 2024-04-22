@@ -786,10 +786,6 @@ def _build_recursion(bld):
         common_dirs_patterns,
         excl=common_dirs_excl,
     )
-    if bld.env.IOMCU_FW is not None:
-        if bld.env.IOMCU_FW:
-            dirs_to_recurse.append('libraries/AP_IOMCU/iofirmware')
-
     if bld.env.PERIPH_FW is not None:
         if bld.env.PERIPH_FW:
             dirs_to_recurse.append('Tools/AP_Periph')

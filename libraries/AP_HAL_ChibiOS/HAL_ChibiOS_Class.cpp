@@ -123,11 +123,6 @@ static Empty::Flash flashDriver;
 static ChibiOS::WSPIDeviceManager wspiDeviceManager;
 #endif
 
-#if HAL_WITH_IO_MCU
-HAL_UART_IO_DRIVER;
-#include <AP_IOMCU/AP_IOMCU.h>
-AP_IOMCU iomcu(uart_io);
-#endif
 
 HAL_ChibiOS::HAL_ChibiOS() :
     AP_HAL::HAL(

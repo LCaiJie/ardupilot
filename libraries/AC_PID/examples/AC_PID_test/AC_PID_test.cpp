@@ -8,12 +8,6 @@
 #include <AC_PID/AC_HELI_PID.h>
 #include <RC_Channel/RC_Channel.h>
 
-// we need a board config created so that the io processor is available
-#if HAL_WITH_IO_MCU
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_IOMCU/AP_IOMCU.h>
-AP_BoardConfig BoardConfig;
-#endif
 
 void setup();
 void loop();
@@ -57,9 +51,6 @@ void setup()
 {
     hal.console->printf("ArduPilot AC_PID library test\n");
 
-#if HAL_WITH_IO_MCU
-    BoardConfig.init();
-#endif
 
     rc().init();
 

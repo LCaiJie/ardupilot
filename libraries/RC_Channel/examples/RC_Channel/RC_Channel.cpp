@@ -7,11 +7,6 @@
 #include <RC_Channel/RC_Channel.h>
 
 // we need a boardconfig created so that the io processor is available
-#if HAL_WITH_IO_MCU
-#include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_IOMCU/AP_IOMCU.h>
-AP_BoardConfig BoardConfig;
-#endif
 
 void setup();
 void loop();
@@ -57,10 +52,6 @@ static void print_radio_values();
 void setup()
 {
     hal.console->printf("ArduPilot RC Channel test\n");
-
-#if HAL_WITH_IO_MCU
-    BoardConfig.init();
-#endif
 
     rc().init();
 

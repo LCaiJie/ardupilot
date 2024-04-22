@@ -54,7 +54,6 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_Module',
     'AP_Networking',
     'AP_FlashStorage',
-    'AP_IOMCU',
     'AP_RAMTRON',
     'AP_RCProtocol',
     'AP_ROMFS',

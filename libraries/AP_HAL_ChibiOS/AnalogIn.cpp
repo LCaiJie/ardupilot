@@ -23,10 +23,6 @@
 
 #include "AnalogIn.h"
 
-#if HAL_WITH_IO_MCU
-#include <AP_IOMCU/AP_IOMCU.h>
-extern AP_IOMCU iomcu;
-#endif
 
 #include "hwdef/common/stm32_util.h"
 
@@ -720,11 +716,6 @@ void AnalogIn::_timer_tick(void)
     // update power status flags
     update_power_flags();
 
-#if HAL_WITH_IO_MCU
-    // handle special inputs from IOMCU
-    _rssi_voltage = iomcu.get_vrssi_adc_count() * (VOLTAGE_SCALING *  HAL_IOMCU_VRSSI_SCALAR);
-#endif
-
     /*
       update each of our ADCs
      */
@@ -736,9 +727,6 @@ void AnalogIn::_timer_tick(void)
     timer_tick_adc(2);
 #endif
 
-#if HAL_WITH_IO_MCU
-    _servorail_voltage = iomcu.get_vservo_adc_count() * (VOLTAGE_SCALING * HAL_IOMCU_VSERVO_SCALAR);
-#endif
 
 #if HAL_WITH_MCU_MONITORING
     // 20Hz temperature and ref voltage

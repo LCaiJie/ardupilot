@@ -12,7 +12,6 @@
 // parameter is available
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_IOMCU/AP_IOMCU.h>
 AP_BoardConfig BoardConfig;
 #endif
 

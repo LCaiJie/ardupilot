@@ -18,7 +18,6 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_IOMCU/AP_IOMCU.h>
 #include <AP_Logger/AP_Logger.h>
 #include <GCS_MAVLink/GCS.h>
 #include "AP_BoardConfig.h"
@@ -111,16 +110,6 @@ void AP_BoardConfig::set_imu_temp(float current)
     gcs().send_text(MAV_SEVERITY_INFO, "Heater: Out=%.1f Temp=%.1f",
                     double(heater.output),
                     double(avg));
-#endif
-
-#if HAL_WITH_IO_MCU
-    if (io_enabled()) {
-        AP_IOMCU *iomcu = AP::iomcu();
-        if (iomcu) {
-            // tell IOMCU to setup heater
-            iomcu->set_heater_duty_cycle(heater.output);
-        }
-    }
 #endif
 }
 

@@ -51,11 +51,6 @@
 #include <AP_Common/ExpandingString.h>
 #include <GCS_MAVLink/GCS.h>
 
-#if HAL_WITH_IO_MCU
-#include <AP_IOMCU/AP_IOMCU.h>
-extern AP_IOMCU iomcu;
-#endif
-
 using namespace ChibiOS;
 
 extern const AP_HAL::HAL& hal;
@@ -276,12 +271,6 @@ void Scheduler::reboot(bool hold_in_bootloader)
 {
     // disarm motors to ensure they are off during a bootloader upload
     hal.rcout->force_safety_on();
-
-#if HAL_WITH_IO_MCU
-    if (AP_BoardConfig::io_enabled()) {
-        iomcu.shutdown();
-    }
-#endif
 
 #if HAL_LOGGING_ENABLED
     //stop logging

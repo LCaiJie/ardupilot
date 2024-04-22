@@ -1801,23 +1801,6 @@ INCLUDE common.ld
             f.write('#define HAL_SERIAL%s_DRIVER Empty::UARTDriver serial%sDriver\n' %
                     (idx, idx))
 
-        if 'IOMCU_UART' in self.config:
-            if 'io_firmware.bin' not in self.romfs:
-                self.error("Need io_firmware.bin in ROMFS for IOMCU")
-
-            f.write('#define HAL_WITH_IO_MCU 1\n')
-            f.write('#define HAL_UART_IOMCU_IDX %u\n' % len(serial_list))
-            f.write(
-                '#define HAL_UART_IO_DRIVER ChibiOS::UARTDriver uart_io(HAL_UART_IOMCU_IDX)\n'
-            )
-            serial_list.append(self.config['IOMCU_UART'][0])
-            f.write('#define HAL_HAVE_SERVO_VOLTAGE 1\n') # make the assumption that IO gurantees servo monitoring
-            # all IOMCU capable boards have SBUS out
-            f.write('#define AP_FEATURE_SBUS_OUT 1\n')
-        else:
-            f.write('#define HAL_WITH_IO_MCU 0\n')
-        f.write('\n')
-
         need_uart_driver = False
         OTG2_index = None
         devlist = []
