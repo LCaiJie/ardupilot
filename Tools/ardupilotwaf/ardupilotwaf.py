@@ -57,7 +57,6 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_IOMCU',
     'AP_RAMTRON',
     'AP_RCProtocol',
-    'AP_Radio',
     'AP_ROMFS',
     'AP_Proximity',
     'AP_RTC',

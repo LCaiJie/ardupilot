@@ -19,10 +19,6 @@
 #include "AP_HAL_ChibiOS.h"
 #include "Semaphores.h"
 
-#if HAL_RCINPUT_WITH_AP_RADIO
-#include <AP_Radio/AP_Radio.h>
-#endif
-
 #include <AP_RCProtocol/AP_RCProtocol.h>
 
 #if HAL_USE_ICU == TRUE
@@ -84,12 +80,6 @@ private:
     } last_source;
 
     bool pulse_input_enabled;
-
-#if HAL_RCINPUT_WITH_AP_RADIO
-    bool _radio_init;
-    AP_Radio *radio;
-    uint32_t last_radio_us;
-#endif
 
 #if HAL_USE_ICU == TRUE
     ChibiOS::SoftSigReader sig_reader;

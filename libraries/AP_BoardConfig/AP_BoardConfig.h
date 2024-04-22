@@ -6,9 +6,7 @@
 #include <AP_RTC/AP_RTC.h>
 #include <AC_PID/AC_PI.h>
 
-#if HAL_RCINPUT_WITH_AP_RADIO
-#include <AP_Radio/AP_Radio.h>
-#endif
+
 
 extern "C" typedef int (*main_fn_t)(int argc, char **);
 
@@ -292,10 +290,6 @@ private:
     } heater;
 #endif
 
-#if HAL_RCINPUT_WITH_AP_RADIO
-    // direct attached radio
-    AP_Radio _radio;
-#endif
 
 #if AP_RTC_ENABLED
     // real-time-clock; private because access is via the singleton

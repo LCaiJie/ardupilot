@@ -225,12 +225,6 @@ const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
     AP_GROUPINFO("IO_ENABLE", 10, AP_BoardConfig, state.io_enable, 1),
 #endif
 
-#if HAL_RCINPUT_WITH_AP_RADIO
-    // @Group: RADIO
-    // @Path: ../AP_Radio/AP_Radio.cpp
-    AP_SUBGROUPINFO(_radio, "RADIO", 11, AP_BoardConfig, AP_Radio),
-#endif
-
     // @Param: SAFETYOPTION
     // @DisplayName: Options for safety button behavior
     // @Description: This controls the activation of the safety button. It allows you to control if the safety button can be used for safety enable and/or disable, and whether the button is only active when disarmed

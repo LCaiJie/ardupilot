@@ -956,12 +956,6 @@ void ToyMode::handle_message(const mavlink_message_t &msg)
         // immediately update AP_Notify recording flag
         AP_Notify::flags.video_recording = true;
     } else if (strncmp(m.name, "WIFICHAN", 10) == 0) {
-#if HAL_RCINPUT_WITH_AP_RADIO
-        AP_Radio *radio = AP_Radio::get_singleton();
-        if (radio) {
-            radio->set_wifi_channel(m.value);
-        }
-#endif
     } else if (strncmp(m.name, "LOGDISARM", 10) == 0) {
         enum ap_var_type vtype;
         AP_Int8 *log_disarmed = (AP_Int8 *)AP_Param::find("LOG_DISARMED", &vtype);
