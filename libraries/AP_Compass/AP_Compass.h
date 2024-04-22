@@ -50,21 +50,14 @@
    maximum number of compass instances available on this platform. If more
    than 1 then redundant sensors may be available
  */
-#ifndef HAL_BUILD_AP_PERIPH
-#ifndef HAL_COMPASS_MAX_SENSORS
-#define HAL_COMPASS_MAX_SENSORS 3
-#endif
-#if HAL_COMPASS_MAX_SENSORS > 1
-#define COMPASS_MAX_UNREG_DEV 5
-#else
-#define COMPASS_MAX_UNREG_DEV 0
-#endif
-#else
 #ifndef HAL_COMPASS_MAX_SENSORS
 #define HAL_COMPASS_MAX_SENSORS 1
 #endif
+
+#ifndef COMPASS_MAX_UNREG_DEV
 #define COMPASS_MAX_UNREG_DEV 0
 #endif
+
 
 #define COMPASS_MAX_INSTANCES HAL_COMPASS_MAX_SENSORS
 #define COMPASS_MAX_BACKEND   HAL_COMPASS_MAX_SENSORS
