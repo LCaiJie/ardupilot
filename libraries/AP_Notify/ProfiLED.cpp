@@ -31,43 +31,6 @@
 
 extern const AP_HAL::HAL& hal;
 
-#if AP_NOTIFY_PROFILED_ENABLED
-
-ProfiLED::ProfiLED() :
-    SerialLED(ProfiLED_OFF, ProfiLED_HIGH, ProfiLED_MEDIUM, ProfiLED_LOW)
-{
-}
-
-uint16_t ProfiLED::init_ports()
-{
-    uint16_t mask = 0;
-    for (uint16_t i=0; i<AP_NOTIFY_ProfiLED_MAX_INSTANCES; i++) {
-        const SRV_Channel::Aux_servo_function_t fn = (SRV_Channel::Aux_servo_function_t)((uint8_t)SRV_Channel::k_ProfiLED_1 + i);
-        if (!SRV_Channels::function_assigned(fn)) {
-            continue;
-        }
-        mask |= SRV_Channels::get_output_channel_mask(fn);
-    }
-
-    if (mask == 0) {
-        return 0;
-    }
-
-    AP_SerialLED *led = AP_SerialLED::get_singleton();
-    if (led == nullptr) {
-        return 0;
-    }
-
-    for (uint16_t chan=0; chan<16; chan++) {
-        if ((1U<<chan) & mask) {
-            led->set_num_profiled(chan+1, (pNotify->get_led_len()));
-        }
-    }
-
-    return mask;
-}
-#endif  // AP_NOTIFY_PROFILED_ENABLED
-
 #if AP_NOTIFY_PROFILED_SPI_ENABLED
 ProfiLED_SPI::ProfiLED_SPI() :
     RGBLed(ProfiLED_OFF, ProfiLED_HIGH, ProfiLED_MEDIUM, ProfiLED_LOW) {}

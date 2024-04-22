@@ -40,7 +40,6 @@
 #include <AP_Relay/AP_Relay.h>                      // APM relay
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
-#include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
 #include <AP_Hott_Telem/AP_Hott_Telem.h>
 #include <AP_ESC_Telem/AP_ESC_Telem.h>
 #include <AP_GyroFFT/AP_GyroFFT.h>
@@ -235,10 +234,6 @@ protected:
 
 #if AP_RELAY_ENABLED
     AP_Relay relay;
-#endif
-
-#if AP_SERVORELAYEVENTS_ENABLED
-    AP_ServoRelayEvents ServoRelayEvents;
 #endif
 
     // notification object for LEDs, buzzers etc (parameter set to

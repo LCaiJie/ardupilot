@@ -29,7 +29,6 @@ define STM32_TIM_TIM3_UP_DMA_CHAN 1
 define NO_FASTBOOT
 define HAL_WITH_DSP FALSE
 define HAL_DSHOT_ENABLED TRUE
-define HAL_SERIALLED_ENABLED FALSE
 
 # Tickless mode is required in order for the virtual timers used by dshot to work correctly
 STM32_ST_USE_TIMER 15

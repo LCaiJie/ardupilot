@@ -42,7 +42,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_BattMonitor/AP_BattMonitor.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 #include <AP_Logger/AP_Logger.h>
-#include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Arming/AP_Arming.h>
 #include <AP_Avoidance/AP_Avoidance.h>
@@ -935,16 +934,6 @@ void RC_Channel::do_aux_function_clear_wp(const AuxSwitchPos ch_flag)
     }
 }
 
-#if AP_SERVORELAYEVENTS_ENABLED && AP_RELAY_ENABLED
-void RC_Channel::do_aux_function_relay(const uint8_t relay, bool val)
-{
-    AP_ServoRelayEvents *servorelayevents = AP::servorelayevents();
-    if (servorelayevents == nullptr) {
-        return;
-    }
-    servorelayevents->do_set_relay(relay, val);
-}
-#endif
 
 #if HAL_GENERATOR_ENABLED
 void RC_Channel::do_aux_function_generator(const AuxSwitchPos ch_flag)
@@ -1110,27 +1099,6 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     case AUX_FUNC::AVOID_PROXIMITY:
         do_aux_function_avoid_proximity(ch_flag);
         break;
-
-#if AP_SERVORELAYEVENTS_ENABLED && AP_RELAY_ENABLED
-    case AUX_FUNC::RELAY:
-        do_aux_function_relay(0, ch_flag == AuxSwitchPos::HIGH);
-        break;
-    case AUX_FUNC::RELAY2:
-        do_aux_function_relay(1, ch_flag == AuxSwitchPos::HIGH);
-        break;
-    case AUX_FUNC::RELAY3:
-        do_aux_function_relay(2, ch_flag == AuxSwitchPos::HIGH);
-        break;
-    case AUX_FUNC::RELAY4:
-        do_aux_function_relay(3, ch_flag == AuxSwitchPos::HIGH);
-        break;
-    case AUX_FUNC::RELAY5:
-        do_aux_function_relay(4, ch_flag == AuxSwitchPos::HIGH);
-        break;
-    case AUX_FUNC::RELAY6:
-        do_aux_function_relay(5, ch_flag == AuxSwitchPos::HIGH);
-        break;
-#endif  // AP_SERVORELAYEVENTS_ENABLED && AP_RELAY_ENABLED
 
     case AUX_FUNC::RUNCAM_CONTROL:
         do_aux_function_runcam_control(ch_flag);

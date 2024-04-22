@@ -255,24 +255,6 @@ public:
 #endif
 
     /*
-      setup serial LED output for a given channel number, with
-      the given max number of LEDs in the chain.
-     */
-#if HAL_SERIALLED_ENABLED
-    bool set_serial_led_num_LEDs(const uint16_t chan, uint8_t num_leds, output_mode mode = MODE_PWM_NONE, uint32_t clock_mask = 0) override;
-
-    /*
-      setup serial LED output data for a given output channel
-      and LEDs number. LED -1 is all LEDs
-     */
-    bool set_serial_led_rgb_data(const uint16_t chan, int8_t led, uint8_t red, uint8_t green, uint8_t blue) override;
-
-    /*
-      trigger send of serial LED data
-     */
-    bool serial_led_send(const uint16_t chan) override;
-#endif
-    /*
       rcout thread
      */
     void rcout_thread();
@@ -359,18 +341,6 @@ private:
         uint64_t dshot_pulse_time_us;
         uint64_t dshot_pulse_send_time_us;
         virtual_timer_t dma_timeout;
-#if HAL_SERIALLED_ENABLED
-        // serial LED support
-        volatile uint8_t serial_nleds;
-        uint8_t clock_mask;
-        enum output_mode led_mode;
-        volatile bool serial_led_pending;
-        volatile bool prepared_send;
-        HAL_Semaphore serial_led_mutex;
-        // structure to hold serial LED data until it can be transferred
-        // to the DMA buffer
-        SerialLed* serial_led_data[4];
-#endif
 
         eventmask_t dshot_event_mask;
         thread_t* dshot_waiter;
@@ -448,18 +418,6 @@ private:
      */
     thread_t *rcout_thread_ctx;
 
-#if HAL_SERIALLED_ENABLED
-    /*
-      timer thread for use by led events
-     */
-    thread_t *led_thread_ctx;
-
-    /*
-      mutex to control LED thread creation
-     */
-    HAL_Semaphore led_thread_sem;
-    bool led_thread_created;
-#endif
 
 #if HAL_SERIAL_ESC_COMM_ENABLED
     /*

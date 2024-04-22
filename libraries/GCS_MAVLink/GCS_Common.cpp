@@ -4662,14 +4662,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
     case MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN:
         return handle_preflight_reboot(packet, msg);
 
-#if AP_MAVLINK_SERVO_RELAY_ENABLED
-    case MAV_CMD_DO_SET_SERVO:
-    case MAV_CMD_DO_REPEAT_SERVO:
-    case MAV_CMD_DO_SET_RELAY:
-    case MAV_CMD_DO_REPEAT_RELAY:
-        return handle_servorelay_message(packet);
-#endif
-
 #if AP_MAVLINK_MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES_ENABLED
     case MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES:
         return handle_command_request_autopilot_capabilities(packet);

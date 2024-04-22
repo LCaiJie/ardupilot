@@ -7,7 +7,6 @@
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_Parachute/AP_Parachute.h>
-#include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
 #include <RC_Channel/RC_Channel.h>
 
 #if AP_RC_CHANNEL_ENABLED
@@ -60,45 +59,6 @@ bool AP_Mission::start_command_do_gripper(const AP_Mission::Mission_Command& cmd
     }
 }
 #endif  // AP_GRIPPER_ENABLED
-
-#if AP_SERVORELAYEVENTS_ENABLED
-bool AP_Mission::start_command_do_servorelayevents(const AP_Mission::Mission_Command& cmd)
-{
-    AP_ServoRelayEvents *sre = AP::servorelayevents();
-    if (sre == nullptr) {
-        return false;
-    }
-
-    switch (cmd.id) {
-    case MAV_CMD_DO_SET_SERVO:
-        return sre->do_set_servo(cmd.content.servo.channel, cmd.content.servo.pwm);
-
-#if AP_RELAY_ENABLED
-    case MAV_CMD_DO_SET_RELAY:
-        return sre->do_set_relay(cmd.content.relay.num, cmd.content.relay.state);
-#endif
-
-    case MAV_CMD_DO_REPEAT_SERVO:
-        return sre->do_repeat_servo(cmd.content.repeat_servo.channel,
-                                    cmd.content.repeat_servo.pwm,
-                                    cmd.content.repeat_servo.repeat_count,
-                                    cmd.content.repeat_servo.cycle_time * 1000.0f);
-
-#if AP_RELAY_ENABLED
-    case MAV_CMD_DO_REPEAT_RELAY:
-        return sre->do_repeat_relay(cmd.content.repeat_relay.num,
-                                    cmd.content.repeat_relay.repeat_count,
-                                    cmd.content.repeat_relay.cycle_time * 1000.0f);
-#endif
-
-    default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        AP_HAL::panic("Unhandled servo/relay case");
-#endif
-        return false;
-    }
-}
-#endif  // AP_SERVORELAYEVENTS_ENABLED
 
 bool AP_Mission::start_command_parachute(const AP_Mission::Mission_Command& cmd)
 {

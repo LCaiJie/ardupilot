@@ -135,7 +135,6 @@ class ExtractFeatures(object):
             ('AP_GRIPPER_ENABLED', r'AP_Gripper::init\b',),
             ('AP_LANDINGGEAR_ENABLED', r'AP_LandingGear::init\b',),
             ('AP_RELAY_ENABLED', 'AP_Relay::init',),
-            ('AP_SERVORELAYEVENTS_ENABLED', 'AP_ServoRelayEvents::update_events',),
 
             ('AP_RCPROTOCOL_ENABLED', r'AP_RCProtocol::init\b',),
             ('AP_RCPROTOCOL_{type}_ENABLED', r'AP_RCProtocol_(?P<type>.*)::_process_byte\b',),
@@ -164,9 +163,7 @@ class ExtractFeatures(object):
             ('AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED', r'AP_Notify::handle_play_tune'),
             ('AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED', r'AP_Notify::handle_led_control'),
             ('AP_NOTIFY_NCP5623_ENABLED', r'NCP5623::write'),
-            ('AP_NOTIFY_PROFILED_ENABLED', r'ProfiLED::init_ports'),
             ('AP_NOTIFY_PROFILED_SPI_ENABLED', r'ProfiLED_SPI::rgb_set_id'),
-            ('AP_NOTIFY_NEOPIXEL_ENABLED', r'NeoPixel::init_ports'),
             ('AP_FILESYSTEM_FORMAT_ENABLED', r'AP_Filesystem::format'),
 
             ('AP_FILESYSTEM_{type}_ENABLED', r'AP_Filesystem_(?P<type>.*)::open'),
@@ -182,7 +179,6 @@ class ExtractFeatures(object):
             ('AP_MAVLINK_MSG_RELAY_STATUS_ENABLED', 'GCS_MAVLINK::send_relay_status'),
             ('AP_MAVLINK_BATTERY2_ENABLED', 'GCS_MAVLINK::send_battery2'),
             ('AP_MAVLINK_MSG_DEVICE_OP_ENABLED', 'GCS_MAVLINK::handle_device_op_write'),
-            ('AP_MAVLINK_SERVO_RELAY_ENABLED', 'GCS_MAVLINK::handle_servorelay_message'),
             ('AP_MAVLINK_MSG_SERIAL_CONTROL_ENABLED', 'GCS_MAVLINK::handle_serial_control'),
             ('AP_MAVLINK_MSG_MISSION_REQUEST_ENABLED', 'GCS_MAVLINK::handle_mission_request\b'),
             ('COMPASS_CAL_ENABLED', 'CompassCalibrator::stop'),

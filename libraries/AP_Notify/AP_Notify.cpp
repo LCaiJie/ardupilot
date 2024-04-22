@@ -23,7 +23,6 @@
 #include "IS31FL3195.h"
 #include "PCA9685LED_I2C.h"
 #include "NavigatorLED.h"
-#include "NeoPixel.h"
 #include "NCP5623.h"
 #include "OreoLED_I2C.h"
 #include "RCOutputRGBLed.h"
@@ -331,17 +330,6 @@ void AP_Notify::add_backends(void)
 #if AP_NOTIFY_PCA9685_ENABLED
             case Notify_LED_PCA9685LED_I2C_External:
                 ADD_BACKEND(new PCA9685LED_I2C());
-                break;
-#endif
-#if AP_NOTIFY_NEOPIXEL_ENABLED
-            case Notify_LED_NeoPixel:
-            case Notify_LED_NeoPixelRGB:
-                ADD_BACKEND(new NeoPixel());
-                break;
-#endif
-#if AP_NOTIFY_PROFILED_ENABLED
-            case Notify_LED_ProfiLED:
-                ADD_BACKEND(new ProfiLED());
                 break;
 #endif
 #if AP_NOTIFY_PROFILED_SPI_ENABLED
