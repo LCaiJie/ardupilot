@@ -81,7 +81,7 @@ struct sitl_fdm {
 
     #define SITL_NUM_RANGEFINDERS 10
     float rangefinder_m[SITL_NUM_RANGEFINDERS];
-    float airspeed_raw_pressure[AIRSPEED_MAX_SENSORS];
+    float airspeed_raw_pressure[2];
 
     struct {
         float speed;
@@ -118,9 +118,6 @@ public:
 #endif // SFML_JOYSTICK
         for (uint8_t i=0; i<BARO_MAX_INSTANCES; i++) {
             AP_Param::setup_object_defaults(&baro[i], baro[i].var_info);
-        }
-        for (uint8_t i=0; i<AIRSPEED_MAX_SENSORS; i++) {
-            AP_Param::setup_object_defaults(&airspeed[i], airspeed[i].var_info);
         }
         // set compass offset
         for (uint8_t i = 0; i < HAL_COMPASS_MAX_SENSORS; i++) {
@@ -272,19 +269,6 @@ public:
     };
     BaroParm baro[BARO_MAX_INSTANCES];
 
-    // airspeed parameters
-    class AirspeedParm {
-    public:
-        static const struct AP_Param::GroupInfo var_info[];
-        AP_Float noise;  // pressure noise
-        AP_Float fail;   // airspeed value in m/s to fail to
-        AP_Float fail_pressure; // pitot tube failure pressure in Pa
-        AP_Float fail_pitot_pressure; // pitot tube failure pressure in Pa
-        AP_Float offset; // airspeed sensor offset in m/s
-        AP_Float ratio; // airspeed ratios
-        AP_Int8  signflip;
-    };
-    AirspeedParm airspeed[AIRSPEED_MAX_SENSORS];
     
     // EFI type
     enum EFIType {

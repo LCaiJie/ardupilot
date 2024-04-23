@@ -24,7 +24,6 @@
 #include "SITL_State.h"
 #include "Util.h"
 #include "DSP.h"
-#include "CANSocketIface.h"
 #include "SPIDevice.h"
 
 #include <AP_BoardConfig/AP_BoardConfig.h>

@@ -45,7 +45,6 @@
 #include "UARTDriver.h"
 #include "Util.h"
 #include "Util_RPI.h"
-#include "CANSocketIface.h"
 
 using namespace Linux;
 

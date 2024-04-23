@@ -7,7 +7,6 @@
 #include "HAL_SITL_Class.h"
 #include "UARTDriver.h"
 #include "Scheduler.h"
-#include "CANSocketIface.h"
 
 #include <stdio.h>
 #include <signal.h>

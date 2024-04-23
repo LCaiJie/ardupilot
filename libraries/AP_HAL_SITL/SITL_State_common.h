@@ -91,7 +91,7 @@ public:
 
     // simulated airspeed, sonar and battery monitor
     float sonar_pin_voltage;    // pin 0
-    float airspeed_pin_voltage[AIRSPEED_MAX_SENSORS]; // pin 1
+    float airspeed_pin_voltage[2]; // pin 1
     float voltage_pin_voltage;  // pin 13
     float current_pin_voltage;  // pin 12
     float voltage2_pin_voltage;  // pin 15

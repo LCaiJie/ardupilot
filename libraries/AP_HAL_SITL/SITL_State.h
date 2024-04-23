@@ -67,7 +67,6 @@ private:
     void _update_rangefinder();
     void _set_signal_handlers(void) const;
 
-    void _update_airspeed(float airspeed);
     void _check_rc_input(void);
     bool _read_rc_sitl_input();
     void _fdm_input_local(void);

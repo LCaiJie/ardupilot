@@ -7,7 +7,6 @@
 #include "HAL_SITL_Class.h"
 #include "UARTDriver.h"
 #include "Scheduler.h"
-#include "CANSocketIface.h"
 
 #include <stdio.h>
 #include <signal.h>
@@ -79,7 +78,6 @@ void SITL_State::_sitl_setup()
 
     if (_sitl != nullptr) {
         // setup some initial values
-        _update_airspeed(0);
         if (enable_gimbal) {
             gimbal = new SITL::Gimbal(_sitl->state);
         }
@@ -168,7 +166,6 @@ void SITL_State::_fdm_input_step(void)
     }
 
     if (_sitl != nullptr) {
-        _update_airspeed(_sitl->state.airspeed);
         _update_rangefinder();
     }
 
